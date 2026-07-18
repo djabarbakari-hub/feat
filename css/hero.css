@@ -6,34 +6,6 @@
   animation: fadeIn 0.8s ease-out;
 }
 
-/* Effet d'Aurore Animée (Mesh Gradient) premium */
-.hero::before {
-  content: '';
-  position: absolute;
-  inset: -50%;
-  background: 
-    radial-gradient(circle at 20% 30%, rgba(78, 154, 122, 0.28) 0%, transparent 45%),
-    radial-gradient(circle at 80% 70%, rgba(212, 175, 55, 0.18) 0%, transparent 45%),
-    radial-gradient(circle at 50% 50%, rgba(15, 26, 20, 1) 0%, transparent 100%);
-  background-size: 200% 200%;
-  animation: auroraFlow 25s ease-in-out infinite alternate;
-  pointer-events: none;
-  z-index: 0;
-  filter: blur(40px);
-}
-
-@keyframes auroraFlow {
-  0% {
-    transform: translate(0, 0) rotate(0deg);
-  }
-  50% {
-    transform: translate(5%, 10%) rotate(180deg);
-  }
-  100% {
-    transform: translate(-5%, -5%) rotate(360deg);
-  }
-}
-
 .hero-inner {
   padding: 64px 0 96px;
   max-width: 1152px;
@@ -70,7 +42,7 @@
   line-height: 1.1;
   color: var(--text-primary);
   margin: 0;
-  font-family: 'Bodoni Moda', serif;
+  font-family: 'Archivo Black', 'Archivo', sans-serif;
   font-weight: 900;
 }
 

@@ -32,7 +32,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Bodoni Moda', serif;
+  font-family: 'Archivo Black', 'Archivo', sans-serif;
   font-weight: 900;
   font-size: 14px;
 }
@@ -40,7 +40,7 @@
 .logo-text {
   font-size: 1.25rem;
   color: var(--text-primary);
-  font-family: 'Bodoni Moda', serif;
+  font-family: 'Archivo Black', 'Archivo', sans-serif;
   font-weight: 700;
 }
 
