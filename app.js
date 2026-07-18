@@ -34,21 +34,56 @@ const TRACKS = [
 ];
 
 const QUIZ_STEPS = [
+  {
+    q: "Bienvenue chez MonProgrammeFit",
+    key: "welcome",
+    type: "text",
+    placeholder: "Ton prénom (optionnel)",
+    button: "Commencer mon onboarding"
+  },
+  {
+    q: "Quel est ton objectif principal ?",
+    key: "objectif",
+    options: [
+      { v: "perte-poids", l: "Perte de poids", icon: "weight" },
+      { v: "prise-muscle", l: "Prise de muscle", icon: "dumbbell" },
+      { v: "endurance", l: "Endurance", icon: "activity" },
+      { v: "sante", l: "Santé générale", icon: "heart" },
+    ]
+  },
   { q: "Où comptes-tu t'entraîner le plus souvent ?", key: "lieu", options: [
-    { v: "gym", l: "En salle de sport" },
-    { v: "home-equip", l: "Chez moi, avec un peu de matériel" },
-    { v: "bodyweight", l: "Chez moi, sans matériel" },
+    { v: "gym", l: "En salle de sport", icon: "dumbbell" },
+    { v: "home-equip", l: "Chez moi, avec un peu de matériel", icon: "home" },
+    { v: "bodyweight", l: "Chez moi, sans matériel", icon: "footprints" },
   ]},
   { q: "Ton niveau actuel en activité physique ?", key: "niveau", options: [
-    { v: "debutant", l: "Débutant complet" },
-    { v: "occasionnel", l: "Je bouge de temps en temps" },
-    { v: "reguliers", l: "Je suis déjà assez actif·ve" },
+    { v: "debutant", l: "Débutant complet", icon: "user" },
+    { v: "occasionnel", l: "Je bouge de temps en temps", icon: "calendar" },
+    { v: "reguliers", l: "Je suis déjà assez actif·ve", icon: "zap" },
   ]},
   { q: "Combien de séances par semaine vises-tu ?", key: "frequence", options: [
-    { v: "2", l: "2 séances" },
-    { v: "3-4", l: "3 à 4 séances" },
-    { v: "5+", l: "5 séances ou plus" },
+    { v: "2", l: "2 séances", icon: "2-circle" },
+    { v: "3-4", l: "3 à 4 séances", icon: "3-circle" },
+    { v: "5+", l: "5 séances ou plus", icon: "plus-circle" },
   ]},
+  {
+    q: "Pour aller plus loin (optionnel)",
+    key: "physique",
+    type: "optional",
+    fields: [
+      { key: "poids", label: "Poids (kg)", type: "number", step: "0.1", placeholder: "Ex: 72.5" },
+      { key: "taille", label: "Taille (cm)", type: "number", placeholder: "Ex: 175" },
+      { key: "age", label: "Âge", type: "number", placeholder: "Ex: 30" },
+    ],
+    button: "Passer",
+    buttonNext: "Suivant"
+  },
+  {
+    q: "Voici ton programme personnalisé",
+    key: "resume",
+    type: "resume",
+    button: "Confirmer et commencer"
+  }
 ];
 
 const CLIENT_PROGRAM = {
@@ -129,7 +164,9 @@ const trackById = (id) => TRACKS.find((t) => t.id === id) || TRACKS[2];
  * @returns {boolean} True si toutes les réponses du quiz sont remplies.
  */
 function isQuizComplete() {
-  return QUIZ_STEPS.every((step) => !!state.quizAnswers[step.key]);
+  // Les étapes obligatoires sont toutes sauf "physique" (optionnelle)
+  const requiredSteps = QUIZ_STEPS.filter(step => step.key !== "physique");
+  return requiredSteps.every((step) => !!state.quizAnswers[step.key]);
 }
 
 function persistState() {
@@ -236,6 +273,12 @@ function navigate(page, { replace = false } = {}) {
   updateBrowserHistory(page, { replace });
   render();
   window.scrollTo({ top: 0, behavior: "smooth" });
+
+  // Réinitialiser le quiz si on retourne à l'accueil
+  if (page === "home") {
+    state.quizStep = 0;
+    state.quizAnswers = {};
+  }
 }
 
 function goBack() {
@@ -693,82 +736,179 @@ function renderNotFound() {
  */
 function renderQuiz() {
   // Animation pour la progression du quiz
-  const progressAnimation = `
+  const quizAnimation = `
     <style>
-      .progress-fill {
-        transition: width 0.4s ease-out;
+      .quiz-progress {
+        height: 0.25rem;
+        background: var(--line);
+        border-radius: 0.125rem;
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+      }
+      .quiz-progress-bar {
+        height: 100%;
+        background: var(--accent-primary);
+        width: 0%;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
       .quiz-option {
         transition: var(--transition);
       }
       .quiz-option:hover {
-        transform: translateX(4px);
-        border-color: var(--accent-primary);
+        transform: translateY(-0.125rem);
+        box-shadow: var(--shadow);
       }
       .quiz-option:focus-visible {
-        outline: 2px solid var(--accent-primary);
-        outline-offset: 2px;
+        outline: 0.125rem solid var(--focus-outline);
+        outline-offset: 0.125rem;
       }
       .quiz-options {
         display: grid;
-        gap: 14px;
-        max-width: 520px;
+        gap: 0.75rem;
+        max-width: 420px;
       }
       .quiz-option {
-        background: var(--surface);
+        text-align: left;
         border: 1px solid var(--line);
-        border-radius: 2px;
-        padding: 18px 20px;
+        border-radius: 0.125rem;
+        padding: 1rem 1.25rem;
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        color: var(--text-primary);
+        justify-content: space-between;
+        font-size: 0.875rem;
+        color: var(--color-ink);
+      }
+      .quiz-optional-fields {
+        display: grid;
+        gap: 1rem;
+        max-width: 420px;
+      }
+      .quiz-optional-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+      .quiz-buttons {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+      }
+      .quiz-resume {
+        display: grid;
+        gap: 0.75rem;
+        max-width: 420px;
+        text-align: left;
+      }
+      .quiz-resume-item {
+        padding: 0.75rem;
+        background: var(--surface);
+        border-radius: 0.125rem;
+        border-left: 0.1875rem solid var(--accent-primary);
       }
     </style>
   `;
-  
+
   if (state.quizStep >= QUIZ_STEPS.length) {
     const result = trackById(state.quizAnswers.lieu);
     const actionButton = state.role === 'client'
-      ? `<button class="btn btn-ember" style="margin-top:24px" data-nav="client-dashboard" aria-label="Voir mon tableau de bord">Voir mon tableau de bord ${icon("arrow-right", 16)}</button>`
-      : `<button class="btn btn-ember" style="margin-top:24px" data-nav="signup" aria-label="Créer mon compte et démarrer">Créer mon compte et démarrer ${icon("arrow-right", 16)}</button>`;
-    
+      ? `<button class="btn btn-ember" style="margin-top:1.5rem" data-nav="client-dashboard" aria-label="Voir mon tableau de bord">Voir mon tableau de bord ${icon("arrow-right", 1)}"</button>`
+      : `<button class="btn btn-ember" style="margin-top:1.5rem" data-nav="signup" aria-label="Créer mon compte et démarrer">Créer mon compte et démarrer ${icon("arrow-right", 1)}"</button>`;
+
     return `
-    ${progressAnimation}
+    ${quizAnimation}
     <div class="section wrap">
       <p class="eyebrow-moss font-mono">RÉSULTAT</p>
       <h1 class="h2 font-display">Ton point de départ : ${result.label}</h1>
-      <div class="card" style="max-width:560px;padding:32px; animation: fadeIn 0.6s ease-out;">
-        ${icon(result.icon, 28, "var(--accent-primary)")}
-        <p style="font-size:1rem;color:var(--text-secondary);margin-top:16px; line-height: 1.7;">${result.desc}</p>
-        <div class="font-mono" style="font-size:0.875rem;color:var(--accent-secondary);margin-top:16px">${result.dist}</div>
+      <div class="card" style="max-width:560px;padding:2rem; animation: fadeIn 0.6s ease-out;">
+        ${icon(result.icon, 1.75, "var(--accent-primary)")}
+        <p style="font-size:1rem;color:var(--text-secondary);margin-top:1rem; line-height: 1.7;">${result.desc}</p>
+        <div class="font-mono" style="font-size:0.875rem;color:var(--accent-secondary);margin-top:1rem">${result.dist}</div>
         ${actionButton}
       </div>
     </div>`;
   }
-  
+
   const s = QUIZ_STEPS[state.quizStep];
-  const pct = Math.round((state.quizStep / QUIZ_STEPS.length) * 100);
-  const optionsHtml = s.options.map((opt) => `
-      <button type="button" class="quiz-option" data-quiz-answer="${s.key}:${opt.v}" aria-label="${opt.l}">
-        <span>${opt.l}</span>
-        ${icon("arrow-right", 16, "var(--ink)")}
-      </button>
-    `).join("");
-  
+  const pct = Math.round((state.quizStep / (QUIZ_STEPS.length - 1)) * 100); // Exclut l'étape "resume"
+
+  let content;
+  if (s.type === "text") {
+    content = `
+      <input
+        type="text"
+        class="text-input"
+        data-quiz-answer="${s.key}"
+        placeholder="${s.placeholder}"
+        value="${state.quizAnswers[s.key] || ""}"
+        style="width: 100%; max-width: 420px; margin-top: 1.75rem;"
+      />
+    `;
+  } else if (s.type === "optional") {
+    content = `
+      <div class="quiz-optional-fields">
+        ${s.fields.map(field => `
+          <div class="quiz-optional-field">
+            <label for="${field.key}">${field.label}</label>
+            <input
+              type="${field.type}"
+              id="${field.key}"
+              step="${field.step || "1"}"
+              class="text-input"
+              data-quiz-answer="${s.key}:${field.key}"
+              placeholder="${field.placeholder}"
+              value="${state.quizAnswers[s.key]?.[field.key] || ""}"
+            />
+          </div>
+        `).join("")}
+      </div>
+      <div class="quiz-buttons">
+        ${state.quizStep > 0 ? `<button type="button" class="btn btn-outline-dark" data-quiz-back>Retour</button>` : ``}
+        <button type="button" class="btn btn-outline-dark" data-quiz-skip="${s.key}">Passer</button>
+        <button type="button" class="btn btn-ember" data-quiz-next>Suivant</button>
+      </div>
+      <script>console.log("Quiz buttons rendered for step:", ${state.quizStep});</script>
+    `;
+  } else if (s.type === "resume") {
+    const result = trackById(state.quizAnswers.lieu);
+    content = `
+      <div class="quiz-resume">
+        <div class="quiz-resume-item">Objectif : <strong>${state.quizAnswers.objectif}</strong></div>
+        <div class="quiz-resume-item">Lieu : <strong>${result.label}</strong></div>
+        <div class="quiz-resume-item">Niveau : <strong>${state.quizAnswers.niveau}</strong></div>
+        <div class="quiz-resume-item">Fréquence : <strong>${state.quizAnswers.frequence}</strong></div>
+        ${state.quizAnswers.physique?.poids ? `<div class="quiz-resume-item">Poids : <strong>${state.quizAnswers.physique.poids} kg</strong></div>` : ""}
+        ${state.quizAnswers.physique?.taille ? `<div class="quiz-resume-item">Taille : <strong>${state.quizAnswers.physique.taille} cm</strong></div>` : ""}
+        ${state.quizAnswers.physique?.age ? `<div class="quiz-resume-item">Âge : <strong>${state.quizAnswers.physique.age} ans</strong></div>` : ""}
+      </div>
+      <button type="button" class="btn btn-ember" data-quiz-confirm style="margin-top: 1.5rem;">Confirmer et commencer</button>
+    `;
+  } else {
+    content = `
+      <div class="quiz-options" style="margin-top:1.75rem">
+        ${s.options.map(opt => `
+          <button type="button" class="quiz-option" data-quiz-answer="${s.key}:${opt.v}" aria-label="${opt.l}">
+            ${opt.icon ? icon(opt.icon, 1) : ""}
+            <span>${opt.l}</span>
+            <span>${icon("arrow-right", 1)}</span>
+          </button>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  console.log("Rendering quiz step:", state.quizStep); // Debug
   return `
-  ${progressAnimation}
+  ${quizAnimation}
   <div class="section wrap">
-    <div class="font-mono" style="font-size:0.875rem;color:var(--ink-muted3);margin-bottom:12px">ÉTAPE ${state.quizStep + 1} / ${QUIZ_STEPS.length}</div>
-    <div class="progress-track">
-      <div class="progress-fill" style="width:${pct}%" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"></div>
+    <div class="quiz-progress">
+      <div class="quiz-progress-bar" style="width: ${pct}%" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"></div>
     </div>
+    <div class="font-mono" style="font-size:0.875rem;color:var(--ink-muted3);margin-bottom:0.75rem">ÉTAPE ${state.quizStep + 1} / ${QUIZ_STEPS.length - 1}</div>
     <h1 class="h2 font-display" style="max-width:560px">${s.q}</h1>
-    <p class="hero-sub" style="max-width:620px; margin-top:12px;">Réponds simplement et découvre le programme MonProgrammeFit le plus adapté à ton cadre d'entraînement.</p>
-    <div class="quiz-options" style="margin-top:28px;">
-      ${optionsHtml}
-    </div>
-  </div>`;
+    <p class="hero-sub" style="max-width:620px; margin-top:0.75rem;">Réponds simplement et découvre le programme MonProgrammeFit le plus adapté à ton cadre d'entraînement.</p>
+    <div>${content}</div>
+  </div>
+</div>`;
 }
 
 function renderLogin() {
@@ -1179,8 +1319,36 @@ document.addEventListener("click", (e) => {
   const sessionActionBtn = e.target.closest("[data-session-action]");
   const adminActionBtn = e.target.closest("[data-admin-action]");
   const navBtn = e.target.closest("[data-nav]");
+  if (navBtn) {
+    console.log("Navigation vers:", navBtn.dataset.nav); // Debug
+    e.preventDefault();
+    navigate(navBtn.dataset.nav);
+    return;
+  }
   const roleNavBtn = e.target.closest("[data-role-nav]");
+  const quizBackBtn = e.target.closest("[data-quiz-back]");
+  if (quizBackBtn && state.quizStep > 0) {
+    state.quizStep--;
+    persistState();
+    render();
+    return;
+  }
   const quizBtn = e.target.closest("[data-quiz-answer]");
+  if (quizBtn) {
+    console.log("Quiz button clicked:", quizBtn.dataset.quizAnswer); // Debug
+    const [key, val] = quizBtn.dataset.quizAnswer.split(":");
+    if (key === "physique") {
+      const [physKey, physVal] = val.split(":");
+      if (!state.quizAnswers.physique) state.quizAnswers.physique = {};
+      state.quizAnswers.physique[physKey] = physVal;
+    } else {
+      state.quizAnswers[key] = val;
+    }
+    state.quizStep++;
+    persistState();
+    render();
+    return;
+  }
   const loginTabBtn = e.target.closest("[data-login-tab]");
   const signupSubmitBtn = e.target.closest("[data-signup-submit]");
   const loginSubmitBtn = e.target.closest("[data-login-submit]");
