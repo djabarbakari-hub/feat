@@ -1,0 +1,44 @@
+/* ---------- DASHBOARDS ---------- */
+.stat-card { border: 1px solid var(--line); border-radius: 2px; padding: 20px; display: flex; align-items: center; gap: 16px; }
+.stat-val { font-size: 18px; color: var(--ink); }
+.stat-label { font-size: 12px; color: var(--slate); }
+.bignum { font-size: 30px; color: var(--ink); margin-top: 12px; }
+
+.progress-bar-bg { width: 100%; height: 8px; background: var(--line); border-radius: 100px; margin-top: 12px; }
+.progress-bar-fill { height: 8px; border-radius: 100px; background: var(--moss); }
+.session-row { border: 1px solid var(--line); border-radius: 2px; padding: 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.session-left { display: flex; align-items: center; gap: 16px; }
+.session-icon { width: 36px; height: 36px; border-radius: 100px; display: flex; align-items: center; justify-content: center; }
+
+.badge { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 2px; }
+.table-row { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--chalk-soft); }
+.table-row:last-child { border-bottom: none; }
+.search-box { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 2px; padding: 8px 12px; }
+.search-box input { border: none; outline: none; font-size: 14px; }
+
+/* Switcher removed */
+
+.hidden { display: none !important; }
+
+/* Trial program block styling */
+.trial-program { border: 1px solid var(--line); border-radius: 4px; padding: 12px; background: var(--surface); }
+.trial-program .font-mono { color: var(--ink-muted3); }
+.trial-program ul { margin: 8px 0 0 18px; padding: 0; }
+.trial-program li { margin-bottom: 8px; color: var(--slate); font-size: 14px; }
+
+/* Signup form grid tweaks */
+.form-grid { display: grid; gap: 12px; grid-template-columns: repeat(2, 1fr); }
+.form-grid [data-signup-submit] { grid-column: 1 / -1; }
+
+/* Back button (bottom-right) visible on every screen */
+/* back button removed */
+
+/* Footer layout */
+footer.footer { background: var(--bg-dark); border-top: 1px solid rgba(255,255,255,0.08); width: 100%; }
+footer.footer .wrap { padding: 24px 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+
+@media (min-width: 768px) {
+  footer.footer .wrap {
+    padding: 40px 20px;
+  }
+}

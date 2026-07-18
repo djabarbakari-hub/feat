@@ -1,0 +1,124 @@
+/* ==========================================================
+   tokens.css — Palette & typographie D'ORIGINE (celles du zip
+   envoyé par ton ami). Restaurées après un intermède "palette
+   premium sombre" (Émeraude & Or Massif) qui avait été appliqué
+   par une session précédente sans cohérence avec le reste du code.
+
+   ⚠️ Les variables --accent-primary / --bg-dark / --text-primary /
+   --text-secondary / --transition / --shadow / --surface / --focus-outline
+   sont ALIASÉES ci-dessous vers la palette d'origine plutôt que
+   supprimées : elles sont encore utilisées dans quelques templates
+   (js/pages/quiz.js notamment). Les supprimer sans les aliaser aurait
+   cassé ces écrans-là (variables CSS non définies = style ignoré).
+   ========================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+:root {
+  /* --- Palette d'origine (abdou.zip) --- */
+  --ink: #16232C;
+  --ink-line: #2A3A45;
+  --ink-line2: #3A4A55;
+  --ink-muted: #8A9199;
+  --ink-muted2: #B9C0C5;
+  --ink-muted3: #7C8790;
+  --chalk: #F7F5F0;
+  --chalk-soft: #F1EFE9;
+  --moss: #3C5A46;
+  --moss-soft: #E9F0EB;
+  --ember: #E2622D;
+  --ember-soft: #FBEBE4;
+  --slate: #6B7280;
+  --line: #E4E0D6;
+
+  /* --- Alias de compatibilité vers les anciens noms "premium" ---
+     Pour que le code qui utilise encore var(--accent-primary) etc.
+     (quelques écrans du quiz) retombe sur la palette d'origine
+     au lieu d'un style non défini. */
+  --bg-dark: var(--chalk);
+  --text-primary: var(--ink);
+  --text-secondary: var(--slate);
+  --accent-primary: var(--ember);
+  --accent-secondary: var(--moss);
+  --surface: var(--chalk-soft);
+  --focus-outline: var(--ember);
+  --shadow: 0 4px 12px rgba(22, 35, 44, 0.12);
+  --transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+  --color-ink: var(--ink);
+  --color-chalk: var(--chalk);
+  --color-moss: var(--moss);
+  --color-ember: var(--ember);
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--chalk);
+  font-family: 'Archivo', sans-serif;
+  color: var(--ink);
+  padding-bottom: 56px;
+}
+
+img { max-width: 100%; display: block; }
+button {
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+  background: none;
+  transition: var(--transition);
+}
+input { font-family: inherit; }
+a { text-decoration: none; }
+
+.skip-link {
+  position: absolute;
+  top: -999px;
+  left: 16px;
+  background: var(--ember);
+  color: var(--ink);
+  padding: 10px 16px;
+  border-radius: 2px;
+  z-index: 999;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+.skip-link:focus-visible { top: 16px; }
+
+.font-display { font-family: 'Archivo Black', 'Archivo', sans-serif; }
+.font-body { font-family: 'Archivo', sans-serif; }
+.font-mono { font-family: 'IBM Plex Mono', monospace; }
+
+h1, h2, h3, h4, h5, h6 { font-family: 'Archivo Black', 'Archivo', sans-serif; color: var(--ink); margin: 0 0 16px; }
+
+.wrap { max-width: 1152px; margin: 0 auto; padding: 0 20px; }
+.section { padding: 64px 0; }
+
+button:focus-visible,
+:focus-visible {
+  outline: 2px solid var(--focus-outline);
+  outline-offset: 2px;
+}
+
+button:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+button:active { transform: scale(0.98); }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  body { font-size: 16px; }
+  .wrap { padding: 0 18px; }
+  .section { padding: 36px 0; }
+}
