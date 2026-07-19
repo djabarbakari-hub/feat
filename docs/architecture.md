@@ -16,6 +16,8 @@ Application monopage (SPA) en vanilla JS avec rendu côté client. L'état globa
 | `index.html`         | Point d'entrée HTML. Charge les assets et initialise l'app.         | Structure de base, meta tags.           | L'app ne se lance pas.                   |
 | `styles.css`         | Styles globaux et tokens de design.                                  | Palette, typographie, animations.       | UI cassée (couleurs, espacements).       |
 | `app.js`             | Logique métier et rendu dynamique.                                  | État, navigation, interactions.         | Aucune fonctionnalité ne marche.         |
+| `js/pages/quiz.js`   | Gestion du quiz de personnalisation.                                 | Rendu des étapes, animations.           | Le quiz ne s'affiche pas.                |
+| `js/pages/admin.js`  | Espace admin (clients, programmes, messages).                        | Tableau de bord, statistiques.          | L'admin ne fonctionne plus.              |
 | `docs/`              | Documentation technique et mémoire du projet.                       | Traçabilité, onboarding.                | Perte de contexte pour les futurs devs.  |
 
 ## Flux Applicatifs
@@ -43,7 +45,16 @@ Application monopage (SPA) en vanilla JS avec rendu côté client. L'état globa
 | Dépendance       | Version | Rôle                          | Critique ? | Alternative si supprimée       |
 |------------------|---------|-------------------------------|------------|--------------------------------|
 | Lucide           | latest  | Icônes (CDN).                 | Non.       | Heroicons, Feather Icons.      |
-| Google Fonts     | -       | Polices (Bodoni Moda, Cormorant). | Oui.       | Polices système (dégradation). |
+| Google Fonts     | -       | Polices (Archivo Black, Archivo, IBM Plex Mono). | Oui.       | Polices système (dégradation). |
+
+## Alias de compatibilité dans `tokens.css`
+Pour éviter de casser des écrans existants (ex: `js/pages/quiz.js`), certaines variables CSS sont **aliasées** vers la palette actuelle :
+- `--accent-primary` → `--ember` (`#E2622D`).
+- `--accent-secondary` → `--moss` (`#3C5A46`).
+- `--bg-dark` → `--chalk` (`#F7F5F0`).
+- `--text-primary` → `--ink` (`#16232C`).
+
+Ces alias permettent une transition progressive vers la nouvelle palette sans casser le code existant.
 
 ## Points Critiques
 - **État global** : `state` est un objet mutable → risque d'effets de bord si modifié directement.

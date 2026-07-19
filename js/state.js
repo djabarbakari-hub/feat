@@ -14,6 +14,9 @@ export const state = {
   history: [],
   activeSession: "",
   adminNotice: "",
+  // ⚠️ AVERTISSEMENT : Ne pas stocker de données sensibles en clair dans `drafts`.
+  // Les données comme les emails, mots de passe ou informations personnelles
+  // doivent être chiffrées ou évitées en stockage local.
   drafts: {
     contact: { name: "", email: "", message: "" },
     signup: { firstName: "", lastName: "", email: "", age: "", goal: "", weight: "", height: "" },

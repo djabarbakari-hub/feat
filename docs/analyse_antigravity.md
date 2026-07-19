@@ -21,16 +21,17 @@
 
 ## 2. 🐛 Bogues Critiques Détectés
 
-### Bug 1 : Erreurs de syntaxe dans `renderQuiz()` (P0)
+### Bug 1 : Erreurs de syntaxe dans `renderQuiz()` (P0) — **Résolu**
 ```javascript
-// Ligne ~910 : Template literal non fermé
+// Ligne ~910 : Template literal non fermé (corrigé)
 return `
   <div>${content}</div>
-</div>`;  // Correction : Ajout du point-virgule
+</div>`;
 ```
 > [!CAUTION]
 > L'application ne se chargeait pas en raison d'erreurs de syntaxe dans `app.js`.
 > **Impact** : Blocage complet du chargement de la page.
+> **Statut** : Résolu le 19 juillet 2026. Le template literal est désormais correctement fermé.
 
 ---
 

@@ -10,34 +10,40 @@
 
 | Nom sémantique   | Valeur hex | Token CSS          | Rôle primaire                          | Restrictions                     | Niveau       |
 |------------------|------------|--------------------|----------------------------------------|----------------------------------|--------------|
-| Or Vieilli       | `#D4AF37`  | `--accent-primary` | CTA, boutons, liens actifs.            | Pas en texte sur fond clair.     | Principale   |
-| Émeraude Clair   | `#4E9A7A`  | `--accent-secondary` | Zones de repos, historique, icônes.   |                                  | Secondaire   |
-| Vert-Noir        | `#0F1A14`  | `--bg-dark`        | Fond principal.                        |                                  | Principale   |
-| Blanc Vert Pâle  | `#E8F0E8`  | `--text-primary`   | Texte principal.                       |                                  | Principale   |
-| Gris Chaud       | `#D4D0C8`  | `--text-secondary` | Texte secondaire (descriptions).      |                                  | Secondaire   |
-| Surface          | `#1A2E24`  | `--surface`        | Cartes, modales.                       |                                  | Sémantique   |
+| Encre           | `#16232C`  | `--ink`           | Texte principal, bordures.             |                                  | Principale   |
+| Encre (ligne)    | `#2A3A45`  | `--ink-line`       | Bordures, séparateurs.                 |                                  | Secondaire   |
+| Encre (muet)     | `#8A9199`  | `--ink-muted`      | Texte secondaire, placeholders.        |                                  | Secondaire   |
+| Craie            | `#F7F5F0`  | `--chalk`          | Fond principal, surfaces claires.      |                                  | Principale   |
+| Mousse           | `#3C5A46`  | `--moss`           | Zones de repos, icônes, accents secondaires. |                          | Secondaire   |
+| Braise           | `#E2622D`  | `--ember`          | CTA, boutons, liens actifs.            | Pas en texte sur fond clair.     | Principale   |
+| Surface          | `#F1EFE9`  | `--surface`        | Cartes, modales.                       |                                  | Sémantique   |
 
 ---
 ## Typographie
 
-### Bodoni Moda (Display)
-- **Source** : Google Fonts (`Bodoni+Moda:ital,wght@0,400;0,500;0,700;0,900;1,400`).
-- **Substituts** : `serif`, Georgia.
+### Archivo Black (Display)
+- **Source** : Google Fonts (`Archivo+Black&family=Archivo:wght@400;500;600;700`).
+- **Substituts** : `sans-serif`, Arial.
 - **Poids utilisés** : 400, 500, 700, 900.
 - **Rôle par poids** :
-  - 900 : Titres h1.
+  - 900 : Logo, titres h1.
   - 700 : Sous-titres h2/h3.
   - 500 : Boutons, liens.
-- **Rationale** : Empattements fins et contrastes marqués → élégance théâtrale, évite le look "gym générique".
+- **Rationale** : Police géométrique et moderne → équilibre entre élégance et lisibilité pour une app fitness.
 
-### Cormorant (Body)
-- **Source** : Google Fonts (`Cormorant:wght@400;500;600`).
-- **Substituts** : `serif`, Times New Roman.
+### Archivo (Body)
+- **Source** : Google Fonts (`Archivo:wght@400;500;600`).
+- **Substituts** : `sans-serif`, Helvetica.
 - **Poids utilisés** : 400, 500.
 - **Rôle par poids** :
   - 400 : Texte courant.
   - 500 : Boutons secondaires.
-- **Rationale** : Serif fluide et lisible → équilibre avec Bodoni Moda sans compétition.
+- **Rationale** : Sans-serif lisible et moderne → complémentaire à Archivo Black.
+
+### IBM Plex Mono (Utilitaire)
+- **Source** : Google Fonts (`IBM+Plex+Mono:wght@500`).
+- **Substituts** : `monospace`, Courier New.
+- **Rôle** : Chiffres, icônes, captions, code.
 
 ### JetBrains Mono (Utilitaire)
 - **Source** : Google Fonts (`JetBrains+Mono:wght@500`).
@@ -47,6 +53,15 @@
 **Échelle typographique** :
 
 | Rôle          | Taille (px) | Line-height | Letter-spacing | Token CSS       |
+
+## Animations
+
+| Nom            | Durée  | Fonction de timing          | Rôle                                  |
+|----------------|--------|-----------------------------|----------------------------------------|
+| `fadeIn`       | 0.5s   | `ease-out`                  | Apparition progressive des éléments.   |
+| `--transition` | 0.2s   | `ease`                      | Transitions pour les couleurs, opacité, transformations, etc. |
+
+Définie dans `tokens.css` avec `@keyframes fadeIn` et utilisée dans `navbar.css`, `hero.css`, et `quiz.js`.
 |---------------|-------------|-------------|----------------|-----------------|
 | h1            | 48          | 1.1         | -0.02em        | `--font-size-h1`|
 | h2            | 32          | 1.2         | -0.01em        | `--font-size-h2`|
