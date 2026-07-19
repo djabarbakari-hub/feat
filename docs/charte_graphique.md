@@ -24,20 +24,19 @@
 ### Archivo Black (Display)
 - **Source** : Google Fonts (`Archivo+Black&family=Archivo:wght@400;500;600;700`).
 - **Substituts** : `sans-serif`, Arial.
-- **Poids utilisés** : 400, 500, 700, 900.
-- **Rôle par poids** :
-  - 900 : Logo, titres h1.
-  - 700 : Sous-titres h2/h3.
-  - 500 : Boutons, liens.
+- **Poids utilisés** : 900.
+- **Rôle** : Logo, titres h1.
 - **Rationale** : Police géométrique et moderne → équilibre entre élégance et lisibilité pour une app fitness.
 
 ### Archivo (Body)
-- **Source** : Google Fonts (`Archivo:wght@400;500;600`).
+- **Source** : Google Fonts (`Archivo:wght@400;500;600;700`).
 - **Substituts** : `sans-serif`, Helvetica.
-- **Poids utilisés** : 400, 500.
+- **Poids utilisés** : 400, 500, 600, 700.
 - **Rôle par poids** :
   - 400 : Texte courant.
-  - 500 : Boutons secondaires.
+  - 500 : Boutons secondaires, liens.
+  - 600 : Sous-titres h2/h3.
+  - 700 : Boutons primaires.
 - **Rationale** : Sans-serif lisible et moderne → complémentaire à Archivo Black.
 
 ### IBM Plex Mono (Utilitaire)
@@ -45,23 +44,38 @@
 - **Substituts** : `monospace`, Courier New.
 - **Rôle** : Chiffres, icônes, captions, code.
 
-### JetBrains Mono (Utilitaire)
-- **Source** : Google Fonts (`JetBrains+Mono:wght@500`).
-- **Substituts** : `monospace`, Courier New.
-- **Rôle** : Chiffres, icônes, captions.
-
 **Échelle typographique** :
 
 | Rôle          | Taille (px) | Line-height | Letter-spacing | Token CSS       |
+|---------------|-------------|-------------|----------------|-----------------|
+| h1            | 48          | 1.1         | -0.02em        | `--font-size-h1`|
+| h2            | 32          | 1.2         | -0.01em        | `--font-size-h2`|
+| h3            | 24          | 1.3         | 0              | `--font-size-h3`|
+| Body          | 16          | 1.6         | 0              | `--font-size-body`|
+| Caption       | 14          | 1.5         | 0.05em         | `--font-size-caption`|
 
 ## Animations
 
-| Nom            | Durée  | Fonction de timing          | Rôle                                  |
-|----------------|--------|-----------------------------|----------------------------------------|
-| `fadeIn`       | 0.5s   | `ease-out`                  | Apparition progressive des éléments.   |
-| `--transition` | 0.2s   | `ease`                      | Transitions pour les couleurs, opacité, transformations, etc. |
+| Nom            | Durée  | Fonction de timing          | Rôle                                  | Définition CSS                          |
+|----------------|--------|-----------------------------|----------------------------------------|------------------------------------------|
+| `fadeIn`       | 0.5s   | `ease-out`                  | Apparition progressive des éléments.   | `@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }` |
+| `--transition` | 0.2s   | `ease`                      | Transitions pour les couleurs, opacité, transformations. | `transition: var(--transition);` |
 
-Définie dans `tokens.css` avec `@keyframes fadeIn` et utilisée dans `navbar.css`, `hero.css`, et `quiz.js`.
+## Alias de compatibilité
+
+Pour éviter de casser des écrans existants, certaines variables CSS sont **aliasées** vers la palette actuelle. Voici les alias utilisés dans `tokens.css` :
+
+| Alias                | Variable Cible       | Rôle                                  |
+|----------------------|----------------------|----------------------------------------|
+| `--bg-dark`          | `--chalk`            | Fond principal.                        |
+| `--text-primary`     | `--ink`              | Texte principal.                       |
+| `--text-secondary`   | `--slate`            | Texte secondaire.                      |
+| `--accent-primary`   | `--ember`            | Couleur d'accent principale (CTA).     |
+| `--accent-secondary` | `--moss`             | Couleur d'accent secondaire.           |
+| `--surface`          | `--chalk-soft`       | Surface des cartes et modales.         |
+| `--focus-outline`    | `--ember`            | Contour de focus pour l'accessibilité. |
+| `--shadow`           | -                    | Ombre pour les éléments surélevés.     |
+| `--transition`       | -                    | Transition pour les animations.        |
 |---------------|-------------|-------------|----------------|-----------------|
 | h1            | 48          | 1.1         | -0.02em        | `--font-size-h1`|
 | h2            | 32          | 1.2         | -0.01em        | `--font-size-h2`|

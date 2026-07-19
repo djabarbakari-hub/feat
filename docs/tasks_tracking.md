@@ -20,9 +20,11 @@
 - [ ] Optimiser les images (compression, WebP). — Impact : Faible — Effort : 1h
 
 ## Tâches en Cours
+- [/] Vérification des accès dans `js/router.js` (rôles admin/client). — Priorité : Haute — Assigné : Agent — Début : 2026-07-19
 - [/] Documentation technique (dossier `/docs`). — Assigné : Agent — Début : 2026-07-14
 
 ## Tâches Futures
+- [ ] Implémentation du système de feedback utilisateur (ADR-002). — Priorité : Moyenne
 - [ ] Intégration Firebase (authentification, stockage). — Priorité : Haute
 - [ ] Intégration FedaPay pour les paiements de programmes premium en FCFA. — Priorité : Moyenne
 - [ ] Notifications par email (SendGrid). — Priorité : Basse

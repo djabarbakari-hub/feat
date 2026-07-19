@@ -27,3 +27,4 @@
 |------------|---------|-----------------------------------------------------------------------------|---------------------------------|------------------------------------------|
 | 2026-07-14 | 1.0     | Refonte premium (palette, typographie, animations).                        | UI/UX, accessibilité.           | `styles.css`, `app.js`, `index.html`     |
 | 2026-07-14 | 0.1     | Initialisation du projet (structure de base, quiz, tableau de bord).       | MVP fonctionnel.                | `app.js`, `index.html`, `styles.css`     |
+| 2026-07-19 | 1.1     | Audit de cohérence et mise à jour de la documentation.                     | Correction des écarts entre `docs/` et `code/`. Ajout des ADR-002 et ADR-003. | `docs/architecture.md`, `docs/charte_graphique.md`, `docs/decisions_log.md` |

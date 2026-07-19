@@ -48,6 +48,30 @@ Application monopage (SPA) en vanilla JS avec rendu côté client. L'état globa
 | Google Fonts     | -       | Polices (Archivo Black, Archivo, IBM Plex Mono). | Oui.       | Polices système (dégradation). |
 
 ## Alias de compatibilité dans `tokens.css`
+
+Pour garantir la rétrocompatibilité avec les écrans existants, certaines variables CSS sont aliasées vers la palette d'origine. Voici les alias définis dans `tokens.css` :
+
+| Alias                | Variable Cible       | Rôle                                  |
+|----------------------|----------------------|----------------------------------------|
+| `--bg-dark`          | `--chalk`            | Fond principal.                        |
+| `--text-primary`     | `--ink`              | Texte principal.                       |
+| `--text-secondary`   | `--slate`            | Texte secondaire.                      |
+| `--accent-primary`   | `--ember`            | Couleur d'accent principale (CTA).     |
+| `--accent-secondary` | `--moss`             | Couleur d'accent secondaire.           |
+| `--surface`          | `--chalk-soft`       | Surface des cartes et modales.         |
+| `--focus-outline`    | `--ember`            | Contour de focus pour l'accessibilité. |
+| `--shadow`           | -                    | Ombre pour les éléments surélevés.     |
+| `--transition`       | -                    | Transition pour les animations.        |
+
+## Fichiers CSS
+
+| Fichier              | Rôle                                  | Dépendances                     |
+|----------------------|----------------------------------------|----------------------------------|
+| `tokens.css`         | Source unique de vérité pour les couleurs, polices et animations. | -                                |
+| `components.css`     | Styles des composants réutilisables (boutons, cartes, etc.).      | `tokens.css`                     |
+| `navbar.css`         | Styles de la barre de navigation.      | `tokens.css`                     |
+| `hero.css`           | Styles de la section hero.             | `tokens.css`                     |
+| `dashboards.css`     | Styles des tableaux de bord.           | `tokens.css`                     |
 Pour éviter de casser des écrans existants (ex: `js/pages/quiz.js`), certaines variables CSS sont **aliasées** vers la palette actuelle :
 - `--accent-primary` → `--ember` (`#E2622D`).
 - `--accent-secondary` → `--moss` (`#3C5A46`).
@@ -55,6 +79,8 @@ Pour éviter de casser des écrans existants (ex: `js/pages/quiz.js`), certaines
 - `--text-primary` → `--ink` (`#16232C`).
 
 Ces alias permettent une transition progressive vers la nouvelle palette sans casser le code existant.
+
+⚠️ **Avertissement** : Ne pas stocker de **données sensibles** (ex: email, mot de passe) en clair dans `state.drafts`. Utiliser un chiffrement local ou un backend dédié pour les données personnelles. Voir [`ADR-003`](decisions_log.md) pour plus de détails.
 
 ## Points Critiques
 - **État global** : `state` est un objet mutable → risque d'effets de bord si modifié directement.
