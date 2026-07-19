@@ -4,12 +4,14 @@
 
 import {
   renderHome, renderPrograms, renderBlog, renderPricing,
-  renderFaq, renderContact, renderLegal, renderNotFound
+  renderFaq, renderContact, renderLegal, renderNotFound, renderAbout
 } from "./guest.js";
 import { renderQuiz } from "./quiz.js";
 import { renderLogin, renderSignup } from "./auth.js";
 import { renderClientDashboard, renderClientProgram, renderClientProgress } from "./client.js";
 import { renderAdminDashboard, renderAdminClients, renderAdminPrograms, renderAdminMessages } from "./admin.js";
+
+console.log("Fonctions importées depuis guest.js:", { renderAbout }); // Debug: Vérifier l'import
 
 export const PAGES = {
   "home": renderHome,
