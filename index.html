@@ -6,14 +6,8 @@
   <meta name="description" content="MonProgrammeFit — Des programmes sportifs personnalisés pour atteindre vos objectifs, avec ou sans matériel." />
   <!-- Couleur du thème pour les navigateurs supportant cette meta (Chrome, Edge, Safari) -->
   <meta name="theme-color" content="#D4AF37" />
-  <!--
-    Fallback pour meta[name=theme-color] :
-    - Firefox et Opera ne supportent pas cette meta en 2026.
-    - Applique manuellement la couleur de fond (--bg-dark = #F7F5F0) pour cohérence visuelle.
-    - Voir : https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta/name/theme-color
-  -->
+  <!-- Fallback pour meta[name=theme-color] (non supporté par Firefox/Opera) -->
   <script>
-    // Appliquer la couleur de fond d'origine pour Firefox/Opera
     document.addEventListener('DOMContentLoaded', () => {
       document.querySelector('body').style.backgroundColor = '#F7F5F0';
     });

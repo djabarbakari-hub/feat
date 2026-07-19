@@ -1,12 +1,14 @@
 # Charte Graphique — MonProgrammeFit
-> *"Premium discret : élégance théâtrale et chaleur minérale."*
+> *"Palettes d'origine restaurées : chaleur minérale et élégance discrète."*
 
-**Version** : 1.0
-**Thème** : dark
-**Dernière mise à jour** : 2026-07-14
+**Version** : 1.1
+**Thème** : light (palette d'origine)
+**Dernière mise à jour** : 2026-07-20
 
 ---
 ## Couleurs
+> **Note** : Les couleurs ci-dessous correspondent à la **palette d'origine** du projet (fichiers `abdou.zip`).
+> La palette jaune (`#D4AF37`) utilisée temporairement a été **remplacée** pour restaurer la cohérence visuelle.
 
 | Nom sémantique   | Valeur hex | Token CSS          | Rôle primaire                          | Restrictions                     | Niveau       |
 |------------------|------------|--------------------|----------------------------------------|----------------------------------|--------------|
