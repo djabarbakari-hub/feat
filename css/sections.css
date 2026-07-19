@@ -1,5 +1,79 @@
 /* ---------- SECTIONS (light) ---------- */
 .eyebrow-moss { font-size: 12px; letter-spacing: 0.15em; color: var(--moss); margin-bottom: 12px; }
+
+/* ---------- ABOUT PAGE ---------- */
+.about-hero {
+  background: var(--bg-dark); /* #F7F5F0 */
+  padding: 64px 0;
+  color: var(--text-primary); /* #16232C */
+}
+
+.about-hero h1 {
+  font-size: 28px;
+  color: var(--text-primary); /* #16232C */
+  margin: 0 0 16px;
+}
+
+.about-hero .hero-sub {
+  color: var(--slate); /* #6B7280 */
+  max-width: 620px;
+  margin-top: 12px;
+}
+
+.about-story, .about-mission, .about-values, .about-team, .about-cta {
+  margin-top: 48px;
+}
+
+.about-story h2, .about-mission h2, .about-values h2, .about-team h2, .about-cta h2 {
+  color: var(--text-primary); /* #16232C */
+  margin-bottom: 24px;
+}
+
+.story-grid, .values-grid, .team-grid {
+  display: grid;
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .story-grid, .values-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.story-card, .value-card, .team-card {
+  background: var(--surface); /* #F1EFE9 */
+  padding: 20px;
+  border-radius: 12px;
+  color: var(--text-primary); /* #16232C */
+}
+
+.story-card h3, .value-card h3, .team-card h3 {
+  color: var(--text-primary); /* #16232C */
+  margin: 0 0 12px;
+}
+
+.story-card p, .value-card p, .team-card p {
+  color: var(--slate); /* #6B7280 */
+  margin: 0;
+  font-size: 14px;
+}
+
+.about-cta {
+  background: var(--surface); /* #F1EFE9 */
+  padding: 32px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.about-cta h2 {
+  color: var(--text-primary); /* #16232C */
+}
+
+.about-cta .btn {
+  background: var(--accent-primary); /* #E2622D */
+  color: var(--chalk); /* #F7F5F0 */
+  margin-top: 24px;
+}
 .h2 { font-size: 28px; color: var(--ink); margin: 0 0 40px; }
 @media (min-width: 768px) { .h2 { font-size: 32px; } }
 .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }

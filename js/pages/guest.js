@@ -310,13 +310,19 @@ export function renderLegal() {
   </div>`;
 }
 
+/**
+ * Rend la page À propos de MonProgrammeFit.
+ * Structure : Hero + Histoire + Mission + Valeurs + Équipe + CTA.
+ * Utilise des templates littéraux pour générer le HTML.
+ * @returns {string} HTML de la page À propos.
+ */
 export function renderAbout() {
   return `
   <div class="section wrap">
     <!-- Hero section -->
     <section class="about-hero">
       <h1 class="h2 font-display">Notre mission : rendre le sport accessible à tous, sans excuse.</h1>
-      <p class="hero-sub" style="max-width:620px; margin-top:12px;">Chez <span class="brand-name">MonProgramme<span>Fit</span></span>, nous croyons que chacun mérite un programme adapté à son niveau, son environnement et ses objectifs. Découvrez notre histoire et nos valeurs.</p>
+      <p class="hero-sub" style="max-width:620px; margin-top:12px;">Chez <span class="brand-name">MonProgrammeFit</span>, nous croyons que chacun mérite un programme adapté à son niveau, son environnement et ses objectifs. Découvre notre histoire et nos valeurs.</p>
     </section>
 
     <!-- Histoire de la marque -->
@@ -325,15 +331,15 @@ export function renderAbout() {
       <div class="story-grid">
         <div class="story-card card">
           <h3 class="font-display">Avant</h3>
-          <p>Tout a commencé en 2018 lorsque Abdou BAKARI, passionné de sport et coach depuis 2 ans, a constaté que beaucoup de personnes abandonnaient le sport par manque de temps, de matériel ou de motivation.</p>
+        <p>Tout a commencé en 2018 lorsque Abdou BAKARI, passionné de sport et coach depuis 2 ans, a constaté que beaucoup de personnes abandonnaient le sport par manque de temps, de matériel ou de motivation.</p>
         </div>
         <div class="story-card card">
           <h3 class="font-display">Le déclencheur</h3>
-          <p>Un jour, un ami lui a demandé : <em>"Comment puis-je m'entraîner chez moi sans matériel ?"</em>. Cette question a été le déclic pour créer <span class="brand-name">MonProgramme<span>Fit</span></span>.</p>
+          <p>Un jour, un ami lui a demandé : <em>"Comment puis-je m'entraîner chez moi sans matériel ?"</em>. Cette question a été le déclic pour créer <span class="brand-name">MonProgrammeFit</span>.</p>
         </div>
         <div class="story-card card">
           <h3 class="font-display">Maintenant</h3>
-          <p>Aujourd'hui, <span class="brand-name">MonProgramme<span>Fit</span></span> accompagne des personnes dans leur transformation physique, avec des programmes 100% personnalisés et accessibles à tous.</p>
+          <p>Aujourd'hui, <span class="brand-name">MonProgrammeFit</span> accompagne des personnes dans leur transformation physique, avec des programmes 100% personnalisés et accessibles à tous.</p>
         </div>
       </div>
     </section>
@@ -350,19 +356,19 @@ export function renderAbout() {
       <div class="values-grid">
         <div class="value-card card">
           <h3 class="font-display">Accessibilité</h3>
-          <p>Programmes adaptés à la salle, à la maison, avec ou sans matériel.</p>
+          <p>Des programmes adaptés à ta salle, ta maison, avec ou sans matériel.</p>
         </div>
         <div class="value-card card">
           <h3 class="font-display">Personnalisation</h3>
-          <p>Questionnaire court pour générer un programme sur mesure.</p>
+          <p>Un questionnaire court pour générer ton programme sur mesure.</p>
         </div>
         <div class="value-card card">
           <h3 class="font-display">Expertise</h3>
-          <p>Coachs reconnu avec plus de 3 ans d'expérience en coaching sportif.</p>
+          <p>Des coachs reconnus avec plus de 3 ans d'expérience pour te guider.</p>
         </div>
         <div class="value-card card">
           <h3 class="font-display">Communauté</h3>
-          <p>Groupe privé pour échanger avec d'autres utilisateurs et poser des questions.</p>
+          <p>Un groupe privé pour échanger avec d'autres utilisateurs et poser tes questions.</p>
         </div>
       </div>
     </section>
@@ -372,23 +378,17 @@ export function renderAbout() {
       <h2 class="h3 font-display">Notre équipe</h2>
       <div class="team-grid">
         <div class="team-card card">
-          <img src="https://via.placeholder.com/300x300?text=Abdou+BAKARI" alt="Photo de Abdou BAKARI" loading="lazy" style="width:100%; border-radius:8px;"/>
+          <img src="images/team/abdou_bakari.jpg" alt="Photo de Abdou BAKARI" loading="lazy" style="width:100%; border-radius:8px;"/>
           <h3 class="font-display" style="margin-top:12px;">Abdou BAKARI</h3>
           <p class="role font-mono">Fondateur & Coach principal</p>
-          <p>"Mon objectif : vous aider à atteindre le vôtre."</p>
-        </div>
-        <div class="team-card card">
-          <img src="https://via.placeholder.com/300x300?text=Fatoumata+DIALLO" alt="Photo de Fatoumata DIALLO" loading="lazy" style="width:100%; border-radius:8px;"/>
-          <h3 class="font-display" style="margin-top:12px;">Fatoumata DIALLO</h3>
-          <p class="role font-mono">Coach spécialisée en nutrition</p>
-          <p>"Une alimentation équilibrée est la clé de votre réussite."</p>
+          <p>"Mon objectif : t'aider à atteindre le tien."</p>
         </div>
       </div>
     </section>
 
     <!-- CTA final -->
     <section class="about-cta card">
-      <h2 class="h3 font-display">Prêt à commencer votre transformation ?</h2>
+      <h2 class="h3 font-display">Prêt à commencer ta transformation ?</h2>
       <button class="btn btn-ember" data-nav="signup" aria-label="Démarrer mon programme">Démarrer mon programme</button>
     </section>
   </div>`;

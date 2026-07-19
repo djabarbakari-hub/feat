@@ -4,7 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="MonProgrammeFit — Des programmes sportifs personnalisés pour atteindre vos objectifs, avec ou sans matériel." />
+  <!-- Couleur du thème pour les navigateurs supportant cette meta (Chrome, Edge, Safari) -->
   <meta name="theme-color" content="#D4AF37" />
+  <!--
+    Fallback pour meta[name=theme-color] :
+    - Firefox et Opera ne supportent pas cette meta en 2026.
+    - Applique manuellement la couleur de fond (--bg-dark = #F7F5F0) pour cohérence visuelle.
+    - Voir : https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta/name/theme-color
+  -->
+  <script>
+    // Appliquer la couleur de fond d'origine pour Firefox/Opera
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelector('body').style.backgroundColor = '#F7F5F0';
+    });
+  </script>
   <meta property="og:title" content="MonProgrammeFit — Coaching sportif personnalisé" />
   <meta property="og:description" content="Des programmes sur mesure pour votre transformation physique." />
   <meta property="og:image" content="https://monprogrammefit.com/og-image.jpg" />
