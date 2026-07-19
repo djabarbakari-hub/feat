@@ -180,24 +180,99 @@ export function renderTrialProgram(id) {
 export function renderBlog() {
   return `
   <div class="section wrap">
-    <h1 class="h2 font-display">À propos de <span class="brand-name">MonProgramme<span>Fit</span></span></h1>
-    <div class="card" style="margin-bottom:32px">
-      <p style="font-size:16px;color:var(--ink);line-height:1.8;margin:0">
-        <span class="brand-name">MonProgramme<span>Fit</span></span> a été créé pour accompagner toutes les personnes, qu'elles soient débutantes ou qu'elles souhaitent franchir un nouveau cap dans leur transformation physique. Notre objectif est de vous permettre de vous entraîner efficacement, en tenant compte de votre disponibilité, de votre niveau et de vos moyens.
-      </p>
-      <p style="font-size:16px;color:var(--ink);line-height:1.8;margin:24px 0 0">
-        Grâce à des programmes personnalisés et adaptés à vos objectifs, <span class="brand-name">MonProgramme<span>Fit</span></span> vous aide à progresser à votre rythme, que vous vous entraîniez en salle, à domicile, avec ou sans matériel.
-      </p>
-    </div>
-    <div class="advice-box card">
-      <p class="eyebrow-moss font-mono" style="margin-bottom:12px">Conseils</p>
-      <ul style="margin:0;padding-left:18px;color:var(--ink);font-size:15px;line-height:1.8">
-        <li>Privilégiez une bonne exécution des mouvements avant d'augmenter les charges.</li>
-        <li>Soyez régulier : la constance est la clé pour obtenir des résultats durables.</li>
-        <li>Mangez suffisamment et hydratez-vous pour favoriser la récupération et la progression.</li>
-        <li>Dormez au moins 7 à 9 heures par nuit, car la récupération est essentielle au développement musculaire.</li>
-      </ul>
-    </div>
+    <h1 class="h2 font-display">Blog</h1>
+    <p class="hero-sub" style="max-width:620px; margin-top:12px;">Découvrez nos articles pour vous aider à progresser dans votre transformation physique.</p>
+    <!-- Contenu du blog sera ajouté ici -->
+  </div>`;
+}
+
+/**
+ * Rend la page À propos avec l'histoire de la marque, les valeurs, l'équipe et un CTA.
+ * @returns {string} HTML de la page À propos.
+ */
+export function renderAbout() {
+  return `
+  <div class="section wrap">
+    <!-- Hero section -->
+    <section class="about-hero">
+      <h1 class="h2 font-display">Notre mission : rendre le sport accessible à tous, sans excuse.</h1>
+      <p class="hero-sub" style="max-width:620px; margin-top:12px;">Chez <span class="brand-name">MonProgramme<span>Fit</span></span>, nous croyons que chacun mérite un programme adapté à son niveau, son environnement et ses objectifs. Découvrez notre histoire et nos valeurs.</p>
+    </section>
+
+    <!-- Histoire de la marque -->
+    <section class="about-story">
+      <h2 class="h3 font-display">Notre histoire</h2>
+      <div class="story-grid">
+        <div class="story-card card">
+          <h3 class="font-display">Avant</h3>
+          <p>Tout a commencé en 2018 lorsque Abdou BAKARI, passionné de sport et coach depuis 2 ans, a constaté que beaucoup de personnes abandonnaient le sport par manque de temps, de matériel ou de motivation.</p>
+        </div>
+        <div class="story-card card">
+          <h3 class="font-display">Le déclencheur</h3>
+          <p>Un jour, un ami lui a demandé : <em>"Comment puis-je m'entraîner chez moi sans matériel ?"</em>. Cette question a été le déclic pour créer <span class="brand-name">MonProgramme<span>Fit</span></span>.</p>
+        </div>
+        <div class="story-card card">
+          <h3 class="font-display">Maintenant</h3>
+          <p>Aujourd'hui, <span class="brand-name">MonProgramme<span>Fit</span></span> accompagne des milliers de personnes dans leur transformation physique, avec des programmes 100% personnalisés et accessibles à tous.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mission -->
+    <section class="about-mission card">
+      <h2 class="h3 font-display">Notre mission</h2>
+      <p>Notre mission est simple : <strong>démocratiser le sport</strong> en proposant des programmes <strong>adaptés à chacun</strong>, quel que soit son niveau, son matériel ou son emploi du temps.</p>
+    </section>
+
+    <!-- Valeurs -->
+    <section class="about-values">
+      <h2 class="h3 font-display">Nos valeurs</h2>
+      <div class="values-grid">
+        <div class="value-card card">
+          <h3 class="font-display">Accessibilité</h3>
+          <p>Programmes adaptés à la salle, à la maison, avec ou sans matériel.</p>
+        </div>
+        <div class="value-card card">
+          <h3 class="font-display">Personnalisation</h3>
+          <p>Questionnaire de 5 secondes pour générer un programme sur mesure.</p>
+        </div>
+        <div class="value-card card">
+          <h3 class="font-display">Expertise</h3>
+          <p>Coachs certifiés avec plus de 5 ans d'expérience en coaching sportif.</p>
+        </div>
+        <div class="value-card card">
+          <h3 class="font-display">Communauté</h3>
+          <p>Groupe privé pour échanger avec d'autres utilisateurs et poser des questions.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Équipe -->
+    <section class="about-team">
+      <h2 class="h3 font-display">Notre équipe</h2>
+      <div class="team-grid">
+        <div class="team-card card">
+          <img src="https://via.placeholder.com/300x300?text=Abdou+BAKARI" alt="Photo de Abdou BAKARI" loading="lazy" style="width:100%; border-radius:8px;"/>
+          <h3 class="font-display" style="margin-top:12px;">Abdou BAKARI</h3>
+          <p class="role font-mono">Fondateur & Coach principal</p>
+          <p>"Mon objectif : vous aider à atteindre le vôtre."</p>
+        </div>
+        <div class="team-card card">
+          <img src="https://via.placeholder.com/300x300?text=Claire+Martin" alt="Photo de Claire Martin" loading="lazy" style="width:100%; border-radius:8px;"/>
+          <h3 class="font-display" style="margin-top:12px;">Claire Martin</h3>
+          <p class="role font-mono">Coach spécialisée en nutrition</p>
+          <p>"Une alimentation équilibrée est la clé de votre réussite."</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA final -->
+    <section class="about-cta card">
+      <h2 class="h3 font-display">Prêt à commencer votre transformation ?</h2>
+      <button class="btn btn-ember" data-nav="signup" aria-label="Démarrer mon programme">Démarrer mon programme</button>
+    </section>
+  </div>`;
+}
   </div>`;
 }
 

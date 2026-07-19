@@ -16,6 +16,7 @@ export const PAGES = {
   "programs": renderPrograms,
   "pricing": renderPricing,
   "faq": renderFaq,
+  "about": renderAbout,
   "blog": renderBlog,
   "contact": renderContact,
   "legal": renderLegal,

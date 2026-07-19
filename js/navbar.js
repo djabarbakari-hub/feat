@@ -13,7 +13,7 @@ import { icon } from "./helpers.js";
 export function navLinksFor(role) {
   if (role === "client") return [["client-dashboard", "Tableau de bord"], ["client-program", "Mon programme"], ["client-progress", "Ma progression"]];
   if (role === "admin") return [["admin-dashboard", "Vue d'ensemble"], ["admin-clients", "Clients"], ["admin-programs", "Programmes"], ["admin-messages", "Messages"]];
-  return [["home", "Accueil"], ["programs", "Programmes"], ["pricing", "Tarifs"], ["faq", "FAQ"], ["blog", "À propos"], ["contact", "Contact"]];
+  return [["home", "Accueil"], ["programs", "Programmes"], ["pricing", "Tarifs"], ["faq", "FAQ"], ["about", "À propos"], ["contact", "Contact"]];
 }
 
 /**
