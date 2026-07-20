@@ -248,6 +248,60 @@
   background: linear-gradient(180deg, rgba(212,175,55,0.95), rgba(78,154,122,0.22));
   padding: 4px;
   display: flex;
+}
+
+/* ---------- PAGE CONTACT ---------- */
+.text-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.text-input[aria-invalid="true"] {
+  border-color: var(--accent-error); /* Rouge */
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Message de confirmation */
+.send-success {
+  text-align: center;
+  padding: 32px;
+  background: var(--bg-light);
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+}
+
+.send-success h1 {
+  font-size: 24px;
+  color: var(--ink);
+  margin: 0 0 16px;
+}
+
+.send-success p {
+  color: var(--slate);
+  margin: 0;
+}
+
+/* Grille 2 colonnes pour la page Contact */
+.grid-2 {
+  display: grid;
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
   align-items: center;
   justify-content: center;
   box-shadow: 0 18px 40px rgba(0,0,0,0.18);
