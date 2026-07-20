@@ -138,14 +138,52 @@ document.addEventListener("click", (e) => {
   }
 
   const contactSendBtn = e.target.closest("[data-contact-send]");
-  if (contactSendBtn) {
+  if (contactSendBtn && contactSendBtn.dataset.contactSend === "1") {
     const form = contactSendBtn.closest('.card') || document;
-    const name = (form.querySelector('input[type="text"]') || {}).value || "";
-    const email = (form.querySelector('input[type="email"]') || {}).value || "";
-    const message = (form.querySelector('textarea') || {}).value || "";
-    const subject = encodeURIComponent('Demande MonProgrammeFit');
-    const body = encodeURIComponent(`Nom: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
-    window.location.href = `mailto:contact@monprogrammefit.com?subject=${subject}&body=${body}`;
+    const name = form.querySelector('[data-contact-name]')?.value || "";
+    const email = form.querySelector('[data-contact-email]')?.value || "";
+    const message = form.querySelector('[data-contact-message]')?.value || "";
+    const subject = form.querySelector('[data-contact-subject]')?.value || "";
+    const captcha = form.querySelector('[data-contact-captcha]')?.value || "";
+    
+    // Validation
+    if (!name || !email || !message || !subject || !captcha) {
+      alert("Tous les champs sont obligatoires.");
+      return;
+    }
+    
+    if (!/^[^@]+@[^@]+\.[^@]+$/.test(email)) {
+      alert("Veuillez entrer un email valide.");
+      return;
+    }
+    
+    if (captcha !== "5") {
+      alert("Réponse anti-spam incorrecte.");
+      return;
+    }
+    
+    // Envoi
+    state.ui.isSending = true;
+    state.drafts.contact = { name: "", email: "", message: "", subject: "", captcha: "" };
+    persistState();
+    render();
+    
+    // Simulation d'envoi (remplacer par un appel API réel)
+    setTimeout(() => {
+      state.ui.isSending = false;
+      state.ui.sendSuccess = true;
+      persistState();
+      render();
+    }, 1500);
+    return;
+  }
+  
+  const contactResetBtn = e.target.closest("[data-contact-reset]");
+  if (contactResetBtn) {
+    state.ui.sendSuccess = false;
+    state.drafts.contact = { name: "", email: "", message: "", subject: "", captcha: "" };
+    persistState();
+    render();
     return;
   }
 

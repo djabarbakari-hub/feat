@@ -267,33 +267,7 @@ export function renderFaq() {
   </div>`;
 }
 
-export function renderContact() {
-  const { name, email, message } = state.drafts.contact;
-  return `
-  <div class="section wrap">
-    <p class="eyebrow-moss font-mono">CONTACT</p>
-    <h1 class="h2 font-display">Besoin d'aide ? On est là pour toi.</h1>
-    <div class="grid-2" style="gap:24px; margin-top:32px;">
-      <div class="card">
-        <p style="font-size:16px;color:var(--ink);line-height:1.8;">Tu veux poser une question sur un programme, ton inscription ou ton suivi ? Écris-nous et nous reviendrons rapidement.</p>
-        <div style="margin-top:24px; display:grid; gap:14px;">
-          <div><strong>Email</strong><p style="margin:6px 0 0;color:var(--slate);">contact@monprogrammefit.com</p></div>
-          <div><strong>Téléphone</strong><p style="margin:6px 0 0;color:var(--slate);">+229 90 00 00 00</p></div>
-          <div><strong>Heures</strong><p style="margin:6px 0 0;color:var(--slate);">Lun–Ven · 8h–18h</p></div>
-        </div>
-      </div>
-      <div class="card">
-        <label class="font-mono" style="font-size:12px">Ton nom</label>
-        <input class="text-input" type="text" data-contact-name value="${escapeHtml(name)}" placeholder="Ex: Aïcha" />
-        <label class="font-mono" style="font-size:12px">Ton email</label>
-        <input class="text-input" type="email" data-contact-email value="${escapeHtml(email)}" placeholder="ton@email.com" />
-        <label class="font-mono" style="font-size:12px">Message</label>
-        <textarea class="text-input" rows="5" data-contact-message placeholder="Décris ta demande...">${escapeHtml(message)}</textarea>
-        <button class="btn btn-ember" style="margin-top:8px" data-contact-send="1">Envoyer le message</button>
-      </div>
-    </div>
-  </div>`;
-}
+// La fonction `renderContact()` a été déplacée dans `js/pages/contact.js` pour éviter la dette technique.
 
 export function renderLegal() {
   return `

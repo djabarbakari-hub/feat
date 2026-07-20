@@ -10,6 +10,7 @@ import { PAGES } from "./js/pages/index.js";
 import "./js/events.js"; // enregistre les écouteurs globaux (input/click)
 
 console.log("app.js chargé et exécuté."); // Debug: Vérifier que app.js est exécuté
+console.log("[DEBUG] PAGES.contact =", PAGES.contact); // Debug: Vérifier que renderContact est bien dans PAGES
 
 setRenderer(render);
 

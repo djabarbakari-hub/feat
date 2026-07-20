@@ -18,9 +18,13 @@ export const state = {
   // Les données comme les emails, mots de passe ou informations personnelles
   // doivent être chiffrées ou évitées en stockage local.
   drafts: {
-    contact: { name: "", email: "", message: "" },
+    contact: { name: "", email: "", message: "", subject: "", captcha: "" },
     signup: { firstName: "", lastName: "", email: "", age: "", goal: "", weight: "", height: "" },
     login: { email: "", password: "" },
+  },
+  ui: {
+    isSending: false,
+    sendSuccess: false,
   },
   backExitAttempted: false,
   backNoticeTimer: null,
