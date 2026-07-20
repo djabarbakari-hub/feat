@@ -9,6 +9,11 @@ import { icon, trackById, escapeHtml } from "../helpers.js";
 export function renderClientDashboard() {
   const p = CLIENT_PROGRAM;
   const clientName = `${state.clientProfile.firstName || "Client"}${state.clientProfile.lastName ? ` ${state.clientProfile.lastName}` : ""}`.trim();
+  const goalLabel = {
+    remise: "Remise en forme",
+    perte: "Perte de poids",
+    musculation: "Musculation"
+  }[state.clientProfile.goal] || state.clientProfile.goal || "Objectif à définir";
   const track = trackById(p.track);
   const pct = Math.round((p.week / p.totalWeeks) * 100);
   // Nombre de séances déjà validées cette semaine et au total, calculé à partir
@@ -20,10 +25,10 @@ export function renderClientDashboard() {
   <div class="section wrap">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px">
       <div>
-        <p class="eyebrow-moss font-mono">BON RETOUR${clientName ? " " + escapeHtml(clientName).toUpperCase() : ""}</p>
-        <h1 class="h2 font-display">Tableau de bord MonProgrammeFit</h1>
+        <h1 class="h2 font-display" style="margin-bottom:6px">Tableau de bord</h1>
+        <div style="font-size:15px;color:var(--ink);font-weight:700">${escapeHtml(clientName)}</div>
+        <div style="font-size:13px;color:var(--slate);margin-top:4px">Objectif : ${escapeHtml(goalLabel)}</div>
       </div>
-      <button class="btn-logout" data-nav="home" data-logout="1" aria-label="Se déconnecter">${icon("log-out", 14)} Déconnexion</button>
     </div>
     <div class="grid-2" style="grid-template-columns:2fr 1fr">
       <div class="card">
@@ -59,6 +64,7 @@ export function renderClientDashboard() {
           <div class="stat-label">Envoyer une demande via Gmail</div>
         </div>
         <a class="btn btn-ember" href="https://mail.google.com/mail/?view=cm&fs=1&to=djabaraboul.032003@gmail.com" target="_blank" rel="noreferrer noopener">Contacter coach</a>
+        <button class="btn-logout" data-nav="home" data-logout="1" aria-label="Se déconnecter">${icon("log-out", 14)} Déconnexion</button>
       </div>
     </div>
   </div>`;

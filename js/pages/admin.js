@@ -26,7 +26,7 @@ export function renderAdminDashboard() {
           </div>
           <div>
             <div class="font-mono" style="color:var(--chalk);font-size:0.75rem;letter-spacing:0.15em;">COACH</div>
-            <h1 class="font-display" style="font-size:2.1rem;line-height:1.05;margin:8px 0 4px;color:var(--chalk);">Admin <span class="brand-name">MonProgramme<span>Fit</span></span></h1>
+            <h1 class="font-display" style="font-size:2.1rem;line-height:1.05;margin:8px 0 4px;color:var(--chalk);">Admin</h1>
             <div class="admin-avatar-badge">En ligne</div>
           </div>
         </div>

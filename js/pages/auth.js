@@ -9,8 +9,8 @@ export function renderLogin() {
   return `
   <div class="section wrap">
     <div class="login-wrap">
-      <h1 class="font-display" style="font-size:24px;text-align:center;color:var(--ink);margin-bottom:4px">Connexion MonProgrammeFit</h1>
-      <p style="font-size:14px;text-align:center;color:var(--slate);margin-bottom:32px">Accède à ton espace MonProgrammeFit et continue ton suivi.</p>
+      <h1 class="font-display" style="font-size:24px;text-align:center;color:var(--ink);margin-bottom:4px">Connexion</h1>
+      <p style="font-size:14px;text-align:center;color:var(--slate);margin-bottom:32px">Accède à ton espace et continue ton suivi.</p>
       <div class="tabs">
         <button class="tab ${state.loginTab === "client" ? "active" : ""}" data-login-tab="client">Espace client</button>
         <button class="tab ${state.loginTab === "admin" ? "active" : ""}" data-login-tab="admin">Espace admin</button>
@@ -30,7 +30,7 @@ export function renderSignup() {
   return `
   <div class="section wrap">
     <div class="card" style="max-width:560px;margin:0 auto;padding:24px">
-      <h1 class="font-display" style="font-size:22px;margin-bottom:8px">Créer mon compte MonProgrammeFit</h1>
+      <h1 class="font-display" style="font-size:22px;margin-bottom:8px">Créer mon compte</h1>
       <p style="font-size:14px;color:var(--slate);margin-bottom:16px">Indique ton objectif et tes mesures actuelles pour démarrer ta transformation.</p>
       <div class="form-grid">
         <label class="font-mono" style="font-size:12px">Prénom</label>

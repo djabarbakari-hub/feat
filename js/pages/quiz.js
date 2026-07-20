@@ -129,7 +129,7 @@ export function renderQuiz() {
     </div>
     <div class="font-mono" style="font-size:0.875rem;color:var(--ink-muted3);margin-bottom:0.75rem">ÉTAPE ${state.quizStep + 1} / ${QUIZ_STEPS.length - 1}</div>
     <h1 class="h2 font-display" style="max-width:560px">${s.q}</h1>
-    <p class="hero-sub" style="max-width:620px; margin-top:0.75rem;">Réponds simplement et découvre le programme MonProgrammeFit le plus adapté à ton cadre d'entraînement.</p>
+    <p class="hero-sub" style="max-width:620px; margin-top:0.75rem;">Réponds simplement et découvre le programme le plus adapté à ton cadre d'entraînement.</p>
     <div>${content}</div>
   </div>
 </div>`;

@@ -78,7 +78,7 @@ export function renderHome() {
 
   <div class="section">
     <div class="wrap">
-      <p class="eyebrow-moss font-mono">POURQUOI <span class="brand-name">MonProgramme<span>Fit</span></span></p>
+      <p class="eyebrow-moss font-mono">POURQUOI CE COACHING</p>
       <h2 class="h2 font-display">Fait pour ceux qui commencent, sans excuse liée au matériel.</h2>
       <div class="feature-grid">
         <div class="feature">
@@ -112,7 +112,7 @@ export function renderPrograms() {
   return `
   <div class="section wrap">
     <p class="eyebrow-moss font-mono">LES TROIS DÉPARTS</p>
-    <h1 class="h2 font-display">Nos programmes MonProgrammeFit</h1>
+    <h1 class="h2 font-display">Nos programmes</h1>
     <p class="hero-sub" style="max-width:620px; margin-top:12px;">Chaque parcours a été conçu pour répondre à un contexte réel : salle, maison avec matériel, ou entraînement au poids de corps.</p>
     <div class="grid-3" style="margin-top:32px">
       ${TRACKS.map((t) => `
@@ -128,7 +128,7 @@ export function renderPrograms() {
     <div class="cta-band" style="margin-top:40px;">
       <div class="wrap">
         <h3 class="font-display">Le bon programme, le bon rythme, la bonne méthode.</h3>
-        <button class="btn btn-ember" data-nav="signup" aria-label="Démarrer MonProgrammeFit">Démarrer MonProgrammeFit</button>
+        <button class="btn btn-ember" data-nav="signup" aria-label="Démarrer">Démarrer</button>
       </div>
     </div>
   </div>`;
