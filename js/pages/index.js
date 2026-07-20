@@ -3,8 +3,7 @@
    ========================================================== */
 
 import {
-  renderHome, renderPrograms, renderBlog, renderPricing,
-  renderFaq, renderLegal, renderNotFound, renderAbout
+  renderHome, renderPrograms, renderBlog, renderLegal, renderNotFound, renderAbout
 } from "./guest.js";
 import { renderContact } from "./contact.js";
 import { renderQuiz } from "./quiz.js";
@@ -18,8 +17,6 @@ console.log("Fonction renderContact importée depuis contact.js:", { renderConta
 export const PAGES = {
   "home": renderHome,
   "programs": renderPrograms,
-  "pricing": renderPricing,
-  "faq": renderFaq,
   "about": renderAbout,
   "blog": renderBlog,
   "contact": renderContact,

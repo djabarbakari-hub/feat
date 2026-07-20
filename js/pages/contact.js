@@ -33,7 +33,7 @@ export function renderContact() {
   return `
   <div class="section wrap">
     <p class="eyebrow-moss font-mono">CONTACT</p>
-    <h1 class="h2 font-display">Besoin d'aide ? On est là pour toi.</h1>
+    <h1 class="h2 font-display">Contactez-nous</h1>
     <p class="hero-sub" style="max-width:620px; margin-top:12px;">Tu as une question sur ton programme, ton inscription ou ton suivi ? Écris-nous et nous te répondrons sous 24h (du lundi au vendredi, 8h–18h).</p>
 
     <div class="grid-2" style="gap:24px; margin-top:32px;">
