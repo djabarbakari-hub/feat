@@ -33,12 +33,3 @@
 /* Back button (bottom-right) visible on every screen */
 /* back button removed */
 
-/* Footer layout */
-footer.footer { background: var(--bg-dark); border-top: 1px solid rgba(255,255,255,0.08); width: 100%; }
-footer.footer .wrap { padding: 24px 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
-
-@media (min-width: 768px) {
-  footer.footer .wrap {
-    padding: 40px 20px;
-  }
-}

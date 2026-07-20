@@ -16,18 +16,9 @@
 
 .hero-grid {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 40px;
+  grid-template-columns: 1fr;
+  gap: 24px;
   align-items: center;
-}
-
-@media (max-width: 1024px) {
-  .hero-grid {
-    grid-template-columns: 1fr;
-  }
-  .hero-photos {
-    display: none;
-  }
 }
 
 .eyebrow-ember {
@@ -103,13 +94,6 @@
   border-color: var(--accent-primary);
   color: var(--accent-primary);
 }
-
-.hero-photos { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; height: 420px; }
-.photo-card { position: relative; border-radius: 2px; overflow: hidden; }
-.photo-card.tall { grid-row: span 2; }
-.photo-card img { width: 100%; height: 100%; object-fit: cover; }
-.photo-card .overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(22,35,44,0.75), transparent 50%); }
-.photo-card .caption { position: absolute; bottom: 12px; left: 12px; font-size: 10px; color: var(--chalk); }
 
 .trail-grid { margin-top: 64px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--ink-line); }
 @media (max-width: 768px) { .trail-grid { grid-template-columns: 1fr; } }

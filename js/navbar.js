@@ -63,7 +63,7 @@ export function renderFooter() {
     </div>
     <div class="footer-links">
       <button class="nav-link" data-nav="contact">Contact</button>
-      <button class="nav-link" data-nav="legal">Mentions</button>
+      <button class="nav-link" data-nav="legal">Mentions légales</button>
     </div>
   </div>`;
 }

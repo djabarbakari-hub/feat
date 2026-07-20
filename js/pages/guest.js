@@ -29,7 +29,7 @@ export function renderHome() {
     <div class="wrap hero-inner">
       <div class="hero-grid">
         <div>
-          <p class="eyebrow-ember font-mono">Salle. Maison. Avec ou sans matériel — L'objectif : votre transformation physique.</p>
+          <p class="eyebrow-ember font-mono">Votre coaching, votre rythme, vos résultats.</p>
           <h1 class="h1 font-display">Avec le bon programme et le bon suivi, votre objectif physique est à votre portée.</h1>
           <p class="hero-sub">Des programmes personnalisés adaptés à votre niveau, votre environnement et vos objectifs. Avec ou sans matériel : nous vous accompagnons avec une méthode efficace pour construire votre meilleure version.</p>
           <div class="hero-cta">

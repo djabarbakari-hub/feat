@@ -23,7 +23,7 @@ export function renderClientDashboard() {
         <p class="eyebrow-moss font-mono">BON RETOUR${clientName ? " " + escapeHtml(clientName).toUpperCase() : ""}</p>
         <h1 class="h2 font-display">Tableau de bord MonProgrammeFit</h1>
       </div>
-      <button class="btn-outline-dark" data-nav="home" data-logout="1" aria-label="Se déconnecter">${icon("log-out", 14)} Déconnexion</button>
+      <button class="btn-logout" data-nav="home" data-logout="1" aria-label="Se déconnecter">${icon("log-out", 14)} Déconnexion</button>
     </div>
     <div class="grid-2" style="grid-template-columns:2fr 1fr">
       <div class="card">
