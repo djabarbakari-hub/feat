@@ -18,8 +18,13 @@ export function renderClientDashboard() {
   const totalDone = p.history.reduce((sum, h) => sum + h.done, 0);
   return `
   <div class="section wrap">
-    <p class="eyebrow-moss font-mono">BON RETOUR${clientName ? " " + escapeHtml(clientName).toUpperCase() : ""}</p>
-    <h1 class="h2 font-display">Tableau de bord MonProgrammeFit</h1>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+      <div>
+        <p class="eyebrow-moss font-mono">BON RETOUR${clientName ? " " + escapeHtml(clientName).toUpperCase() : ""}</p>
+        <h1 class="h2 font-display">Tableau de bord MonProgrammeFit</h1>
+      </div>
+      <button class="btn-outline-dark" data-nav="home" data-logout="1" aria-label="Se déconnecter">${icon("log-out", 14)} Déconnexion</button>
+    </div>
     <div class="grid-2" style="grid-template-columns:2fr 1fr">
       <div class="card">
         <div class="font-mono" style="font-size:12px;color:var(--ink-muted3);display:flex;align-items:center;gap:8px">${icon(track.icon, 14, "var(--ember)")} ${track.label}</div>
