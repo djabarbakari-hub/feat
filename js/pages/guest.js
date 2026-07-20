@@ -125,6 +125,37 @@ export function renderPrograms() {
           <div style="margin-top:12px">${renderTrialProgram(t.id)}</div>
         </div>`).join("")}
     </div>
+
+    <div class="card" style="margin-top:32px;padding:24px">
+      <p class="eyebrow-moss font-mono">TARIFS</p>
+      <h2 class="h2 font-display" style="font-size:24px;margin-bottom:20px">Choisis l'offre qui te correspond</h2>
+      <div class="grid-3">
+        <div class="card" style="padding:20px">
+          <h3 class="font-display" style="font-size:18px;color:var(--ink);margin-bottom:8px">Abonnement Flex</h3>
+          <p style="font-size:14px;color:var(--slate);margin-bottom:12px">Accès à tous les programmes (salle/maison/extérieur)</p>
+          <div class="stat-val font-display">8 000 FCFA / mois</div>
+          <div class="font-mono" style="font-size:12px;color:var(--moss);margin-top:8px">Mensuel</div>
+        </div>
+        <div class="card" style="padding:20px">
+          <h3 class="font-display" style="font-size:18px;color:var(--ink);margin-bottom:8px">Abonnement Premium</h3>
+          <p style="font-size:14px;color:var(--slate);margin-bottom:12px">Consultation personnalisée/mois + accès prioritaire aux nouveaux programmes</p>
+          <div class="stat-val font-display">15 000 FCFA / mois</div>
+          <div class="font-mono" style="font-size:12px;color:var(--moss);margin-top:8px">Mensuel</div>
+        </div>
+        <div class="card" style="padding:20px">
+          <h3 class="font-display" style="font-size:18px;color:var(--ink);margin-bottom:8px">Programme 30 Jours Défi</h3>
+          <p style="font-size:14px;color:var(--slate);margin-bottom:12px">Défi intensif de 30 jours avec objectif précis + suivi quotidien</p>
+          <div class="stat-val font-display">15 000 FCFA</div>
+          <div class="font-mono" style="font-size:12px;color:var(--moss);margin-top:8px">30 jours</div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:20px;padding:20px;background:var(--chalk-soft)">
+        <h3 class="font-display" style="font-size:18px;color:var(--ink);margin-bottom:8px">Séance Découverte Gratuite</h3>
+        <p style="font-size:14px;color:var(--slate);margin-bottom:12px">1 semaine d'accès gratuit à 3 programmes de base + 1 consultation</p>
+        <div class="font-mono" style="font-size:12px;color:var(--moss)">Gratuit</div>
+      </div>
+    </div>
+
     <div class="cta-band" style="margin-top:40px;">
       <div class="wrap">
         <h3 class="font-display">Le bon programme, le bon rythme, la bonne méthode.</h3>
@@ -146,7 +177,6 @@ export function renderTrialProgram(id) {
           <li><strong>Séance 3 — Jambes</strong> : squat, fente, soulevé roumain — 45–55 min</li>
           <li><strong>Séance 4 — Cardio</strong> : 30–40 min (fractionné ou endurance)</li>
         </ul>
-          <div style="margin-top:8px"><button class="btn btn-ember" data-nav="signup">Recevez votre programme personnalisé</button></div>
       </div>`;
   }
   if (id === "home-equip") {
@@ -161,7 +191,6 @@ export function renderTrialProgram(id) {
           <li><strong>Séance 4 — Push</strong> : épaules, triceps, pompes lestées — 40 min</li>
           <li><strong>Séance 5 — Pull / Cardio</strong> : tirage, curls + 20 min cardio léger — 40–45 min</li>
         </ul>
-        <div style="margin-top:8px"><button class="btn btn-ember" data-nav="signup">Recevez votre programme personnalisé</button></div>
       </div>`;
   }
   // bodyweight
@@ -176,7 +205,6 @@ export function renderTrialProgram(id) {
         <li><strong>Séance 4 — Core + mobilité</strong> : planche, hollow, stretching — 25–30 min</li>
         <li><strong>Séance 5 — Endurance</strong> : running ou cardio à la maison 30–40 min</li>
       </ul>
-      <div style="margin-top:8px"><button class="btn btn-ember" data-nav="signup">Recevez votre programme personnalisé</button></div>
     </div>`;
 }
 
