@@ -40,11 +40,10 @@ export function renderContact() {
       <div class="card">
         <p style="font-size:16px;color:var(--ink);line-height:1.8;">Tu préfères nous contacter directement ? Voici nos coordonnées :</p>
         <div style="margin-top:24px; display:grid; gap:14px;">
-          <div><strong>Email</strong><p style="margin:6px 0 0;color:var(--slate);">contact@monprogrammefit.com</p></div>
-          <div><strong>Téléphone</strong><p style="margin:6px 0 0;color:var(--slate);">+229 90 00 00 00</p></div>
+          <div><strong>Email</strong><p style="margin:6px 0 0;color:var(--slate);">djabarbakari.032003@gmail.com</p></div>
+          <div><strong>Téléphone</strong><p style="margin:6px 0 0;color:var(--slate);">+229 01 91 72 05 96</p></div>
           <div><strong>Heures</strong><p style="margin:6px 0 0;color:var(--slate);">Lun–Ven · 8h–18h</p></div>
           <div style="margin-top:16px;">
-            <a href="#faq" class="btn btn-line" style="display:inline-block; margin-right:8px;">Voir la FAQ</a>
             <div style="display:flex; gap:8px; margin-top:8px;">
               <a href="https://www.instagram.com/menblvck/#" target="_blank" aria-label="Instagram">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--slate);">
