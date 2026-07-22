@@ -25,6 +25,9 @@ export const state = {
   ui: {
     isSending: false,
     sendSuccess: false,
+    loginError: "",
+    loginShowPassword: false,
+    loginPending: false,
   },
   backExitAttempted: false,
   backNoticeTimer: null,
@@ -35,6 +38,14 @@ export const state = {
  */
 export function persistState() {
   try {
+    const safeDrafts = {
+      ...state.drafts,
+      login: {
+        ...state.drafts.login,
+        password: "",
+      },
+    };
+
     const snapshot = {
       page: state.page,
       role: state.role,
@@ -45,7 +56,7 @@ export function persistState() {
       history: state.history,
       activeSession: state.activeSession,
       adminNotice: state.adminNotice,
-      drafts: state.drafts,
+      drafts: safeDrafts,
       lastVisitedAt: Date.now(),
     };
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));

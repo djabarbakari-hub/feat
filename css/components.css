@@ -17,12 +17,20 @@
 .quiz-option:hover { border-color: var(--ink); }
 
 /* ---------- LOGIN ---------- */
-.login-wrap { max-width: 380px; margin: 0 auto; min-height: 60vh; display: flex; flex-direction: column; justify-content: center; }
+.login-wrap { max-width: 420px; margin: 0 auto; min-height: 60vh; display: flex; flex-direction: column; justify-content: center; }
 .tabs { display: flex; margin-bottom: 24px; border: 1px solid var(--line); border-radius: 2px; overflow: hidden; }
 .tab { flex: 1; padding: 10px 0; font-size: 14px; font-weight: 600; color: var(--slate); background: transparent; }
 .tab.active { background: var(--ink); color: var(--chalk); }
-.form-grid { display: grid; gap: 12px; }
+.login-form { display: grid; gap: 14px; }
+.login-subtitle { margin: 0; color: var(--slate); line-height: 1.6; }
+.login-help { margin: 4px 0 0; font-size: 12px; color: var(--slate); }
+.password-field { position: relative; }
+.password-field .text-input { padding-right: 98px; }
+.toggle-password { position: absolute; top: 50%; right: 12px; transform: translateY(-50%); background: transparent; border: none; color: var(--ember); font-size: 12px; font-weight: 600; cursor: pointer; }
+.toggle-password:hover { text-decoration: underline; }
+.form-error { color: var(--ember); background: rgba(226,98,45,0.08); border: 1px solid rgba(226,98,45,0.18); border-radius: 2px; padding: 10px 12px; font-size: 13px; }
 .text-input { border: 1px solid var(--line); border-radius: 2px; padding: 14px 16px; font-size: 14px; width: 100%; }
+.btn[disabled] { opacity: 0.65; cursor: not-allowed; }
 .hint { font-size: 12px; text-align: center; margin-top: 24px; color: var(--ink-muted3); }
 .hint button { text-decoration: underline; color: inherit; }
 

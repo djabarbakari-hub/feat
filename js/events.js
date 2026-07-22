@@ -62,6 +62,14 @@ document.addEventListener("input", (e) => {
     state.drafts.signup.height = e.target.value;
     persistState();
   }
+  if (e.target.matches('[data-login-email]')) {
+    state.drafts.login.email = e.target.value;
+    persistState();
+  }
+  if (e.target.matches('[data-login-password]')) {
+    state.drafts.login.password = e.target.value;
+    persistState();
+  }
   if (e.target.matches('[data-quiz-text]')) {
     state.quizAnswers[e.target.dataset.quizText] = e.target.value;
     persistState();
@@ -243,6 +251,15 @@ document.addEventListener("click", (e) => {
   const loginTabBtn = e.target.closest("[data-login-tab]");
   if (loginTabBtn) {
     state.loginTab = loginTabBtn.dataset.loginTab;
+    state.ui.loginError = "";
+    state.ui.loginPending = false;
+    render();
+    return;
+  }
+
+  const loginPasswordToggle = e.target.closest("[data-login-toggle-password]");
+  if (loginPasswordToggle) {
+    state.ui.loginShowPassword = !state.ui.loginShowPassword;
     render();
     return;
   }
@@ -268,8 +285,43 @@ document.addEventListener("click", (e) => {
 
   const loginSubmitBtn = e.target.closest("[data-login-submit]");
   if (loginSubmitBtn) {
-    state.role = state.loginTab;
-    navigate(state.loginTab === "client" ? "client-dashboard" : "admin-dashboard");
+    const form = loginSubmitBtn.closest('.login-wrap') || document;
+    const email = (form.querySelector('[data-login-email]') || {}).value || "";
+    const password = (form.querySelector('[data-login-password]') || {}).value || "";
+    const emailValid = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
+
+    state.drafts.login.email = email;
+    state.drafts.login.password = password;
+
+    if (!email) {
+      state.ui.loginError = "Veuillez saisir votre adresse e-mail.";
+      render();
+      return;
+    }
+
+    if (!emailValid) {
+      state.ui.loginError = "Veuillez saisir une adresse e-mail valide.";
+      render();
+      return;
+    }
+
+    if (!password) {
+      state.ui.loginError = "Veuillez saisir votre mot de passe.";
+      render();
+      return;
+    }
+
+    state.ui.loginError = "";
+    state.ui.loginPending = true;
+    render();
+
+    window.setTimeout(() => {
+      state.ui.loginPending = false;
+      state.role = state.loginTab;
+      state.drafts.login.password = "";
+      persistState();
+      navigate(state.loginTab === "client" ? "client-dashboard" : "admin-dashboard");
+    }, 400);
     return;
   }
 

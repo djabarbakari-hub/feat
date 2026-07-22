@@ -6,19 +6,33 @@ import { state } from "../state.js";
 import { escapeHtml } from "../helpers.js";
 
 export function renderLogin() {
+  const login = state.drafts.login;
   return `
   <div class="section wrap">
     <div class="login-wrap">
       <h1 class="font-display" style="font-size:24px;text-align:center;color:var(--ink);margin-bottom:4px">Connexion</h1>
-      <p style="font-size:14px;text-align:center;color:var(--slate);margin-bottom:32px">Accède à ton espace et continue ton suivi.</p>
+      <p style="font-size:14px;text-align:center;color:var(--slate);margin-bottom:24px">Accède à ton espace et reprends ton suivi où tu l’as laissé.</p>
       <div class="tabs">
         <button class="tab ${state.loginTab === "client" ? "active" : ""}" data-login-tab="client">Espace client</button>
         <button class="tab ${state.loginTab === "admin" ? "active" : ""}" data-login-tab="admin">Espace admin</button>
       </div>
-      <div class="form-grid">
-        <input class="text-input" placeholder="Adresse e-mail" />
-        <input class="text-input" placeholder="Mot de passe" type="password" />
-        <button class="btn btn-ember" style="justify-content:center;margin-top:8px" data-login-submit="1">Se connecter (démo)</button>
+      <div class="login-form card">
+        <label class="font-mono" style="font-size:12px">Adresse e-mail</label>
+        <input class="text-input" type="email" data-login-email value="${escapeHtml(login.email)}" placeholder="ton@exemple.com" autocomplete="username" />
+        <p class="login-help">Utilise l’adresse liée à ton compte MonProgrammeFit.</p>
+
+        <label class="font-mono" style="font-size:12px">Mot de passe</label>
+        <div class="password-field">
+          <input class="text-input" type="${state.ui.loginShowPassword ? "text" : "password"}" data-login-password value="${escapeHtml(login.password)}" placeholder="•••••••••" autocomplete="current-password" />
+          <button type="button" class="toggle-password" data-login-toggle-password>${state.ui.loginShowPassword ? "Masquer" : "Afficher"}</button>
+        </div>
+        <p class="login-help">Ton mot de passe reste confidentiel et n’est pas enregistré en clair.</p>
+
+        ${state.ui.loginError ? `<div class="form-error" role="alert">${escapeHtml(state.ui.loginError)}</div>` : ""}
+
+        <button class="btn btn-ember" style="justify-content:center;margin-top:8px" data-login-submit="1" ${state.ui.loginPending ? "disabled" : ""}>
+          ${state.ui.loginPending ? "Connexion en cours…" : "Se connecter"}
+        </button>
       </div>
       <p class="hint">Pas encore de compte ? <button class="btn btn-ember" style="font-size:14px;padding:10px 14px;color:var(--ink);" data-nav="signup">S'inscrire</button></p>
     </div>
