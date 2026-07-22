@@ -14,12 +14,19 @@ export const state = {
   history: [],
   activeSession: "",
   adminNotice: "",
+  adminStats: {
+    clients: 0,
+    activeToday: 0,
+    newThisWeek: 0,
+    popular: [],
+    messages: []
+  },
   // ⚠️ AVERTISSEMENT : Ne pas stocker de données sensibles en clair dans `drafts`.
   // Les données comme les emails, mots de passe ou informations personnelles
   // doivent être chiffrées ou évitées en stockage local.
   drafts: {
     contact: { name: "", email: "", message: "", subject: "", captcha: "" },
-    signup: { firstName: "", lastName: "", email: "", age: "", goal: "", weight: "", height: "" },
+    signup: { firstName: "", lastName: "", email: "", password: "" },
     login: { email: "", password: "" },
   },
   ui: {
@@ -28,6 +35,8 @@ export const state = {
     loginError: "",
     loginShowPassword: false,
     loginPending: false,
+    signupError: "",
+    signupPending: false,
   },
   backExitAttempted: false,
   backNoticeTimer: null,
@@ -42,6 +51,10 @@ export function persistState() {
       ...state.drafts,
       login: {
         ...state.drafts.login,
+        password: "",
+      },
+      signup: {
+        ...state.drafts.signup,
         password: "",
       },
     };
@@ -86,6 +99,7 @@ export function restorePersistedState(validPageKeys = []) {
       if (Array.isArray(parsed.history)) state.history = parsed.history;
       if (parsed.activeSession) state.activeSession = parsed.activeSession;
       if (parsed.adminNotice) state.adminNotice = parsed.adminNotice;
+      if (parsed.adminStats) state.adminStats = parsed.adminStats;
       if (parsed.drafts) state.drafts = { ...state.drafts, ...parsed.drafts };
     }
   } catch (error) {

@@ -45,7 +45,7 @@ export function renderSignup() {
   <div class="section wrap">
     <div class="card" style="max-width:560px;margin:0 auto;padding:24px">
       <h1 class="font-display" style="font-size:22px;margin-bottom:8px">Créer mon compte</h1>
-      <p style="font-size:14px;color:var(--slate);margin-bottom:16px">Indique ton objectif et tes mesures actuelles pour démarrer ta transformation.</p>
+      <p style="font-size:14px;color:var(--slate);margin-bottom:16px">Commence avec ton profil et choisis ton programme après inscription.</p>
       <div class="form-grid">
         <label class="font-mono" style="font-size:12px">Prénom</label>
         <input class="text-input" type="text" data-signup-firstname value="${escapeHtml(d.firstName)}" placeholder="Ex: Julie" />
@@ -54,26 +54,20 @@ export function renderSignup() {
         <input class="text-input" type="text" data-signup-lastname value="${escapeHtml(d.lastName)}" placeholder="Ex: Dubois" />
 
         <label class="font-mono" style="font-size:12px">Adresse e-mail</label>
-        <input class="text-input" type="email" data-signup-email value="${escapeHtml(d.email)}" placeholder="ton@exemple.com" />
+        <input class="text-input" type="email" data-signup-email value="${escapeHtml(d.email)}" placeholder="ton@exemple.com" autocomplete="username" />
+        <p class="login-help">Ton adresse email permettra de te reconnecter plus tard.</p>
 
-        <label class="font-mono" style="font-size:12px">Âge</label>
-        <input class="text-input" type="number" min="13" data-signup-age value="${escapeHtml(d.age)}" placeholder="Ex: 28" />
+        <label class="font-mono" style="font-size:12px">Mot de passe</label>
+        <input class="text-input" type="password" data-signup-password value="${escapeHtml(d.password)}" placeholder="•••••••••" autocomplete="new-password" />
+        <p class="login-help">Ton mot de passe restera confidentiel et n’est pas enregistré en clair.</p>
 
-        <label class="font-mono" style="font-size:12px">Objectif</label>
-        <select class="text-input" data-signup-goal>
-          <option value="remise" ${d.goal === "remise" ? "selected" : ""}>Remise en forme</option>
-          <option value="perte" ${d.goal === "perte" ? "selected" : ""}>Perte de poids</option>
-          <option value="musculation" ${d.goal === "musculation" ? "selected" : ""}>Musculation</option>
-        </select>
+        ${state.ui.signupError ? `<div class="form-error" role="alert">${escapeHtml(state.ui.signupError)}</div>` : ""}
 
-        <label class="font-mono" style="font-size:12px">Poids (kg)</label>
-        <input class="text-input" type="number" step="0.1" data-signup-weight value="${escapeHtml(d.weight)}" placeholder="Ex: 72.5" />
-
-        <label class="font-mono" style="font-size:12px">Taille (cm)</label>
-        <input class="text-input" type="number" step="0.1" data-signup-height value="${escapeHtml(d.height)}" placeholder="Ex: 175" />
-
-        <button class="btn btn-ember" style="justify-content:center;margin-top:8px" data-signup-submit="1">Créer mon compte et démarrer</button>
+        <button class="btn btn-ember" style="justify-content:center;margin-top:8px" data-signup-submit="1" ${state.ui.signupPending ? "disabled" : ""}>
+          ${state.ui.signupPending ? "Création en cours…" : "Créer mon compte"}
+        </button>
       </div>
+      <p class="hint">Déjà un compte ? <button class="btn btn-ember" style="font-size:14px;padding:10px 14px;color:var(--ink);" data-nav="login">Se connecter</button></p>
     </div>
   </div>`;
 }

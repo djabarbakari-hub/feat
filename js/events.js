@@ -20,6 +20,7 @@ import { state, persistState } from "./state.js";
 import { navigate, goBack } from "./router.js";
 import { render } from "./render.js";
 import { QUIZ_STEPS } from "./data.js";
+import { trackById } from "./helpers.js";
 
 document.addEventListener("input", (e) => {
   if (e.target.matches('[data-contact-name]')) {
@@ -46,20 +47,8 @@ document.addEventListener("input", (e) => {
     state.drafts.signup.email = e.target.value;
     persistState();
   }
-  if (e.target.matches('[data-signup-age]')) {
-    state.drafts.signup.age = e.target.value;
-    persistState();
-  }
-  if (e.target.matches('[data-signup-goal]')) {
-    state.drafts.signup.goal = e.target.value;
-    persistState();
-  }
-  if (e.target.matches('[data-signup-weight]')) {
-    state.drafts.signup.weight = e.target.value;
-    persistState();
-  }
-  if (e.target.matches('[data-signup-height]')) {
-    state.drafts.signup.height = e.target.value;
+  if (e.target.matches('[data-signup-password]')) {
+    state.drafts.signup.password = e.target.value;
     persistState();
   }
   if (e.target.matches('[data-login-email]')) {
@@ -125,6 +114,34 @@ document.addEventListener("click", (e) => {
 
   const quizConfirmBtn = e.target.closest("[data-quiz-confirm]");
   if (quizConfirmBtn) {
+    const answers = state.quizAnswers || {};
+    const track = trackById(answers.lieu || "home-equip");
+    const weekLength = track.id === "gym" ? 12 : track.id === "bodyweight" ? 8 : 10;
+    const program = {
+      trackLabel: track.label,
+      track: track.id,
+      week: 1,
+      totalWeeks: weekLength,
+      nextSession: `${track.label} — Séance 1`,
+      history: [
+        { name: "Semaine 1", done: 0, total: 3 }
+      ],
+      sessions: [
+        { name: "Séance 1 — Focus technique", exos: 6, duree: "35 min", done: false },
+        { name: "Séance 2 — Intensité maîtrisée", exos: 7, duree: "40 min", done: false },
+        { name: "Séance 3 — Endurance active", exos: 5, duree: "30 min", done: false },
+      ]
+    };
+
+    state.clientProfile = {
+      ...state.clientProfile,
+      goal: answers.objectif,
+      track: answers.lieu,
+      niveau: answers.niveau,
+      frequence: answers.frequence,
+      physique: answers.physique,
+      program,
+    };
     state.quizStep = QUIZ_STEPS.length;
     persistState();
     render();
@@ -270,16 +287,42 @@ document.addEventListener("click", (e) => {
     const firstName = (card.querySelector('[data-signup-firstname]') || {}).value || "";
     const lastName = (card.querySelector('[data-signup-lastname]') || {}).value || "";
     const email = (card.querySelector('[data-signup-email]') || {}).value || "";
-    const ageVal = (card.querySelector('[data-signup-age]') || {}).value || null;
-    const goal = (card.querySelector('[data-signup-goal]') || {}).value || "";
-    const weightVal = (card.querySelector('[data-signup-weight]') || {}).value || null;
-    const heightVal = (card.querySelector('[data-signup-height]') || {}).value || null;
-    const age = ageVal ? parseInt(ageVal, 10) : null;
-    const weight = weightVal ? parseFloat(weightVal) : null;
-    const height = heightVal ? parseFloat(heightVal) : null;
-    state.clientProfile = { firstName, lastName, email, age, goal, weight, height };
-    state.role = 'client';
-    navigate('quiz');
+    const password = (card.querySelector('[data-signup-password]') || {}).value || "";
+    const emailValid = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
+
+    state.drafts.signup.email = email;
+    state.drafts.signup.password = password;
+
+    if (!email) {
+      state.ui.signupError = "Veuillez saisir votre adresse e-mail.";
+      render();
+      return;
+    }
+
+    if (!emailValid) {
+      state.ui.signupError = "Veuillez saisir une adresse e-mail valide.";
+      render();
+      return;
+    }
+
+    if (!password) {
+      state.ui.signupError = "Veuillez définir un mot de passe.";
+      render();
+      return;
+    }
+
+    state.ui.signupError = "";
+    state.ui.signupPending = true;
+    render();
+
+    window.setTimeout(() => {
+      state.ui.signupPending = false;
+      state.clientProfile = { firstName, lastName, email };
+      state.role = 'client';
+      state.drafts.signup.password = "";
+      persistState();
+      navigate('quiz');
+    }, 400);
     return;
   }
 

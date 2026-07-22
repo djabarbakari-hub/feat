@@ -11,9 +11,6 @@ import { renderLogin, renderSignup } from "./auth.js";
 import { renderClientDashboard, renderClientProgram, renderClientProgress } from "./client.js";
 import { renderAdminDashboard, renderAdminClients, renderAdminPrograms, renderAdminMessages } from "./admin.js";
 
-console.log("Fonctions importées depuis guest.js:", { renderAbout }); // Debug: Vérifier l'import
-console.log("Fonction renderContact importée depuis contact.js:", { renderContact }); // Debug: Vérifier l'import
-
 export const PAGES = {
   "home": renderHome,
   "programs": renderPrograms,

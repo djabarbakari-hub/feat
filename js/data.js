@@ -39,8 +39,7 @@ export const QUIZ_STEPS = [
   {
     q: "Bienvenue chez MonProgrammeFit",
     key: "welcome",
-    type: "text",
-    placeholder: "Ton prénom (optionnel)",
+    type: "info",
     button: "Commencer mon onboarding"
   },
   {
@@ -88,38 +87,3 @@ export const QUIZ_STEPS = [
   }
 ];
 
-// Programme client de démonstration (pas encore branché sur un backend)
-export const CLIENT_PROGRAM = {
-  track: "home-equip",
-  week: 4,
-  totalWeeks: 10,
-  nextSession: "Haut du corps — Séance B",
-  history: [
-    { name: "Semaine 1", done: 3, total: 3 },
-    { name: "Semaine 2", done: 3, total: 3 },
-    { name: "Semaine 3", done: 2, total: 3 },
-    { name: "Semaine 4", done: 1, total: 3 },
-  ],
-  sessions: [
-    { name: "Séance A — Bas du corps", exos: 6, duree: "40 min", done: true },
-    { name: "Séance B — Haut du corps", exos: 7, duree: "45 min", done: false },
-    { name: "Séance C — Full body", exos: 8, duree: "35 min", done: false },
-  ],
-};
-
-// Statistiques admin de démonstration (pas encore branchées sur un backend)
-export const ADMIN_STATS = {
-  clients: 128,
-  activeToday: 34,
-  newThisWeek: 9,
-  popular: [
-    { name: "Maison — au poids du corps", pct: 44 },
-    { name: "Salle de gym", pct: 33 },
-    { name: "Maison — avec matériel", pct: 23 },
-  ],
-  messages: [
-    { from: "Sarah M.", preview: "J'ai une douleur au genou pendant les squats, je fais quoi ?", time: "10:24" },
-    { from: "Karim B.", preview: "Question sur la fréquence des séances de running", time: "09:02" },
-    { from: "Julie T.", preview: "Merci coach, super première semaine !", time: "hier" },
-  ],
-};

@@ -14,7 +14,6 @@ import { icon, escapeHtml } from "../helpers.js";
  * @returns {string} HTML de la page Contact.
  */
 export function renderContact() {
-  console.log("[DEBUG] renderContact() appelée");
   const { name, email, message, subject } = state.drafts.contact;
   const isSending = state.ui.isSending;
   const sendSuccess = state.ui.sendSuccess;

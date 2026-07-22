@@ -2,12 +2,12 @@
    pages/admin.js — Espace admin (vue d'ensemble, clients, programmes, messages).
    ========================================================== */
 
-import { TRACKS, ADMIN_STATS } from "../data.js";
+import { TRACKS } from "../data.js";
 import { state } from "../state.js";
 import { icon, escapeHtml } from "../helpers.js";
 
 export function renderAdminDashboard() {
-  const a = ADMIN_STATS;
+  const a = state.adminStats || { clients: 0, activeToday: 0, newThisWeek: 0, popular: [], messages: [] };
   const notice = state.adminNotice ? `<div class="card" style="margin:16px 0 0;background:rgba(78,154,122,0.08);border-color:rgba(78,154,122,0.2);">${escapeHtml(state.adminNotice)}</div>` : "";
   return `
   <div class="admin-panel">
@@ -98,13 +98,6 @@ export function renderAdminDashboard() {
 }
 
 export function renderAdminClients() {
-  const clients = [
-    { name: "Julie T.", track: "Maison — matériel", week: "4/10", status: "Actif" },
-    { name: "Karim B.", track: "Salle de gym", week: "7/12", status: "Actif" },
-    { name: "Sarah M.", track: "Bodyweight", week: "2/8", status: "En pause" },
-    { name: "Marc D.", track: "Salle de gym", week: "12/12", status: "Terminé" },
-  ];
-  const badgeStyle = (s) => s === "Actif" ? "background:var(--moss-soft);color:var(--moss)" : s === "Terminé" ? "background:var(--chalk-soft);color:var(--slate)" : "background:var(--ember-soft);color:var(--ember)";
   return `
   <div class="section wrap">
     <p class="eyebrow-moss font-mono">GESTION</p>
@@ -113,13 +106,9 @@ export function renderAdminClients() {
       <div class="search-box">${icon("search", 14, "var(--ink-muted3)")}<input placeholder="Rechercher..." /></div>
     </div>
     <div class="card" style="padding:0">
-      ${clients.map((c) => `
-        <div class="table-row">
-          <div style="font-weight:600;font-size:14px;color:var(--ink)">${c.name}</div>
-          <div class="font-mono" style="font-size:12px;color:var(--slate)">${c.track}</div>
-          <div class="font-mono" style="font-size:12px;color:var(--slate)">${c.week}</div>
-          <span class="badge" style="${badgeStyle(c.status)}">${c.status}</span>
-        </div>`).join("")}
+      <div class="table-row" style="justify-content:center;padding:32px 0;color:var(--slate);font-size:14px">
+        Aucune liste de clients disponible sans back-end connecté.
+      </div>
     </div>
   </div>`;
 }
@@ -149,20 +138,20 @@ export function renderAdminPrograms() {
 }
 
 export function renderAdminMessages() {
-  const a = ADMIN_STATS;
+  const a = state.adminStats || { messages: [] };
   return `
   <div class="section wrap">
     <p class="eyebrow-moss font-mono">ÉCHANGES</p>
     <h1 class="h2 font-display">Messages clients</h1>
     <div class="card" style="padding:0">
-      ${a.messages.map((m) => `
+      ${a.messages.length ? a.messages.map((m) => `
         <div class="table-row" style="justify-content:flex-start;gap:16px;align-items:flex-start">
           <div style="width:36px;height:36px;border-radius:100px;background:var(--chalk-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0">${icon("user", 16, "var(--slate)")}</div>
           <div style="flex:1">
             <div style="display:flex;justify-content:space-between"><span style="font-weight:600;font-size:14px;color:var(--ink)">${m.from}</span><span class="font-mono" style="font-size:10px;color:var(--ink-muted3)">${m.time}</span></div>
             <p style="font-size:14px;color:var(--slate);margin:4px 0 0">${m.preview}</p>
           </div>
-        </div>`).join("")}
+        </div>`).join("") : `<div class="table-row" style="justify-content:center;padding:32px 0;color:var(--slate);font-size:14px">Aucun message client à afficher pour le moment.</div>`}
     </div>
   </div>`;
 }
