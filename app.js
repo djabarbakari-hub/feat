@@ -15,12 +15,56 @@ import {
 } from "./js/modules/privacy.js";
 import { renderConsentModal } from "./js/modules/consent-modal.js";
 
+import { auth, db } from "./js/firebase.js";
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { state } from "./js/state.js";
+
 setRenderer(render);
 
 restorePersistedState(Object.keys(PAGES));
 window.addEventListener("popstate", handleBackNavigation);
 window.addEventListener("pageshow", () => {
   persistState();
+});
+
+// Écouteur d'état d'authentification Firebase (restauration automatique de la session)
+// Explication : Firebase gère la persistance des jetons d'accès. Firestore fournit le rôle ("client" ou "admin").
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    try {
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        state.role = userData.role || "client";
+        state.clientProfile = {
+          ...state.clientProfile,
+          ...userData,
+          email: user.email,
+          uid: user.uid,
+        };
+      } else {
+        state.role = "client";
+        state.clientProfile = {
+          ...state.clientProfile,
+          email: user.email,
+          uid: user.uid,
+        };
+      }
+    } catch (error) {
+      console.warn("Impossible d'obtenir les données du rôle Firestore:", error);
+      state.role = "client";
+    }
+  } else {
+    state.role = "guest";
+    state.clientProfile = {};
+    if (state.page.startsWith("client") || state.page.startsWith("admin")) {
+      state.page = "home";
+    }
+  }
+  render();
 });
 
 // 1. Nettoyage automatique des données expirées (14 jours)

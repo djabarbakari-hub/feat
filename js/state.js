@@ -62,7 +62,6 @@ export function persistState() {
 
     const snapshot = {
       page: state.page,
-      role: state.role,
       quizStep: state.quizStep,
       quizAnswers: state.quizAnswers,
       loginTab: state.loginTab,
@@ -92,7 +91,6 @@ export function restorePersistedState(validPageKeys = []) {
     if (saved) {
       const parsed = JSON.parse(saved);
       if (parsed.page) state.page = parsed.page;
-      if (parsed.role) state.role = parsed.role;
       if (typeof parsed.quizStep === "number") state.quizStep = parsed.quizStep;
       if (parsed.quizAnswers) state.quizAnswers = parsed.quizAnswers;
       if (parsed.loginTab) state.loginTab = parsed.loginTab;

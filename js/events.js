@@ -21,6 +21,62 @@ import { navigate, goBack } from "./router.js";
 import { render } from "./render.js";
 import { QUIZ_STEPS } from "./data.js";
 import { trackById, closeMobileMenu } from "./helpers.js";
+import { auth, db } from "./firebase.js";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+
+/**
+ * Traduit les codes d'erreur Firebase Auth en français lisible.
+ * Explication : évite d'afficher des erreurs d'API brutes à l'utilisateur.
+ */
+function getReadableAuthError(error) {
+  const code = error?.code || "";
+  switch (code) {
+    case "auth/email-already-in-use":
+      return "Cette adresse e-mail est déjà associée à un compte.";
+    case "auth/invalid-email":
+      return "L'adresse e-mail saisie n'est pas valide.";
+    case "auth/operation-not-allowed":
+      return "L'authentification e-mail/mot de passe n'est pas activée.";
+    case "auth/weak-password":
+      return "Le mot de passe est trop faible. Il doit contenir au moins 8 caractères avec majuscule, minuscule, chiffre et caractère spécial.";
+    case "auth/user-disabled":
+      return "Ce compte utilisateur a été désactivé.";
+    case "auth/user-not-found":
+    case "auth/wrong-password":
+    case "auth/invalid-credential":
+      return "Adresse e-mail ou mot de passe incorrect.";
+    case "auth/too-many-requests":
+      return "Trop de tentatives infructueuses. Veuillez répliquer plus tard.";
+    case "auth/network-request-failed":
+      return "Connexion réseau impossible. Vérifiez votre connexion Internet.";
+    default:
+      return error.message || "Une erreur est survenue lors de l'authentification.";
+  }
+}
+
+/**
+ * Valide les exigences de complexité du mot de passe côté client.
+ * Explication : Majuscule, minuscule, chiffre et caractère spécial obligatoires.
+ */
+function validatePasswordComplexity(password) {
+  if (password.length < 8) {
+    return "Le mot de passe doit contenir au moins 8 caractères.";
+  }
+  if (!/[A-Z]/.test(password)) {
+    return "Le mot de passe doit contenir au moins une lettre majuscule (A-Z).";
+  }
+  if (!/[a-z]/.test(password)) {
+    return "Le mot de passe doit contenir au moins une lettre minuscule (a-z).";
+  }
+  if (!/[0-9]/.test(password)) {
+    return "Le mot de passe doit contenir au moins un chiffre (0-9).";
+  }
+  if (!/[^A-Za-z0-9]/.test(password)) {
+    return "Le mot de passe doit contenir au moins un caractère spécial (ex: @, #, !, $, %).";
+  }
+  return null;
+}
 
 document.addEventListener("input", (e) => {
   if (e.target.matches('[data-contact-name]')) {
@@ -73,7 +129,17 @@ document.addEventListener("input", (e) => {
 document.addEventListener("click", async (e) => {
   const navBtn = e.target.closest("[data-nav]");
   if (navBtn) {
-    if (navBtn.dataset.logout) { state.role = "guest"; }
+    if (navBtn.dataset.logout) {
+      try {
+        await signOut(auth);
+      } catch (err) {
+        console.error("Erreur de déconnexion Firebase:", err);
+      }
+      state.role = "guest";
+      state.clientProfile = {};
+      state.drafts.login.password = "";
+      state.drafts.signup.password = "";
+    }
     navigate(navBtn.dataset.nav);
     closeMobileMenu();
     return;
@@ -294,14 +360,22 @@ document.addEventListener("click", async (e) => {
   const signupSubmitBtn = e.target.closest("[data-signup-submit]");
   if (signupSubmitBtn) {
     const card = signupSubmitBtn.closest('.card') || document;
-    const firstName = (card.querySelector('[data-signup-firstname]') || {}).value || "";
-    const lastName = (card.querySelector('[data-signup-lastname]') || {}).value || "";
-    const email = (card.querySelector('[data-signup-email]') || {}).value || "";
+    const firstName = (card.querySelector('[data-signup-firstname]') || {}).value.trim();
+    const lastName = (card.querySelector('[data-signup-lastname]') || {}).value.trim();
+    const email = (card.querySelector('[data-signup-email]') || {}).value.trim();
     const password = (card.querySelector('[data-signup-password]') || {}).value || "";
     const emailValid = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
 
+    state.drafts.signup.firstName = firstName;
+    state.drafts.signup.lastName = lastName;
     state.drafts.signup.email = email;
     state.drafts.signup.password = password;
+
+    if (!firstName) {
+      state.ui.signupError = "Veuillez saisir votre prénom.";
+      render();
+      return;
+    }
 
     if (!email) {
       state.ui.signupError = "Veuillez saisir votre adresse e-mail.";
@@ -315,8 +389,9 @@ document.addEventListener("click", async (e) => {
       return;
     }
 
-    if (!password) {
-      state.ui.signupError = "Veuillez définir un mot de passe.";
+    const passwordComplexityError = validatePasswordComplexity(password);
+    if (passwordComplexityError) {
+      state.ui.signupError = passwordComplexityError;
       render();
       return;
     }
@@ -325,21 +400,42 @@ document.addEventListener("click", async (e) => {
     state.ui.signupPending = true;
     render();
 
-    window.setTimeout(() => {
-      state.ui.signupPending = false;
-      state.clientProfile = { firstName, lastName, email };
-      state.role = 'client';
+    try {
+      // 1. Création de l'utilisateur dans Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // 2. Création du document Firestore dans la collection "users"
+      // Le rôle est TOUJOURS "client" à l'inscription publique
+      await setDoc(doc(db, "users", user.uid), {
+        firstName,
+        lastName,
+        email,
+        role: "client",
+        createdAt: new Date().toISOString(),
+      });
+
+      // 3. Mise à jour de l'état global et redirection vers le quiz
+      state.clientProfile = { firstName, lastName, email, uid: user.uid };
+      state.role = "client";
       state.drafts.signup.password = "";
+      state.ui.signupPending = false;
+      state.ui.signupError = "";
+
       persistState();
-      navigate('quiz');
-    }, 400);
+      navigate("quiz");
+    } catch (error) {
+      state.ui.signupPending = false;
+      state.ui.signupError = getReadableAuthError(error);
+      render();
+    }
     return;
   }
 
   const loginSubmitBtn = e.target.closest("[data-login-submit]");
   if (loginSubmitBtn) {
     const form = loginSubmitBtn.closest('.login-wrap') || document;
-    const email = (form.querySelector('[data-login-email]') || {}).value || "";
+    const email = (form.querySelector('[data-login-email]') || {}).value.trim();
     const password = (form.querySelector('[data-login-password]') || {}).value || "";
     const emailValid = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
 
@@ -368,13 +464,38 @@ document.addEventListener("click", async (e) => {
     state.ui.loginPending = true;
     render();
 
-    window.setTimeout(() => {
-      state.ui.loginPending = false;
-      state.role = state.loginTab;
+    try {
+      // 1. Connexion via Firebase Auth
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // 2. Lecture du rôle réel et des données depuis la collection "users" dans Firestore
+      let userRole = "client";
+      let userProfile = { email: user.email, uid: user.uid };
+
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+        const data = userDocSnap.data();
+        userRole = data.role || "client";
+        userProfile = { ...userProfile, ...data };
+      }
+
+      // 3. Mise à jour de l'état local et redirection selon le rôle Firestore (client ou admin)
+      state.role = userRole;
+      state.clientProfile = userProfile;
       state.drafts.login.password = "";
+      state.ui.loginPending = false;
+      state.ui.loginError = "";
+
       persistState();
-      navigate(state.loginTab === "client" ? "client-dashboard" : "admin-dashboard");
-    }, 400);
+      navigate(userRole === "admin" ? "admin-dashboard" : "client-dashboard");
+    } catch (error) {
+      state.ui.loginPending = false;
+      state.ui.loginError = getReadableAuthError(error);
+      render();
+    }
     return;
   }
 

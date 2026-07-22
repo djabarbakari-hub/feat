@@ -59,7 +59,7 @@ export function renderSignup() {
 
         <label class="font-mono" style="font-size:12px">Mot de passe</label>
         <input class="text-input" type="password" data-signup-password value="${escapeHtml(d.password)}" placeholder="•••••••••" autocomplete="new-password" />
-        <p class="login-help">Ton mot de passe restera confidentiel et n’est pas enregistré en clair.</p>
+        <p class="login-help">Au moins 8 caractères avec majuscule, minuscule, chiffre et caractère spécial (ex: @, #, !).</p>
 
         ${state.ui.signupError ? `<div class="form-error" role="alert">${escapeHtml(state.ui.signupError)}</div>` : ""}
 
