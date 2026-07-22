@@ -118,7 +118,7 @@ export function renderClientDashboard() {
         <div style="color:var(--ember); margin-bottom:16px;">${icon("message-circle", 40)}</div>
         <h3 class="client-card-title">Besoin d'aide ?</h3>
         <p style="color:var(--slate); font-size:14px; margin:0 0 24px; line-height:1.5;">Je suis disponible pour ajuster votre programme ou répondre à vos questions sur un mouvement.</p>
-        <button class="btn btn-outline-dark" style="margin: 0 auto;">Contacter Coach Abdou</button>
+        <a href="https://wa.me/33600000000" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark" style="margin: 0 auto; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">Contacter Coach Abdoul</a>
       </div>
     </div>
   </div>`;
