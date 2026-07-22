@@ -17,7 +17,7 @@ import { renderConsentModal } from "./js/modules/consent-modal.js";
 
 import { auth, db } from "./js/firebase.js";
 import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { state } from "./js/state.js";
 
 setRenderer(render);
@@ -28,38 +28,87 @@ window.addEventListener("pageshow", () => {
   persistState();
 });
 
+/**
+ * Charge les données Firestore réelles pour le panneau administrateur.
+ * Explication : Récupère la liste des clients et des messages pour alimenter les KPIs.
+ */
+export async function refreshAdminData() {
+  if (state.role !== "admin") return;
+  state.adminData.loading = true;
+  try {
+    // 1. Tous les utilisateurs ayant le rôle "client"
+    const clientsQuery = query(collection(db, "users"), where("role", "==", "client"));
+    const clientsSnap = await getDocs(clientsQuery);
+    const clients = [];
+    clientsSnap.forEach((docSnap) => {
+      clients.push({ id: docSnap.id, ...docSnap.data() });
+    });
+
+    // 2. Tous les messages de contact envoyés par les clients/visiteurs
+    const messagesSnap = await getDocs(collection(db, "messages"));
+    const messages = [];
+    messagesSnap.forEach((docSnap) => {
+      messages.push({ id: docSnap.id, ...docSnap.data() });
+    });
+
+    // Tri chronologique inverse (plus récents en premier)
+    messages.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+    state.adminData.clients = clients;
+    state.adminData.messages = messages;
+    state.adminData.loaded = true;
+    state.adminData.loading = false;
+  } catch (err) {
+    console.error("Erreur de chargement des données admin Firestore:", err);
+    state.adminData.loading = false;
+  }
+}
+
 // Écouteur d'état d'authentification Firebase (restauration automatique de la session)
-// Explication : Firebase gère la persistance des jetons d'accès. Firestore fournit le rôle ("client" ou "admin").
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     try {
       const userDocRef = doc(db, "users", user.uid);
       const userDocSnap = await getDoc(userDocRef);
 
+      let userData = {};
       if (userDocSnap.exists()) {
-        const userData = userDocSnap.data();
-        state.role = userData.role || "client";
-        state.clientProfile = {
-          ...state.clientProfile,
-          ...userData,
-          email: user.email,
-          uid: user.uid,
-        };
-      } else {
-        state.role = "client";
-        state.clientProfile = {
-          ...state.clientProfile,
-          email: user.email,
-          uid: user.uid,
-        };
+        userData = userDocSnap.data();
+      }
+
+      state.role = userData.role || "client";
+
+      // Récupération des séances réelles depuis la sous-collection users/{uid}/sessions
+      const sessionsSnap = await getDocs(collection(db, "users", user.uid, "sessions"));
+      const sessions = [];
+      sessionsSnap.forEach((sDoc) => {
+        sessions.push({ id: sDoc.id, ...sDoc.data() });
+      });
+
+      const program = userData.program || {};
+      if (sessions.length > 0) {
+        program.sessions = sessions;
+      }
+
+      state.clientProfile = {
+        ...state.clientProfile,
+        ...userData,
+        email: user.email,
+        uid: user.uid,
+        program
+      };
+
+      if (state.role === "admin") {
+        await refreshAdminData();
       }
     } catch (error) {
-      console.warn("Impossible d'obtenir les données du rôle Firestore:", error);
+      console.warn("Impossible d'obtenir les données Firestore:", error);
       state.role = "client";
     }
   } else {
     state.role = "guest";
     state.clientProfile = {};
+    state.adminData = { clients: [], messages: [], loaded: false, loading: false };
     if (state.page.startsWith("client") || state.page.startsWith("admin")) {
       state.page = "home";
     }

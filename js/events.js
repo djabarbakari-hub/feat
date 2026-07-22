@@ -23,7 +23,7 @@ import { QUIZ_STEPS } from "./data.js";
 import { trackById, closeMobileMenu } from "./helpers.js";
 import { auth, db } from "./firebase.js";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, addDoc, collection, writeBatch } from "firebase/firestore";
 
 /**
  * Traduit les codes d'erreur Firebase Auth en français lisible.
@@ -203,24 +203,57 @@ document.addEventListener("click", async (e) => {
         { name: "Semaine 1", done: 0, total: 3 }
       ],
       sessions: [
-        { name: "Séance 1 — Focus technique", exos: 6, duree: "35 min", done: false },
-        { name: "Séance 2 — Intensité maîtrisée", exos: 7, duree: "40 min", done: false },
-        { name: "Séance 3 — Endurance active", exos: 5, duree: "30 min", done: false },
+        { id: "s1", name: "Séance 1 — Focus technique", exos: 6, duree: "35 min", done: false, weekNumber: 1 },
+        { id: "s2", name: "Séance 2 — Intensité maîtrisée", exos: 7, duree: "40 min", done: false, weekNumber: 1 },
+        { id: "s3", name: "Séance 3 — Endurance active", exos: 5, duree: "30 min", done: false, weekNumber: 1 },
       ]
     };
 
     state.clientProfile = {
       ...state.clientProfile,
-      goal: answers.objectif,
-      track: answers.lieu,
-      niveau: answers.niveau,
-      frequence: answers.frequence,
-      physique: answers.physique,
+      goal: answers.objectif || "",
+      track: answers.lieu || "",
+      niveau: answers.niveau || "",
+      frequence: answers.frequence || "",
+      physique: answers.physique || {},
+      quizAnswers: answers,
       program,
     };
     state.quizStep = QUIZ_STEPS.length;
     persistState();
+
+    // Écriture dans Firestore pour l'utilisateur connecté
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      try {
+        const userRef = doc(db, "users", currentUser.uid);
+        await setDoc(userRef, {
+          goal: answers.objectif || "",
+          track: answers.lieu || "",
+          niveau: answers.niveau || "",
+          frequence: answers.frequence || "",
+          weight: answers.physique?.poids ? parseFloat(answers.physique.poids) : null,
+          height: answers.physique?.taille ? parseFloat(answers.physique.taille) : null,
+          age: answers.physique?.age ? parseInt(answers.physique.age, 10) : null,
+          quizAnswers: answers,
+          program,
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+
+        // Enregistrement des séances dans la sous-collection users/{uid}/sessions
+        const batch = writeBatch(db);
+        program.sessions.forEach((s) => {
+          const sRef = doc(db, "users", currentUser.uid, "sessions", s.id);
+          batch.set(sRef, s);
+        });
+        await batch.commit();
+      } catch (err) {
+        console.error("Erreur d'enregistrement Firestore du quiz:", err);
+      }
+    }
+
     render();
+    navigate("client-dashboard");
     return;
   }
 
@@ -258,24 +291,37 @@ document.addEventListener("click", async (e) => {
       return;
     }
     
-    if (captcha !== "5") {
-      alert("Réponse anti-spam incorrecte.");
+    if (captcha.trim() !== "5") {
+      alert("Réponse anti-spam incorrecte (2 + 3 = 5).");
       return;
     }
     
-    // Envoi
     state.ui.isSending = true;
-    state.drafts.contact = { name: "", email: "", message: "", subject: "", captcha: "" };
-    persistState();
     render();
-    
-    // Simulation d'envoi (remplacer par un appel API réel)
-    setTimeout(() => {
+
+    try {
+      // Écriture du message dans la collection Firestore "messages"
+      await addDoc(collection(db, "messages"), {
+        fromUid: auth.currentUser?.uid || null,
+        fromName: name,
+        fromEmail: email,
+        subject,
+        message,
+        createdAt: new Date().toISOString(),
+        read: false
+      });
+
       state.ui.isSending = false;
       state.ui.sendSuccess = true;
+      state.drafts.contact = { name: "", email: "", message: "", subject: "", captcha: "" };
       persistState();
       render();
-    }, 1500);
+    } catch (err) {
+      console.error("Erreur d'envoi de message Firestore:", err);
+      state.ui.isSending = false;
+      alert("Erreur lors de l'envoi du message.");
+      render();
+    }
     return;
   }
   

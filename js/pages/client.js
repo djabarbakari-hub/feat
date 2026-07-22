@@ -50,9 +50,8 @@ export function renderClientDashboard() {
   const week = program.week || 1;
   const totalWeeks = program.totalWeeks || 8;
   const progressPct = totalWeeks ? Math.round((week / totalWeeks) * 100) : 0;
-  const history = program.history || [];
-  const nextSession = program.nextSession || "Séance Corps Complet";
-  const totalDone = history.reduce((sum, h) => sum + (h.done || 0), 0);
+  const sessions = program.sessions || [];
+  const totalDone = sessions.filter(s => s.done).length;
   
   return `
   <div class="wrap client-page">

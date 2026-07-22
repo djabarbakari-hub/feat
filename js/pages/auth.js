@@ -31,7 +31,7 @@ export function renderLogin() {
         ${state.ui.loginError ? `<div class="form-error" role="alert">${escapeHtml(state.ui.loginError)}</div>` : ""}
 
         <button class="btn btn-ember" style="justify-content:center;margin-top:8px" data-login-submit="1" ${state.ui.loginPending ? "disabled" : ""}>
-          ${state.ui.loginPending ? "Connexion en cours…" : "Se connecter"}
+          ${state.ui.loginPending ? `<span class="btn-spinner"></span>Connexion en cours…` : "Se connecter"}
         </button>
       </div>
       <p class="hint">Pas encore de compte ? <button class="btn btn-ember" style="font-size:14px;padding:10px 14px;color:var(--ink);" data-nav="signup">S'inscrire</button></p>
@@ -64,7 +64,7 @@ export function renderSignup() {
         ${state.ui.signupError ? `<div class="form-error" role="alert">${escapeHtml(state.ui.signupError)}</div>` : ""}
 
         <button class="btn btn-ember" style="justify-content:center;margin-top:8px" data-signup-submit="1" ${state.ui.signupPending ? "disabled" : ""}>
-          ${state.ui.signupPending ? "Création en cours…" : "Créer mon compte"}
+          ${state.ui.signupPending ? `<span class="btn-spinner"></span>Création en cours…` : "Créer mon compte"}
         </button>
       </div>
       <p class="hint">Déjà un compte ? <button class="btn btn-ember" style="font-size:14px;padding:10px 14px;color:var(--ink);" data-nav="login">Se connecter</button></p>
