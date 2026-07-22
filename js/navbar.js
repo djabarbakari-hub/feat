@@ -30,7 +30,7 @@ export function renderNavbar() {
     `<button class="nav-link ${state.page === id ? "active" : ""}" data-nav="${id}" aria-current="${state.page === id ? "page" : "false"}">${label}</button>`;
 
   const rightGuest = `<button class="btn-primary" data-nav="login" aria-label="Se connecter">Se connecter</button>`;
-  const rightUser = `<button class="btn-outline-dark" data-nav="home" data-logout="1" aria-label="Quitter">${icon("log-out", 14)} Quitter</button>`;
+  const rightUser = `<button class="btn-logout" data-nav="home" data-logout="1" aria-label="Quitter">${icon("log-out", 14)} Quitter</button>`;
 
   return `
   <div class="navbar">
@@ -55,6 +55,8 @@ export function renderNavbar() {
 }
 
 export function renderFooter() {
+  const isLogged = state.role !== "guest";
+  
   return `
   <div class="wrap">
     <div class="footer-brand">
@@ -64,8 +66,13 @@ export function renderFooter() {
     <div class="footer-links">
       <button class="nav-link" data-nav="contact">Contact</button>
       <button class="nav-link" data-nav="legal">Mentions légales</button>
-      <button class="nav-link" data-nav="privacy">Mes données</button>
+      ${isLogged ? `<button class="nav-link" data-nav="privacy">Mes données</button>` : ""}
     </div>
-  </div>`;
+  </div>
+  
+  <!-- Bouton WhatsApp flottant -->
+  <a href="https://wa.me/+2290191720596" class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Contacter sur WhatsApp">
+    ${icon("message-circle", 24)}
+  </a>`;
 }
 

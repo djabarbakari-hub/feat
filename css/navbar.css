@@ -106,9 +106,9 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.24);
-  color: var(--chalk);
-  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--ink-muted);
+  color: var(--ink);
+  background: transparent;
   font-size: 0.875rem;
   padding: 8px 14px;
   border-radius: 2px;
@@ -116,9 +116,8 @@
 }
 
 .btn-outline-dark:hover {
-  border-color: var(--accent-primary);
-  color: var(--accent-primary);
-  background: rgba(226, 98, 45, 0.1);
+  border-color: var(--ink);
+  background: rgba(22, 35, 44, 0.04);
 }
 
 .btn-outline-dark:focus-visible {
@@ -242,7 +241,7 @@
     padding: 12px 0;
   }
 
-  .nav-mobile .btn-outline-dark {
+  .nav-mobile .btn-outline-dark, .nav-mobile .btn-logout {
     width: 100%;
     justify-content: flex-start;
     display: flex;
