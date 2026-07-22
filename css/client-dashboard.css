@@ -1,0 +1,166 @@
+/* Dashboard client — blocs prioritaires et responsive */
+.client-dashboard {
+  display: grid;
+  gap: 24px;
+  width: 100%;
+}
+
+.client-dashboard-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.client-dashboard-title {
+  margin: 0;
+  font-size: clamp(2rem, 2.5vw, 2.6rem);
+  line-height: 1.05;
+}
+
+.client-dashboard-subtitle {
+  margin: 10px 0 0;
+  color: var(--slate);
+  font-size: 0.95rem;
+  max-width: 620px;
+}
+
+.client-dashboard-meta {
+  display: grid;
+  gap: 12px;
+  min-width: 280px;
+  width: min(100%, 360px);
+}
+
+.client-dashboard-actions {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.client-dashboard-action {
+  background: var(--chalk-soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.client-dashboard-action strong {
+  display: block;
+  font-size: 1rem;
+  color: var(--ink);
+}
+
+.client-dashboard-action span {
+  color: var(--slate);
+  font-size: 0.9rem;
+}
+
+.client-dashboard-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.client-dashboard-card {
+  background: var(--chalk);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: 220px;
+}
+
+.client-dashboard-card h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--ink);
+}
+
+.client-dashboard-card p {
+  margin: 0;
+  color: var(--slate);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.client-dashboard-card-list {
+  display: grid;
+  gap: 12px;
+}
+
+.client-dashboard-card-list > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.client-dashboard-card-list .label {
+  color: var(--ink-muted3);
+  font-size: 0.9rem;
+}
+
+.client-dashboard-card-list .value {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.client-dashboard-chart {
+  width: 100%;
+  min-height: 160px;
+  display: grid;
+  gap: 10px;
+}
+
+.client-dashboard-summary {
+  display: grid;
+  gap: 16px;
+}
+
+.client-dashboard-summary-item {
+  background: var(--chalk-soft);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.client-dashboard-summary-item h3 {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.client-dashboard-summary-item p {
+  margin: 0;
+  color: var(--slate);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 980px) {
+  .client-dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .client-dashboard-header,
+  .client-dashboard-actions,
+  .client-dashboard-grid,
+  .client-dashboard-meta,
+  .client-dashboard-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .client-dashboard-actions {
+    grid-template-columns: 1fr;
+  }
+}
