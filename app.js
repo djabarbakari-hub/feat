@@ -38,7 +38,6 @@ render();
     const modal = container.firstElementChild;
     if (modal) {
       document.body.appendChild(modal);
-      if (window.lucide) window.lucide.createIcons();
     }
   }
 })();

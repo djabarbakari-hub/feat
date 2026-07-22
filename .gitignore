@@ -3,3 +3,6 @@ code/
 AGENT-CONTRAT-LOGIQUE.md
 ORCHESTRATEUR.md
 GEMINI.md
+node_modules/
+dist/
+.vite/
