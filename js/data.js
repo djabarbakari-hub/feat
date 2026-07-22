@@ -48,8 +48,7 @@ export const QUIZ_STEPS = [
     options: [
       { v: "perte-poids", l: "Perte de poids", icon: "weight" },
       { v: "prise-muscle", l: "Prise de muscle", icon: "dumbbell" },
-      { v: "endurance", l: "Endurance", icon: "activity" },
-      { v: "sante", l: "Santé générale", icon: "heart" },
+      { v: "endurance-sante", l: "Endurance & Santé", icon: "heart" },
     ]
   },
   { q: "Où comptes-tu t'entraîner le plus souvent ?", key: "lieu", options: [
@@ -63,7 +62,6 @@ export const QUIZ_STEPS = [
     { v: "reguliers", l: "Je suis déjà assez actif·ve", icon: "zap" },
   ]},
   { q: "Combien de séances par semaine vises-tu ?", key: "frequence", options: [
-    { v: "2", l: "2 séances", icon: "2-circle" },
     { v: "3-4", l: "3 à 4 séances", icon: "3-circle" },
     { v: "5+", l: "5 séances ou plus", icon: "plus-circle" },
   ]},

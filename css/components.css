@@ -46,8 +46,7 @@ button {
   right: 24px;
   width: 56px;
   height: 56px;
-  background-color: #25D366; /* Vert officiel WhatsApp */
-  color: white;
+  background-color: transparent;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -61,7 +60,6 @@ button {
 .whatsapp-float:hover {
   transform: translateY(-4px) scale(1.05);
   box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5);
-  color: white;
 }
 
 @media (max-width: 768px) {

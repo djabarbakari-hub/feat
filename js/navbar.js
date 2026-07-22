@@ -71,8 +71,7 @@ export function renderFooter() {
   </div>
   
   <!-- Bouton WhatsApp flottant -->
-  <a href="https://wa.me/+2290191720596" class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Contacter sur WhatsApp">
-    ${icon("message-circle", 24)}
+  <a href="https://wa.me/33600000000" class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Contacter sur WhatsApp">
+    <img src="./images/icone-whatsapp.jfif" alt="WhatsApp" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />
   </a>`;
 }
-
