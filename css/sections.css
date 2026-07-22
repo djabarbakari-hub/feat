@@ -365,6 +365,17 @@
   gap: 12px;
   margin-bottom: 20px;
 }
+
+.admin-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  flex-wrap: wrap;
+  gap: 12px;
+}
 .admin-tabs {
   display: flex;
   gap: 10px;

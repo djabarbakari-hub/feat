@@ -60,7 +60,14 @@
   }
 }
 
-* { box-sizing: border-box; }
+*,:before,:after {
+  box-sizing: border-box;
+  min-width: 0;
+}
+html, body {
+  width: 100%;
+  overflow-x: auto;
+}
 body {
   margin: 0;
   min-height: 100vh;
@@ -73,6 +80,27 @@ body {
 
 main {
   flex: 1 0 auto;
+  width: 100%;
+  min-width: 0;
+}
+
+.card {
+  width: 100%;
+  max-width: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+  min-width: 0;
+}
+
+img,
+video,
+iframe {
+  max-width: 100%;
+  height: auto;
 }
 
 img { max-width: 100%; display: block; }
@@ -106,8 +134,16 @@ a { text-decoration: none; }
 
 h1, h2, h3, h4, h5, h6 { font-family: 'Archivo Black', 'Archivo', sans-serif; color: var(--ink); margin: 0 0 16px; }
 
-.wrap { max-width: 1152px; margin: 0 auto; padding: 0 20px; }
-.section { padding: 64px 0; }
+.wrap {
+  width: min(100%, 1152px);
+  max-width: 1152px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+.section {
+  padding: 64px 0;
+  overflow: hidden;
+}
 
 button:focus-visible,
 :focus-visible {

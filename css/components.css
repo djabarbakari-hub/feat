@@ -1,8 +1,8 @@
 /* ---------- CARDS / GRIDS (generic) ---------- */
-.card { border: 1px solid var(--line); border-radius: 2px; padding: 24px; }
-.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.card { border: 1px solid var(--line); border-radius: 2px; padding: 24px; width: 100%; max-width: 100%; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
 @media (max-width: 768px) { .grid-3 { grid-template-columns: 1fr; } }
-.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
 @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
 
 .program-card { display: flex; flex-direction: column; }
@@ -12,12 +12,12 @@
 /* ---------- QUIZ ---------- */
 .progress-track { width: 100%; height: 4px; background: var(--line); margin-bottom: 40px; }
 .progress-fill { height: 4px; background: var(--ember); transition: width .3s; }
-.quiz-options { display: grid; gap: 12px; max-width: 420px; }
-.quiz-option { text-align: left; border: 1px solid var(--line); border-radius: 2px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; font-size: 14px; color: var(--ink); }
+.quiz-options { display: grid; gap: 12px; max-width: 420px; width: 100%; }
+.quiz-option { text-align: left; border: 1px solid var(--line); border-radius: 2px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; font-size: 14px; color: var(--ink); width: 100%; min-width: 0; }
 .quiz-option:hover { border-color: var(--ink); }
 
 /* ---------- LOGIN ---------- */
-.login-wrap { max-width: 420px; margin: 0 auto; min-height: 60vh; display: flex; flex-direction: column; justify-content: center; }
+.login-wrap { max-width: 420px; width: 100%; margin: 0 auto; min-height: 60vh; display: flex; flex-direction: column; justify-content: center; padding: 0 12px; }
 .tabs { display: flex; margin-bottom: 24px; border: 1px solid var(--line); border-radius: 2px; overflow: hidden; }
 .tab { flex: 1; padding: 10px 0; font-size: 14px; font-weight: 600; color: var(--slate); background: transparent; }
 .tab.active { background: var(--ink); color: var(--chalk); }
@@ -31,6 +31,11 @@
 .form-error { color: var(--ember); background: rgba(226,98,45,0.08); border: 1px solid rgba(226,98,45,0.18); border-radius: 2px; padding: 10px 12px; font-size: 13px; }
 .text-input { border: 1px solid var(--line); border-radius: 2px; padding: 14px 16px; font-size: 14px; width: 100%; }
 .btn[disabled] { opacity: 0.65; cursor: not-allowed; }
+.btn,
+button {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
 .hint { font-size: 12px; text-align: center; margin-top: 24px; color: var(--ink-muted3); }
 .hint button { text-decoration: underline; color: inherit; }
 

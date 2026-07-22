@@ -56,7 +56,7 @@ export function renderAdminDashboard() {
             </div>
             <button class="btn btn-line" data-admin-action="export">${icon("download", 14)} Export</button>
           </div>
-          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;">
+          <div class="admin-stat-grid">
             <div class="admin-stat-card"><div class="stat-val">${a.clients}</div><div class="stat-label">Clients inscrits</div></div>
             <div class="admin-stat-card"><div class="stat-val">${a.activeToday}</div><div class="stat-label">Actifs aujourd'hui</div></div>
             <div class="admin-stat-card"><div class="stat-val">${a.newThisWeek}</div><div class="stat-label">Nouveaux cette semaine</div></div>
@@ -101,9 +101,9 @@ export function renderAdminClients() {
   return `
   <div class="section wrap">
     <p class="eyebrow-moss font-mono">GESTION</p>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:32px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:32px">
       <h1 class="font-display" style="font-size:28px;color:var(--ink);margin:0">Clients</h1>
-      <div class="search-box">${icon("search", 14, "var(--ink-muted3)")}<input placeholder="Rechercher..." /></div>
+      <div class="search-box" style="width:min(100%,360px);">${icon("search", 14, "var(--ink-muted3)")}<input placeholder="Rechercher..." /></div>
     </div>
     <div class="card" style="padding:0">
       <div class="table-row" style="justify-content:center;padding:32px 0;color:var(--slate);font-size:14px">

@@ -39,7 +39,7 @@ export function renderQuiz() {
     <div class="section wrap">
       <p class="eyebrow-moss font-mono">RÉSULTAT</p>
       <h1 class="h2 font-display">Ton point de départ : ${result.label}</h1>
-      <div class="card" style="max-width:560px;padding:2rem; animation: fadeIn 0.6s ease-out;">
+      <div class="card" style="padding:2rem; animation: fadeIn 0.6s ease-out;max-width:100%;">
         ${icon(result.icon, 1.75, "var(--accent-primary)")}
         <p style="font-size:1rem;color:var(--text-secondary);margin-top:1rem; line-height: 1.7;">${result.desc}</p>
         <div class="font-mono" style="font-size:0.875rem;color:var(--accent-secondary);margin-top:1rem">${result.dist}</div>

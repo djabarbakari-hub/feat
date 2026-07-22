@@ -6,15 +6,93 @@
 
 .progress-bar-bg { width: 100%; height: 8px; background: var(--line); border-radius: 100px; margin-top: 12px; }
 .progress-bar-fill { height: 8px; border-radius: 100px; background: var(--moss); }
-.session-row { border: 1px solid var(--line); border-radius: 2px; padding: 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.session-left { display: flex; align-items: center; gap: 16px; }
-.session-icon { width: 36px; height: 36px; border-radius: 100px; display: flex; align-items: center; justify-content: center; }
+.session-row {
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+.session-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1 1 220px;
+  min-width: 0;
+}
+.session-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 
-.badge { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 2px; }
-.table-row { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--chalk-soft); }
-.table-row:last-child { border-bottom: none; }
-.search-box { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 2px; padding: 8px 12px; }
-.search-box input { border: none; outline: none; font-size: 14px; }
+.badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+.table-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--chalk-soft);
+  gap: 14px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+.table-row:last-child {
+  border-bottom: none;
+}
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  padding: 8px 12px;
+  min-width: 0;
+}
+.search-box input {
+  border: none;
+  outline: none;
+  font-size: 14px;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .session-row,
+  .table-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .session-left {
+    width: 100%;
+  }
+
+  .session-row > button,
+  .table-row > span,
+  .table-row > div {
+    width: 100%;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+}
 
 /* Switcher removed */
 

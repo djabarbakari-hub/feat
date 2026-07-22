@@ -33,14 +33,14 @@ export function renderClientDashboard() {
         <div style="font-size:13px;color:var(--slate);margin-top:4px">Objectif : ${escapeHtml(goalLabel)}</div>
       </div>
     </div>
-    <div class="grid-2" style="grid-template-columns:2fr 1fr">
+    <div class="grid-2">
       <div class="card">
-        <div class="font-mono" style="font-size:12px;color:var(--ink-muted3);display:flex;align-items:center;gap:8px">${icon(track.icon, 14, "var(--ember)")} ${track.label}</div>
+        <div class="font-mono" style="font-size:12px;color:var(--ink-muted3);display:flex;align-items:center;gap:8px;flex-wrap:wrap;">${icon(track.icon, 14, "var(--ember)")} ${track.label}</div>
         <h2 class="font-display" style="font-size:18px;color:var(--ink);margin-top:8px">Semaine ${week} / ${totalWeeks}</h2>
         <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
         <p style="font-size:14px;color:var(--slate);margin-top:16px">Prochaine séance</p>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding:16px;border-radius:2px;background:var(--chalk-soft)">
-          <div style="display:flex;align-items:center;gap:12px">${icon("play", 18, "var(--ember)")}<span style="font-size:14px;font-weight:600;color:var(--ink)">${escapeHtml(nextSession)}</span></div>
+        <div class="client-session-card">
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">${icon("play", 18, "var(--ember)")}<span style="font-size:14px;font-weight:600;color:var(--ink)">${escapeHtml(nextSession)}</span></div>
           <button class="btn-primary" data-nav="client-program">Démarrer</button>
         </div>
       </div>
@@ -126,10 +126,10 @@ export function renderClientProgress() {
     ${activeLabel}
     <div style="display:grid;gap:16px">
       ${history.map((h) => `
-        <div style="display:flex;align-items:center;gap:16px">
-          <span class="font-mono" style="font-size:12px;color:var(--ink-muted3);width:80px">${h.name}</span>
-          <div class="progress-bar-bg" style="flex:1;margin-top:0"><div class="progress-bar-fill" style="width:${(h.done / h.total) * 100}%"></div></div>
-          <span class="font-mono" style="font-size:12px;color:var(--ink);width:48px;text-align:right">${h.done}/${h.total}</span>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;min-width:0">
+          <span class="font-mono" style="font-size:12px;color:var(--ink-muted3);width:80px;min-width:0">${h.name}</span>
+          <div class="progress-bar-bg" style="flex:1;min-width:0;margin-top:0"><div class="progress-bar-fill" style="width:${(h.done / h.total) * 100}%"></div></div>
+          <span class="font-mono" style="font-size:12px;color:var(--ink);width:48px;min-width:0;text-align:right">${h.done}/${h.total}</span>
         </div>`).join("")}
     </div>
   </div>`;
