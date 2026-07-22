@@ -47,7 +47,7 @@ export function renderAdminDashboard() {
       <div class="adm-header-inner">
         <div>
           <p class="adm-eyebrow">${todayDate}</p>
-          <h1 class="adm-title">Bonjour Coach Abdoul</h1>
+          <h1 class="adm-title">Bonjour Coach Abdou</h1>
           <p class="adm-subtitle">Voici l'activité de vos clients aujourd'hui. 2 messages nécessitent votre attention.</p>
         </div>
         <div class="adm-actions">
