@@ -106,9 +106,9 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.24);
   color: var(--chalk);
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.12);
   font-size: 0.875rem;
   padding: 8px 14px;
   border-radius: 2px;
@@ -118,6 +118,12 @@
 .btn-outline-dark:hover {
   border-color: var(--accent-primary);
   color: var(--accent-primary);
+  background: rgba(226, 98, 45, 0.1);
+}
+
+.btn-outline-dark:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
 }
 
 .btn-logout {
@@ -203,13 +209,16 @@
 
 @media (max-width: 768px) {
   .nav-links,
-  .navbar .btn-primary,
-  .navbar .btn-outline-dark {
+  .navbar .btn-primary {
     display: none;
   }
 
   .nav-toggle {
     display: block;
+  }
+
+  .navbar .wrap .btn-outline-dark {
+    display: none;
   }
 
   .nav-mobile {
@@ -230,6 +239,13 @@
   .nav-mobile button {
     width: 100%;
     text-align: left;
+    padding: 12px 0;
+  }
+
+  .nav-mobile .btn-outline-dark {
+    width: 100%;
+    justify-content: flex-start;
+    display: flex;
   }
 
   .hero-inner {

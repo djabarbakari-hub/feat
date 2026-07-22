@@ -20,7 +20,7 @@ import { state, persistState } from "./state.js";
 import { navigate, goBack } from "./router.js";
 import { render } from "./render.js";
 import { QUIZ_STEPS } from "./data.js";
-import { trackById } from "./helpers.js";
+import { trackById, closeMobileMenu } from "./helpers.js";
 
 document.addEventListener("input", (e) => {
   if (e.target.matches('[data-contact-name]')) {
@@ -75,6 +75,7 @@ document.addEventListener("click", (e) => {
   if (navBtn) {
     if (navBtn.dataset.logout) { state.role = "guest"; }
     navigate(navBtn.dataset.nav);
+    closeMobileMenu();
     return;
   }
 

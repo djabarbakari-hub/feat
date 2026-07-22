@@ -66,6 +66,16 @@ export function renderQuiz() {
         <button type="button" class="btn btn-ember" data-quiz-next>${s.button || "Suivant"}</button>
       </div>
     `;
+  } else if (s.type === "info") {
+    // Écran d'accueil du quiz
+    content = `
+      <div style="margin-top: 1.75rem;">
+        <p style="font-size: 1.125rem; color: var(--slate); line-height: 1.7; max-width: 500px;">Réponds simplement à 5 questions pour découvrir un programme d'entraînement complètement personnalisé en fonction de ton environnement et tes objectifs.</p>
+        <div class="quiz-buttons" style="margin-top: 2rem;">
+          <button type="button" class="btn btn-ember" data-quiz-next>${s.button || "Commencer"}</button>
+        </div>
+      </div>
+    `;
   } else if (s.type === "optional") {
     // CORRECTIF : ces champs texte n'étaient captés par aucun listener "input" —
     // les valeurs tapées ici (poids/taille/âge) étaient perdues silencieusement.
