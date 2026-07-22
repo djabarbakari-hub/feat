@@ -8,6 +8,12 @@ import { setRenderer, handleBackNavigation } from "./js/router.js";
 import { render } from "./js/render.js";
 import { PAGES } from "./js/pages/index.js";
 import "./js/events.js"; // enregistre les écouteurs globaux (input/click)
+import {
+  cleanupExpiredData,
+  hasAnalyticsServices,
+  getAnalyticsConsent,
+} from "./js/modules/privacy.js";
+import { renderConsentModal } from "./js/modules/consent-modal.js";
 
 setRenderer(render);
 
@@ -16,4 +22,23 @@ window.addEventListener("popstate", handleBackNavigation);
 window.addEventListener("pageshow", () => {
   persistState();
 });
+
+// 1. Nettoyage automatique des données expirées (14 jours)
+cleanupExpiredData();
+
+// 2. Rendu initial
 render();
+
+// 3. Bannière de consentement analytics (si services présents et pas encore choisi)
+(function initConsentBanner() {
+  const consent = getAnalyticsConsent();
+  if (hasAnalyticsServices() && !consent.userChoice) {
+    const container = document.createElement("div");
+    container.innerHTML = renderConsentModal();
+    const modal = container.firstElementChild;
+    if (modal) {
+      document.body.appendChild(modal);
+      if (window.lucide) window.lucide.createIcons();
+    }
+  }
+})();

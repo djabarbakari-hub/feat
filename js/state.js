@@ -14,6 +14,7 @@ export const state = {
   history: [],
   activeSession: "",
   adminNotice: "",
+  lastVisitedAt: null,
   adminStats: {
     clients: 0,
     activeToday: 0,
@@ -100,6 +101,7 @@ export function restorePersistedState(validPageKeys = []) {
       if (parsed.activeSession) state.activeSession = parsed.activeSession;
       if (parsed.adminNotice) state.adminNotice = parsed.adminNotice;
       if (parsed.adminStats) state.adminStats = parsed.adminStats;
+      if (parsed.lastVisitedAt) state.lastVisitedAt = parsed.lastVisitedAt;
       if (parsed.drafts) state.drafts = { ...state.drafts, ...parsed.drafts };
     }
   } catch (error) {

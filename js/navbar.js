@@ -11,8 +11,8 @@ import { icon } from "./helpers.js";
  * @returns {Array} Liste de liens sous forme de tableaux [id, label].
  */
 export function navLinksFor(role) {
-  if (role === "client") return [["client-dashboard", "Tableau de bord"], ["client-program", "Mon programme"], ["client-progress", "Ma progression"]];
-  if (role === "admin") return [["admin-dashboard", "Vue d'ensemble"], ["admin-clients", "Clients"], ["admin-programs", "Programmes"], ["admin-messages", "Messages"]];
+  if (role === "client") return [["client-dashboard", "Tableau de bord"], ["client-program", "Mon programme"], ["client-progress", "Ma progression"], ["privacy", "Mes données"]];
+  if (role === "admin") return [["admin-dashboard", "Vue d'ensemble"], ["admin-clients", "Clients"], ["admin-programs", "Programmes"], ["admin-messages", "Messages"], ["privacy", "Données"]];
   return [["home", "Accueil"], ["programs", "Programmes"], ["about", "À propos"], ["contact", "Contact"]];
 }
 
@@ -64,6 +64,8 @@ export function renderFooter() {
     <div class="footer-links">
       <button class="nav-link" data-nav="contact">Contact</button>
       <button class="nav-link" data-nav="legal">Mentions légales</button>
+      <button class="nav-link" data-nav="privacy">Mes données</button>
     </div>
   </div>`;
 }
+

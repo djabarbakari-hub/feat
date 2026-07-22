@@ -70,7 +70,7 @@ document.addEventListener("input", (e) => {
   }
 });
 
-document.addEventListener("click", (e) => {
+document.addEventListener("click", async (e) => {
   const navBtn = e.target.closest("[data-nav]");
   if (navBtn) {
     if (navBtn.dataset.logout) { state.role = "guest"; }
@@ -378,4 +378,202 @@ document.addEventListener("click", (e) => {
     }
     return;
   }
+
+  // === ÉVÉNEMENTS PRIVACY ===
+  const privacyDeleteBtn = e.target.closest("[data-privacy-delete]");
+  if (privacyDeleteBtn) {
+    const type = privacyDeleteBtn.dataset.privacyDelete;
+    showPrivacyConfirmModal(type);
+    return;
+  }
+
+  const privacyExportBtn = e.target.closest("[data-privacy-export]");
+  if (privacyExportBtn) {
+    const { downloadUserDataAsJson } = await import("./modules/privacy.js");
+    downloadUserDataAsJson();
+    return;
+  }
+
+  const privacyConsentBtn = e.target.closest("[data-privacy-consent]");
+  if (privacyConsentBtn) {
+    const choice = privacyConsentBtn.dataset.privacyConsent;
+    const { setAnalyticsConsent } = await import("./modules/privacy.js");
+    if (choice === "accept") setAnalyticsConsent(true, "all");
+    if (choice === "refuse") setAnalyticsConsent(false, "all");
+    if (choice === "customize") showConsentCustomizeModal();
+    return;
+  }
+
+  // === ÉVÉNEMENTS MODAL CONSENTEMENT ===
+  const consentAccept = e.target.closest("#consent-accept-all");
+  if (consentAccept) {
+    const { setAnalyticsConsent } = await import("./modules/privacy.js");
+    setAnalyticsConsent(true, "all");
+    const modal = document.getElementById("consent-modal");
+    if (modal) modal.remove();
+    return;
+  }
+
+  const consentRefuse = e.target.closest("#consent-refuse-all");
+  if (consentRefuse) {
+    const { setAnalyticsConsent } = await import("./modules/privacy.js");
+    setAnalyticsConsent(false, "all");
+    const modal = document.getElementById("consent-modal");
+    if (modal) modal.remove();
+    return;
+  }
+
+  const consentCustomize = e.target.closest("#consent-customize");
+  if (consentCustomize) {
+    showConsentCustomizeModal();
+    return;
+  }
+
+  const consentClose = e.target.closest("#consent-close");
+  if (consentClose) {
+    const modal = document.getElementById("consent-modal");
+    if (modal) modal.remove();
+    return;
+  }
+
+  const consentCustomizeSave = e.target.closest("#consent-customize-save");
+  if (consentCustomizeSave) {
+    const gaCheckbox = document.getElementById("consent-ga");
+    const clarityCheckbox = document.getElementById("consent-clarity");
+    const { setAnalyticsConsent } = await import("./modules/privacy.js");
+    
+    if (gaCheckbox) setAnalyticsConsent(gaCheckbox.checked, "analytics");
+    if (clarityCheckbox) setAnalyticsConsent(clarityCheckbox.checked, "clarity");
+    
+    const customizeModal = document.getElementById("consent-customize-modal");
+    if (customizeModal) customizeModal.remove();
+    return;
+  }
+
+  const consentCustomizeCancel = e.target.closest("#consent-customize-cancel");
+  if (consentCustomizeCancel) {
+    const customizeModal = document.getElementById("consent-customize-modal");
+    if (customizeModal) customizeModal.remove();
+    return;
+  }
 });
+
+/**
+ * Affiche le modal de confirmation de suppression.
+ */
+async function showPrivacyConfirmModal(type) {
+  const messages = {
+    drafts: {
+      title: "Supprimer les brouillons?",
+      text: "Les brouillons non envoyés seront supprimés définitivement.",
+      action: "delete-drafts",
+    },
+    history: {
+      title: "Effacer l'historique?",
+      text: "Votre historique de navigation et vos réponses au quiz seront supprimés.",
+      action: "delete-history",
+    },
+    profile: {
+      title: "Supprimer le profil?",
+      text: "Vos données personnelles seront supprimées. Vous devrez recommencer l'onboarding.",
+      action: "delete-profile",
+    },
+    account: {
+      title: "⚠️ ATTENTION: Suppression du compte",
+      text: "Cette action est IRRÉVERSIBLE. Toutes vos données seront supprimées définitivement.",
+      action: "delete-account",
+      isDestructive: true,
+    },
+  };
+
+  const config = messages[type];
+  if (!config) return;
+
+  const modal = document.createElement("div");
+  modal.id = "privacy-confirm-modal";
+  modal.style.cssText = `
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7); display: flex; align-items: center;
+    justify-content: center; z-index: 120;
+  `;
+
+  modal.innerHTML = `
+    <div style="
+      background: var(--chalk); color: var(--ink);
+      border-radius: 4px; padding: 32px; max-width: 400px;
+      width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    ">
+      <h2 style="margin: 0 0 16px 0; font-size: 20px; font-weight: 600;">
+        ${config.title}
+      </h2>
+      <p style="color: var(--slate); font-size: 14px; margin: 0 0 24px 0; line-height: 1.5;">
+        ${config.text}
+      </p>
+
+      <div style="display: flex; gap: 8px;">
+        <button class="privacy-confirm-no" style="
+          background: var(--line); color: var(--ink);
+          flex: 1; padding: 10px; font-weight: 600; border-radius: 2px;
+          cursor: pointer; border: none;
+        ">
+          Annuler
+        </button>
+        <button class="privacy-confirm-yes" data-privacy-confirm="${config.action}" style="
+          background: ${config.isDestructive ? "var(--ember)" : "var(--moss)"}; 
+          color: white; flex: 1; padding: 10px; font-weight: 600;
+          border-radius: 2px; cursor: pointer; border: none;
+        ">
+          Confirmer
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  // Événements du modal
+  modal.querySelector(".privacy-confirm-no").addEventListener("click", () => {
+    modal.remove();
+  });
+
+  const confirmBtn = modal.querySelector(".privacy-confirm-yes");
+  confirmBtn.addEventListener("click", async () => {
+    modal.remove();
+    const {
+      clearDrafts,
+      clearHistory,
+      deleteClientProfile,
+      deleteEntireAccount,
+    } = await import("./modules/privacy.js");
+
+    switch (config.action) {
+      case "delete-drafts":
+        clearDrafts();
+        break;
+      case "delete-history":
+        clearHistory();
+        break;
+      case "delete-profile":
+        deleteClientProfile();
+        persistState();
+        render();
+        break;
+      case "delete-account":
+        if (confirm("DERNIÈRE CONFIRMATION: Êtes-vous vraiment sûr? Cette action est irréversible.")) {
+          deleteEntireAccount();
+        }
+        break;
+    }
+  });
+}
+
+/**
+ * Affiche le modal de personnalisation du consentement.
+ */
+async function showConsentCustomizeModal() {
+  const { renderConsentCustomizeModal } = await import("./modules/consent-modal.js");
+  const modalHtml = renderConsentCustomizeModal();
+  const container = document.createElement("div");
+  container.innerHTML = modalHtml;
+  document.body.appendChild(container.firstElementChild);
+}

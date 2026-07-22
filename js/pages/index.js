@@ -10,6 +10,7 @@ import { renderQuiz } from "./quiz.js";
 import { renderLogin, renderSignup } from "./auth.js";
 import { renderClientDashboard, renderClientProgram, renderClientProgress } from "./client.js";
 import { renderAdminDashboard, renderAdminClients, renderAdminPrograms, renderAdminMessages } from "./admin.js";
+import { renderPrivacyPage } from "./privacy.js";
 
 export const PAGES = {
   "home": renderHome,
@@ -24,6 +25,7 @@ export const PAGES = {
   "client-dashboard": renderClientDashboard,
   "client-program": renderClientProgram,
   "client-progress": renderClientProgress,
+  "privacy": renderPrivacyPage,
   "admin-dashboard": renderAdminDashboard,
   "admin-clients": renderAdminClients,
   "admin-programs": renderAdminPrograms,
