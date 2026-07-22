@@ -62,8 +62,11 @@ export function renderQuiz() {
         value="${escapeHtml(state.quizAnswers[s.key] || "")}"
         style="width: 100%; max-width: 420px; margin-top: 1.75rem;"
       />
-      <div class="quiz-buttons">
+      <div class="quiz-buttons" style="flex-wrap: wrap;">
+        ${state.quizStep > 0 ? `<button type="button" class="btn btn-outline-dark" data-quiz-back>${icon("arrow-left", 14)} Retour</button>` : ``}
         <button type="button" class="btn btn-ember" data-quiz-next>${s.button || "Suivant"}</button>
+        ${state.quizStep > 0 ? `<button type="button" class="btn btn-outline-dark" data-quiz-restart style="margin-left:auto;">${icon("rotate-ccw", 14)} Recommencer</button>` : ``}
+        <button type="button" class="btn btn-outline-dark" data-nav="${state.role === 'client' ? 'client-dashboard' : 'home'}">Reprendre plus tard</button>
       </div>
     `;
   } else if (s.type === "info") {
@@ -97,10 +100,12 @@ export function renderQuiz() {
           </div>
         `).join("")}
       </div>
-      <div class="quiz-buttons">
-        ${state.quizStep > 0 ? `<button type="button" class="btn btn-outline-dark" data-quiz-back>Retour</button>` : ``}
+      <div class="quiz-buttons" style="flex-wrap: wrap;">
+        ${state.quizStep > 0 ? `<button type="button" class="btn btn-outline-dark" data-quiz-back>${icon("arrow-left", 14)} Retour</button>` : ``}
         <button type="button" class="btn btn-outline-dark" data-quiz-skip>Passer</button>
         <button type="button" class="btn btn-ember" data-quiz-next>Suivant</button>
+        ${state.quizStep > 0 ? `<button type="button" class="btn btn-outline-dark" data-quiz-restart style="margin-left:auto;">${icon("rotate-ccw", 14)} Recommencer</button>` : ``}
+        <button type="button" class="btn btn-outline-dark" data-nav="${state.role === 'client' ? 'client-dashboard' : 'home'}">Reprendre plus tard</button>
       </div>
     `;
   } else if (s.type === "resume") {
@@ -115,7 +120,11 @@ export function renderQuiz() {
         ${state.quizAnswers.physique?.taille ? `<div class="quiz-resume-item">Taille : <strong>${escapeHtml(state.quizAnswers.physique.taille)} cm</strong></div>` : ""}
         ${state.quizAnswers.physique?.age ? `<div class="quiz-resume-item">Âge : <strong>${escapeHtml(state.quizAnswers.physique.age)} ans</strong></div>` : ""}
       </div>
-      <button type="button" class="btn btn-ember" data-quiz-confirm style="margin-top: 1.5rem;">Confirmer et commencer</button>
+      <div class="quiz-buttons" style="flex-wrap: wrap; margin-top: 1.5rem;">
+        <button type="button" class="btn btn-outline-dark" data-quiz-back>${icon("arrow-left", 14)} Retour</button>
+        <button type="button" class="btn btn-ember" data-quiz-confirm>Confirmer et commencer</button>
+        <button type="button" class="btn btn-outline-dark" data-quiz-restart style="margin-left:auto;">${icon("rotate-ccw", 14)} Recommencer</button>
+      </div>
     `;
   } else {
     content = `
@@ -127,6 +136,11 @@ export function renderQuiz() {
             <span>${icon("arrow-right", 1)}</span>
           </button>
         `).join("")}
+      </div>
+      <div class="quiz-buttons" style="margin-top: 24px; flex-wrap: wrap;">
+        ${state.quizStep > 0 ? `<button type="button" class="btn btn-outline-dark" data-quiz-back>${icon("arrow-left", 14)} Retour</button>` : ``}
+        ${state.quizStep > 0 ? `<button type="button" class="btn btn-outline-dark" data-quiz-restart>${icon("rotate-ccw", 14)} Recommencer</button>` : ``}
+        <button type="button" class="btn btn-outline-dark" data-nav="${state.role === 'client' ? 'client-dashboard' : 'home'}">Reprendre plus tard</button>
       </div>
     `;
   }

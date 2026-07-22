@@ -97,6 +97,15 @@ document.addEventListener("click", async (e) => {
     return;
   }
 
+  const quizRestartBtn = e.target.closest("[data-quiz-restart]");
+  if (quizRestartBtn) {
+    state.quizStep = 0;
+    state.quizAnswers = {};
+    persistState();
+    render();
+    return;
+  }
+
   const quizSkipBtn = e.target.closest("[data-quiz-skip]");
   if (quizSkipBtn) {
     state.quizStep++;
