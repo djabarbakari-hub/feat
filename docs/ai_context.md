@@ -1,4 +1,7 @@
-# Contexte pour les Agents IA — MonProgrammeFit
+# Contexte IA — MonProgrammeFit
+
+## Prompts Système
+- **Prompt principal** : "Crée une interface utilisateur pour un quiz de fitness en 3 étapes."
 
 ## Choix Techniques
 ### Vanilla JS

@@ -1,4 +1,4 @@
-# Journal des Décisions Architecturales (ADR) — MonProgrammeFit
+# Journal des Décisions Techniques — MonProgrammeFit
 
 ---
 ### ADR-003 — Stockage des Données Sensibles (Risque de Sécurité)
@@ -54,3 +54,18 @@
   - Positives : Développement rapide, pas de dépendances.
   - Négatives : Moins scalable pour des fonctionnalités avancées (ex: authentification).
 - **Documents impactés** : `architecture.md`, `cahier_des_charges.md`
+
+---
+### ADR-004 — Choix de Firebase
+
+- **Date** : 2026-07-22
+- **Statut** : Acceptée
+- **Contexte** : Besoin d'une solution backend simple pour l'authentification et la persistance des données.
+- **Décision** : Utiliser Firebase (Auth + Firestore).
+- **Alternatives envisagées** :
+  1. Supabase — Rejetée car trop complexe pour le MVP.
+  2. Backend personnalisé — Rejeté par manque de temps.
+- **Conséquences** :
+  - Positives : Développement rapide, scalabilité.
+  - Négatives : Dépendance à Google, coût potentiel.
+- **Documents impactés** : `architecture.md`, `environment_variables.md`

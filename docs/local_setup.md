@@ -1,27 +1,20 @@
 # Installation Locale — MonProgrammeFit
 
 ## Prérequis
-| Outil       | Version requise | Vérification          |
-|-------------|-----------------|-----------------------|
-| Navigateur  | Chrome ≥ 90     | `chrome://version`    |
-| Node.js     | N/A             | Pas de backend.       |
+- Node.js v18+
 
 ## Point d'Entrée
 `index.html` (ouvrir directement dans un navigateur).
 
 ## Installation
-Aucune installation requise. Cloner le dépôt et ouvrir `index.html` :
 ```bash
-git clone <url_du_depot>
-cd abdoul
-start index.html  # Windows
-open index.html   # Mac
-xdg-open index.html # Linux
+npm install
 ```
 
 ## Développement
-1. Modifier les fichiers (`app.js`, `styles.css`, `index.html`).
-2. Rafraîchir le navigateur (`Ctrl + F5` pour vider le cache).
+```bash
+npm run dev
+```
 
 ## Build
 Aucun build nécessaire (projet statique).

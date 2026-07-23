@@ -1,35 +1,24 @@
 # Variables d'Environnement — MonProgrammeFit
 
-## Variables Actuelles
-Aucune variable d'environnement n'est requise pour le MVP. Les futures intégrations (Firebase, FedaPay) nécessiteront les variables suivantes :
+## Registre
+| Variable | Description | Obligatoire ? |
+|----------|-------------|---------------|
+| `VITE_FIREBASE_API_KEY` | Clé API Firebase | ✅ Oui |
+| `VITE_FIREBASE_AUTH_DOMAIN` | Domaine d'authentification Firebase | ✅ Oui |
+| `VITE_FIREBASE_PROJECT_ID` | ID du projet Firebase | ✅ Oui |
 
----
-
-## Firebase
-| Variable                  | Description                          | Exemple de Valeur               | Obligatoire |
-|---------------------------|--------------------------------------|----------------------------------|-------------|
-| `FIREBASE_API_KEY`        | Clé API Firebase.                    | `AIzaSy...`                      | Oui         |
-| `FIREBASE_AUTH_DOMAIN`    | Domaine d'authentification Firebase. | `monprogrammefit.firebaseapp.com`| Oui         |
-| `FIREBASE_PROJECT_ID`     | ID du projet Firebase.               | `monprogrammefit`                | Oui         |
-| `FIREBASE_STORAGE_BUCKET` | Bucket de stockage Firebase.         | `monprogrammefit.appspot.com`    | Non         |
-| `FIREBASE_MESSAGING_ID`   | ID de messagerie Firebase.           | `1234567890`                     | Non         |
-| `FIREBASE_APP_ID`         | ID de l'application Firebase.        | `1:1234567890:web:abcdef`        | Non         |
-
----
+## Fichier `.env.example`
+```env
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+```
 
 ## FedaPay
 | Variable               | Description                          | Exemple de Valeur | Obligatoire |
 |------------------------|--------------------------------------|-------------------|-------------|
 | `FEDAPAY_API_KEY`      | Clé API FedaPay.                     | `sk_live_...`     | Oui         |
 | `FEDAPAY_ENV`          | Environnement (sandbox/live).        | `sandbox`         | Oui         |
-
----
-
-## SendGrid (Notifications Email)
-| Variable               | Description                          | Exemple de Valeur | Obligatoire |
-|------------------------|--------------------------------------|-------------------|-------------|
-| `SENDGRID_API_KEY`     | Clé API SendGrid.                    | `SG.xxx`          | Oui         |
-
 ---
 
 ## Configuration

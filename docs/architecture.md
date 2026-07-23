@@ -1,13 +1,19 @@
 # Architecture — MonProgrammeFit
 
 ## Vue d'Ensemble
-Application monopage (SPA) en vanilla JS avec rendu côté client. L'état global est géré via un objet `state` centralisé, et le DOM est mis à jour dynamiquement via des fonctions de rendu (`render()`, `renderNavbar()`, etc.).
+Application monopage (SPA) en JavaScript modulaire, bundlée avec Vite. L'état global est géré via un objet `state` centralisé, et le DOM est mis à jour dynamiquement via des fonctions de rendu (`render()`, `renderNavbar()`, etc.). L'authentification et la persistance des données sont gérées par Firebase (Authentication et Firestore).
+
+## Outils et Technologies
+- **Bundler** : Vite (pour le développement et la production).
+- **Backend** : Firebase (Authentication, Firestore, Storage).
+- **Gestion d'état** : Objet `state` centralisé avec réactivité manuelle.
+- **Styles** : CSS moderne avec variables (tokens) pour la cohérence visuelle.
 
 ```
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│   index.html│    │  styles.css │    │    app.js   │
-│ (Structure) │───▶│ (Présentation)───▶│ (Logique)   │
-└─────────────┘    └─────────────┘    └─────────────┘
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│   index.html│    │  styles.css │    │    app.js   │    │   Firebase  │
+│ (Structure) │───▶│ (Présentation)───▶│ (Logique)   │───▶│ (Auth/DB)   │
+└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
 ```
 
 ## Structure du Projet
@@ -31,6 +37,24 @@ Application monopage (SPA) en vanilla JS avec rendu côté client. L'état globa
    - L'utilisateur répond aux questions (`data-quiz-answer`).
    - `state.quizAnswers` est mis à jour, `renderQuiz()` affiche la suite.
 
+## Flux API
+- **Firebase Authentication** : Gestion des utilisateurs (inscription, connexion, déconnexion).
+  - Endpoints : `signUp`, `signIn`, `signOut`.
+  - Payload : `{ email, password }`.
+  - Réponse : `{ user, error }`.
+- **Firestore** : Base de données NoSQL pour les profils clients, programmes, messages et données admin.
+  - Collections :
+    - `users` : Stocke les profils utilisateurs.
+    - `sessions` (sous-collection) : Historique des sessions d'entraînement.
+    - `messages` : Messages de contact.
+  - Opérations : `get`, `add`, `update`, `delete`.
+- **Firebase Storage** : Stockage des images de programmes (si applicable).
+
+## Flux Base de Données
+- **Collection `users`** : Stocke les informations de profil utilisateur (rôle, email, programme).
+  - **Sous-collection `sessions`** : Pour chaque utilisateur, stocke l'historique de ses sessions d'entraînement.
+- **Collection `messages`** : Stocke les messages de contact envoyés via le formulaire.
+
 ## Conventions Utilisées
 - **Nommage** :
   - Fichiers : `kebab-case` (ex: `client-dashboard.js`).
@@ -39,13 +63,16 @@ Application monopage (SPA) en vanilla JS avec rendu côté client. L'état globa
 - **Commits** :
   - Format : `type(scope): description` (ex: `feat(quiz): add progress bar`).
 - **Imports** :
-  - Pas de bundler → scripts chargés via `<script>` dans `index.html`.
+  - Utilisation de modules ES (`import/export`) gérés par Vite. Les dépendances npm sont résolues automatiquement.
 
 ## Dépendances Clés
-| Dépendance       | Version | Rôle                          | Critique ? | Alternative si supprimée       |
-|------------------|---------|-------------------------------|------------|--------------------------------|
-| Lucide           | latest  | Icônes (CDN).                 | Non.       | Heroicons, Feather Icons.      |
-| Google Fonts     | -       | Polices (Archivo Black, Archivo, IBM Plex Mono). | Oui.       | Polices système (dégradation). |
+| Dépendance | Version | Rôle | Critique ? | Alternative si supprimée |
+|---|---|---|---|---|
+| Vite | ^6.3.5 | Bundler, serveur de dev. | Oui. | Webpack, Parcel. |
+| Firebase | ^11.3.0 | Authentification, BDD (Firestore).| Oui. | Supabase, AWS Amplify. |
+| Lucide | ^0.507.0 | Icônes (via npm). | Non. | Heroicons, Feather Icons. |
+| Google Fonts | - | Polices (Archivo Black, Archivo, IBM Plex Mono). | Oui. | Polices système (dégradation). |
+| Firebase Storage | ^11.3.0 | Stockage des médias (images, vidéos). | Non (MVP). | AWS S3, Cloudinary. |
 
 ## Alias de compatibilité dans `tokens.css`
 
@@ -88,6 +115,5 @@ Ces alias permettent une transition progressive vers la nouvelle palette sans ca
 - **Images** : URLs externes (Unsplash) → risque de 404 si supprimées.
 
 ## Zones d'Amélioration
-- **Modularité** : Découper `app.js` en modules (ex: `quiz.js`, `dashboard.js`).
 - **Tests** : Ajouter Jest pour les fonctions pures (ex: `trackById`, `isQuizComplete`).
 - **Backend** : Intégrer Firebase pour l'authentification et le stockage des données.

@@ -1,7 +1,7 @@
 # Cahier des Charges — MonProgrammeFit
 
 ## Invite Initiale
-> *"Je veux une plateforme de coaching sportif personnalisé pour débutants. L'utilisateur répond à un quiz (lieu d'entraînement, niveau, fréquence) et reçoit un programme adapté. Il peut suivre sa progression dans un tableau de bord. Version MVP : vanilla JS, pas de backend."*
+> *"Je veux une plateforme de coaching sportif personnalisé pour débutants. L'utilisateur répond à un quiz (lieu d'entraînement, niveau, fréquence) et reçoit un programme adapté. Il peut suivre sa progression dans un tableau de bord. Version MVP : utilisation de Vite pour le bundling et Firebase pour l'authentification et la persistance des données."*
 
 ## Exigences Fonctionnelles
 ### Priorité Haute
@@ -12,7 +12,7 @@
 - [x] Navigation responsive (mobile/desktop).
 
 ### Priorité Moyenne
-- [ ] Authentification (email/mot de passe).
+- [x] Authentification (email/mot de passe) via Firebase.
 - [ ] Bibliothèque média (upload d'images pour les programmes).
 - [ ] Export des données (CSV pour les admins).
 
@@ -25,11 +25,14 @@
 
 ## Exigences Non-Fonctionnelles
 - **Performance** : Temps de chargement < 2s (optimisation des images, lazy loading).
-- **Sécurité** : Pas de stockage de données sensibles (MVP sans backend).
+- **Sécurité** :
+  - Authentification via Firebase Auth (email/mot de passe).
+  - Données sensibles chiffrées côté client avant stockage dans Firestore.
+  - Protection contre les attaques XSS et CSRF via les headers de sécurité.
 - **Évolutivité** : Code modulaire pour intégrer un backend ultérieurement.
 - **Accessibilité** : Niveau WCAG AA (contrastes, focus visible, ARIA labels).
 
 ## Contraintes
-- **Techniques** : Vanilla JS uniquement (pas de framework).
+- **Techniques** : Vanilla JS, bundler Vite, Firebase SDK pour l'authentification et la base de données. Architecture modulaire pour faciliter l'évolution vers un backend personnalisé si nécessaire.
 - **Commerciales** : MVP à livrer sous 1 semaine.
 - **Juridiques** : Mentions légales et politique de confidentialité obligatoires (à ajouter).

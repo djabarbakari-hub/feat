@@ -18,6 +18,7 @@
 - [ ] Découper `app.js` en modules (ex: `quiz.js`, `dashboard.js`). — Impact : Moyen — Effort : 2h
 - [ ] Ajouter des tests unitaires (Jest). — Impact : Élevé — Effort : 4h
 - [ ] Optimiser les images (compression, WebP). — Impact : Faible — Effort : 1h
+- [ ] Migrer les alias CSS vers les nouveaux tokens (`--ember` au lieu de `--accent-primary`). — Impact : Moyen — Effort : 2h
 
 ## Tâches en Cours
 - [/] Vérification des accès dans `js/router.js` (rôles admin/client). — Priorité : Haute — Assigné : Agent — Début : 2026-07-19
@@ -28,6 +29,7 @@
 - [ ] Intégration Firebase (authentification, stockage). — Priorité : Haute
 - [ ] Intégration FedaPay pour les paiements de programmes premium en FCFA. — Priorité : Moyenne
 - [ ] Notifications par email (SendGrid). — Priorité : Basse
+- [ ] Création du fichier tasks_tracking.md pour le suivi des tâches.
 
 ## Mise à jour UX récente
 - [x] Les boutons visibles du site déclenchent désormais des actions réelles (retour, contact, progression, administration). — 2026-07-14
