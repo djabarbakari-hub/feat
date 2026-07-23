@@ -7,11 +7,17 @@
 }
 
 .hero-inner {
-  padding: 64px 0 96px;
+  padding: 64px 28px 96px;
   max-width: 1152px;
   margin: 0 auto;
   position: relative;
   z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .hero-inner {
+    padding: 36px 20px 56px;
+  }
 }
 
 .hero-grid {

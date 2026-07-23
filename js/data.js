@@ -47,7 +47,7 @@ export const QUIZ_STEPS = [
     key: "objectif",
     options: [
       { v: "perte-poids", l: "Perte de poids", icon: "weight" },
-      { v: "prise-muscle", l: "Prise de muscle", icon: "dumbbell" },
+      { v: "musculation", l: "Musculation / Prise de masse", icon: "dumbbell" },
       { v: "endurance-sante", l: "Endurance & Santé", icon: "heart" },
     ]
   },
@@ -57,13 +57,15 @@ export const QUIZ_STEPS = [
     { v: "bodyweight", l: "Chez moi, sans matériel", icon: "footprints" },
   ]},
   { q: "Ton niveau actuel en activité physique ?", key: "niveau", options: [
-    { v: "debutant", l: "Débutant complet", icon: "user" },
-    { v: "occasionnel", l: "Je bouge de temps en temps", icon: "calendar" },
-    { v: "reguliers", l: "Je suis déjà assez actif·ve", icon: "zap" },
+    { v: "debutant", l: "Débutant (moins de 6 mois)", icon: "user" },
+    { v: "intermediaire", l: "Intermédiaire (6 mois à 2 ans)", icon: "calendar" },
+    { v: "avance", l: "Avancé (plus de 2 ans)", icon: "zap" },
   ]},
   { q: "Combien de séances par semaine vises-tu ?", key: "frequence", options: [
-    { v: "3-4", l: "3 à 4 séances", icon: "3-circle" },
-    { v: "5+", l: "5 séances ou plus", icon: "plus-circle" },
+    { v: "2", l: "2 séances par semaine", icon: "calendar" },
+    { v: "3", l: "3 séances par semaine", icon: "calendar" },
+    { v: "4", l: "4 séances par semaine", icon: "calendar" },
+    { v: "5", l: "5 séances ou plus", icon: "plus-circle" },
   ]},
   {
     q: "Pour aller plus loin (optionnel)",

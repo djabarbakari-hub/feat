@@ -323,23 +323,32 @@ export function renderAbout() {
   <div class="section wrap">
     <!-- Hero section -->
     <section class="about-hero">
-      <h1 class="h2 font-display">Notre mission : rendre le sport accessible à tous, sans excuse.</h1>
-      <p class="hero-sub" style="max-width:620px; margin-top:12px;">Chez <span class="brand-name">MonProgrammeFit</span>, nous croyons que chacun mérite un programme adapté à son niveau, son environnement et ses objectifs. Découvre notre histoire et nos valeurs.</p>
+      <p class="eyebrow-moss font-mono">À PROPOS DE NOUS</p>
+      <h1 class="font-display" style="max-width:780px;margin-bottom:16px;">Notre mission : rendre le sport accessible à tous, sans excuse.</h1>
+      <p class="hero-sub" style="max-width:640px;font-size:16px;line-height:1.6;color:var(--slate);">
+        Chez <span class="brand-name">MonProgrammeFit</span>, nous croyons que chacun mérite un programme adapté à son niveau, son environnement et ses objectifs. Découvre notre histoire et nos valeurs.
+      </p>
     </section>
 
     <!-- Histoire de la marque -->
-    <section class="about-story">
-      <h2 class="h3 font-display">Notre histoire</h2>
+    <section class="about-story" style="margin-top:36px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+        ${icon("history", 22, "var(--ember)")}
+        <h2 class="h3 font-display" style="margin:0;">Notre histoire</h2>
+      </div>
       <div class="story-grid">
         <div class="story-card card">
+          <div class="story-step-badge">01</div>
           <h3 class="font-display">Avant</h3>
-        <p>Tout a commencé en 2018 lorsque Abdou BAKARI, passionné de sport et coach depuis 2 ans, a constaté que beaucoup de personnes abandonnaient le sport par manque de temps, de matériel ou de motivation.</p>
+          <p>Tout a commencé en 2018 lorsque Abdou BAKARI, passionné de sport et coach depuis 2 ans, a constaté que beaucoup de personnes abandonnaient le sport par manque de temps, de matériel ou de motivation.</p>
         </div>
         <div class="story-card card">
+          <div class="story-step-badge">02</div>
           <h3 class="font-display">Le déclencheur</h3>
-          <p>Un jour, un ami lui a demandé : <em>"Comment puis-je m'entraîner chez moi sans matériel ?"</em>. Cette question a été le déclic pour créer <span class="brand-name">MonProgrammeFit</span>.</p>
+          <p>Un jour, un ami lui a demandé : <em>« Comment puis-je m'entraîner chez moi sans matériel ? »</em>. Cette question a été le déclic pour créer <span class="brand-name">MonProgrammeFit</span>.</p>
         </div>
         <div class="story-card card">
+          <div class="story-step-badge">03</div>
           <h3 class="font-display">Maintenant</h3>
           <p>Aujourd'hui, <span class="brand-name">MonProgrammeFit</span> accompagne des personnes dans leur transformation physique, avec des programmes 100% personnalisés et accessibles à tous.</p>
         </div>
@@ -347,28 +356,40 @@ export function renderAbout() {
     </section>
 
     <!-- Mission -->
-    <section class="about-mission card">
-      <h2 class="h3 font-display">Notre mission</h2>
-      <p>Notre mission est simple : <strong>rendre le sport accessible à tous</strong> en proposant des programmes <strong>adaptés à chacun</strong>, quel que soit son niveau, son matériel ou son emploi du temps.</p>
+    <section class="about-mission card" style="margin-top:40px;padding:28px 24px;border-left:4px solid var(--ember, #E2622D);background:var(--surface);">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        ${icon("target", 22, "var(--ember)")}
+        <h2 class="h3 font-display" style="margin:0;">Notre mission</h2>
+      </div>
+      <p style="font-size:15px;line-height:1.7;color:var(--text-primary);margin:0;">
+        Notre mission est simple : <strong>rendre le sport accessible à tous</strong> en proposant des programmes <strong>adaptés à chacun</strong>, quel que soit son niveau, son matériel ou son emploi du temps.
+      </p>
     </section>
 
     <!-- Valeurs -->
-    <section class="about-values">
-      <h2 class="h3 font-display">Nos valeurs</h2>
+    <section class="about-values" style="margin-top:44px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+        ${icon("heart", 22, "var(--ember)")}
+        <h2 class="h3 font-display" style="margin:0;">Nos valeurs</h2>
+      </div>
       <div class="values-grid">
         <div class="value-card card">
+          <div class="value-icon">${icon("check-circle-2", 22, "var(--ember)")}</div>
           <h3 class="font-display">Accessibilité</h3>
           <p>Des programmes adaptés à ta salle, ta maison, avec ou sans matériel.</p>
         </div>
         <div class="value-card card">
+          <div class="value-icon">${icon("sliders", 22, "var(--ember)")}</div>
           <h3 class="font-display">Personnalisation</h3>
           <p>Un questionnaire court pour générer ton programme sur mesure.</p>
         </div>
         <div class="value-card card">
+          <div class="value-icon">${icon("award", 22, "var(--ember)")}</div>
           <h3 class="font-display">Expertise</h3>
           <p>Des coachs reconnus avec plus de 3 ans d'expérience pour te guider.</p>
         </div>
         <div class="value-card card">
+          <div class="value-icon">${icon("users", 22, "var(--ember)")}</div>
           <h3 class="font-display">Communauté</h3>
           <p>Un groupe privé pour échanger avec d'autres utilisateurs et poser tes questions.</p>
         </div>
@@ -376,21 +397,29 @@ export function renderAbout() {
     </section>
 
     <!-- Équipe -->
-    <section class="about-team">
-      <h2 class="h3 font-display">Notre équipe</h2>
-      <div class="team-grid">
-        <div class="team-card card">
-          <img src="images/team/abdou_bakari.jpg" alt="Photo de Abdou BAKARI" loading="lazy" style="width:100%; border-radius:8px;"/>
-          <h3 class="font-display" style="margin-top:12px;">Abdou BAKARI</h3>
-          <p class="role font-mono">Fondateur & Coach principal</p>
-          <p>"Mon objectif : t'aider à atteindre le tien."</p>
+    <section class="about-team" style="margin-top:44px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+        ${icon("user-check", 22, "var(--ember)")}
+        <h2 class="h3 font-display" style="margin:0;">Notre équipe</h2>
+      </div>
+      <div class="team-card card" style="display:flex;gap:28px;align-items:center;flex-wrap:wrap;padding:28px;">
+        <div style="flex:0 0 330px;width:330px;height:360px;border-radius:12px;overflow:hidden;background:var(--line, #e5e7eb);box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
+          <img src="/images/team/abdou_bakari.jpg" alt="Photo de Abdou BAKARI" loading="lazy" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+          <div style="display:none;width:100%;height:100%;background:var(--ink, #1f2937);color:#ffffff;align-items:center;justify-content:center;font-weight:700;font-size:48px;">AB</div>
+        </div>
+        <div style="flex:1;min-width:240px;">
+          <h3 class="font-display" style="font-size:22px;margin:0 0 6px;">Abdou BAKARI</h3>
+          <p class="role font-mono" style="color:var(--moss);font-size:14px;margin:0 0 12px;font-weight:600;">Fondateur & Coach principal</p>
+          <p style="font-size:16px;color:var(--slate);line-height:1.6;font-style:italic;margin:0;">
+            « Mon objectif : t'aider à atteindre le tien. »
+          </p>
         </div>
       </div>
     </section>
 
     <!-- CTA final -->
-    <section class="about-cta card">
-      <h2 class="h3 font-display">Prêt à commencer ta transformation ?</h2>
+    <section class="about-cta card" style="margin-top:48px;">
+      <h2 class="h3 font-display" style="margin-bottom:16px;">Prêt à commencer ta transformation ?</h2>
       <button class="btn btn-ember" data-nav="signup" aria-label="Démarrer mon programme">Démarrer mon programme</button>
     </section>
   </div>`;

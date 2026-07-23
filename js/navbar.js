@@ -3,7 +3,7 @@
    ========================================================== */
 
 import { state } from "./state.js";
-import { icon } from "./helpers.js";
+import { icon, escapeHtml } from "./helpers.js";
 
 /**
  * Génère les liens de navigation en fonction du rôle de l'utilisateur.
@@ -30,7 +30,44 @@ export function renderNavbar() {
     `<button class="nav-link ${state.page === id ? "active" : ""}" data-nav="${id}" aria-current="${state.page === id ? "page" : "false"}">${label}</button>`;
 
   const rightGuest = `<button class="btn-primary" data-nav="login" aria-label="Se connecter">Se connecter</button>`;
-  const rightUser = `<button class="btn-logout" data-nav="home" data-logout="1" aria-label="Quitter">${icon("log-out", 14)} Quitter</button>`;
+  
+  // Badge de profil dynamique de l'utilisateur connecté
+  const isDocAdmin = state.role === "admin";
+  const firstName = state.clientProfile?.firstName || (isDocAdmin ? "Abdou" : "Athlète");
+  const lastName = state.clientProfile?.lastName || "";
+  const initial = firstName.charAt(0).toUpperCase() || "U";
+
+  const rightUser = `
+    <div class="navbar-right-user" style="display: flex; align-items: center; gap: 14px;">
+      <div class="user-badge-header" style="display: flex; align-items: center; gap: 8px; padding: 6px 14px; background: rgba(255, 255, 255, 0.06); border-radius: 9999px; border: 1px solid rgba(255, 255, 255, 0.12); cursor: default;">
+        <span style="width: 22px; height: 22px; border-radius: 50%; background: var(--accent-primary); color: var(--ink); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; font-family: 'Archivo', sans-serif;">
+          ${escapeHtml(initial)}
+        </span>
+        <span style="font-size: 13px; color: var(--chalk); font-weight: 600; white-space: nowrap; max-width: 120px; overflow: hidden; text-overflow: ellipsis; display: inline-block;">
+          ${escapeHtml(isDocAdmin ? "Coach Abdou" : firstName)}
+        </span>
+      </div>
+      <button class="btn-logout" data-nav="home" data-logout="1" aria-label="Quitter" style="padding: 8px 14px; font-size: 13px; font-weight: 600; height: auto;">
+        ${icon("log-out", 14)} Quitter
+      </button>
+    </div>
+  `;
+
+  const rightUserMobile = `
+    <div style="display: flex; flex-direction: column; gap: 12px; border-top: 1px dashed rgba(255, 255, 255, 0.12); padding-top: 12px; margin-top: 12px;">
+      <div style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: rgba(255, 255, 255, 0.06); border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.08);">
+        <span style="width: 26px; height: 26px; border-radius: 50%; background: var(--accent-primary); color: var(--ink); display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800;">
+          ${escapeHtml(initial)}
+        </span>
+        <span style="font-size: 13px; color: var(--chalk); font-weight: 600;">
+          Session active : ${escapeHtml(isDocAdmin ? `Coach Abdou` : `${firstName} ${lastName}`.trim())}
+        </span>
+      </div>
+      <button class="btn-logout" data-nav="home" data-logout="1" aria-label="Quitter" style="width: 100%; justify-content: flex-start; padding: 12px 14px;">
+        ${icon("log-out", 14)} Quitter la session
+      </button>
+    </div>
+  `;
 
   return `
   <div class="navbar">
@@ -49,7 +86,7 @@ export function renderNavbar() {
     </div>
     <div class="nav-mobile" id="navMobile" role="navigation" aria-label="Navigation mobile">
       ${links.map(([id, l]) => linkHtml(id, l)).join("")}
-      ${state.role === "guest" ? rightGuest : rightUser}
+      ${state.role === "guest" ? rightGuest : rightUserMobile}
     </div>
   </div>`;
 }
@@ -71,7 +108,7 @@ export function renderFooter() {
   </div>
   
   <!-- Bouton WhatsApp flottant -->
-  <a href="https://wa.me/33600000000" class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Contacter sur WhatsApp">
-    <img src="./images/icone-whatsapp.jfif" alt="WhatsApp" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />
+  <a href="https://wa.me/2290191720596" class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Contacter sur WhatsApp">
+    <img src="/images/icone-whatsapp.jfif" alt="WhatsApp" style="width:100%;height:100%;object-fit:cover;border-radius:50%;transform:scale(1.4);" />
   </a>`;
 }

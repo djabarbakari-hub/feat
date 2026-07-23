@@ -18,7 +18,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 20px;
+  padding: 14px 28px;
   max-width: 1152px;
   margin: 0 auto;
 }
@@ -208,8 +208,9 @@
 
 @media (max-width: 768px) {
   .nav-links,
-  .navbar .btn-primary {
-    display: none;
+  .navbar .btn-primary,
+  .navbar-right-user {
+    display: none !important;
   }
 
   .nav-toggle {
@@ -224,7 +225,7 @@
     display: none;
     flex-direction: column;
     gap: 12px;
-    padding: 16px 20px 20px;
+    padding: 16px 24px 20px;
     background: rgba(15, 26, 20, 0.96);
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     width: 100%;

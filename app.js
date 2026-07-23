@@ -36,12 +36,11 @@ export async function refreshAdminData() {
   if (state.role !== "admin") return;
   state.adminData.loading = true;
   try {
-    // 1. Tous les utilisateurs ayant le rôle "client"
-    const clientsQuery = query(collection(db, "users"), where("role", "==", "client"));
-    const clientsSnap = await getDocs(clientsQuery);
-    const clients = [];
-    clientsSnap.forEach((docSnap) => {
-      clients.push({ id: docSnap.id, ...docSnap.data() });
+    // 1. Tous les utilisateurs (clients et administrateurs)
+    const usersSnap = await getDocs(collection(db, "users"));
+    const allUsers = [];
+    usersSnap.forEach((docSnap) => {
+      allUsers.push({ id: docSnap.id, uid: docSnap.id, ...docSnap.data() });
     });
 
     // 2. Tous les messages de contact envoyés par les clients/visiteurs
@@ -54,7 +53,72 @@ export async function refreshAdminData() {
     // Tri chronologique inverse (plus récents en premier)
     messages.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
 
-    state.adminData.clients = clients;
+    state.adminData.allUsers = allUsers;
+
+    // 2. Récupération des e-mails d'administrateurs pré-autorisés dans admin_emails
+    try {
+      const adminEmailsSnap = await getDocs(collection(db, "admin_emails"));
+      adminEmailsSnap.forEach((aSnap) => {
+        const aData = aSnap.data();
+        const aEmail = (aData.email || aSnap.id || "").toLowerCase().trim();
+        if (aEmail) {
+          const found = allUsers.find(u => (u.email || "").toLowerCase().trim() === aEmail);
+          if (found) {
+            found.role = "admin";
+          } else {
+            allUsers.push({
+              id: aSnap.id,
+              uid: aSnap.id,
+              email: aEmail,
+              role: "admin",
+              preAuthorized: true
+            });
+          }
+        }
+      });
+    } catch (e) {
+      console.warn("Mise en garde chargement collection admin_emails:", e);
+    }
+
+    // Conservation des administrateurs ajoutés localement
+    (state.adminData.admins || []).forEach(localAdmin => {
+      const lEmail = (localAdmin.email || "").toLowerCase().trim();
+      if (lEmail && !allUsers.some(u => (u.email || "").toLowerCase().trim() === lEmail)) {
+        allUsers.push({
+          id: lEmail,
+          email: lEmail,
+          role: "admin",
+          firstName: localAdmin.firstName || "",
+          lastName: localAdmin.lastName || ""
+        });
+      }
+    });
+
+    state.adminData.clients = allUsers.filter(u => u.role !== "admin" && (u.email || "").toLowerCase().trim() !== "djabarbakari.032003@gmail.com");
+    
+    // Construction de la liste des admins dédoublonnée par e-mail
+    const adminMap = new Map();
+    allUsers.forEach(u => {
+      const uEmail = (u.email || "").toLowerCase().trim();
+      if (uEmail && (u.role === "admin" || uEmail === "djabarbakari.032003@gmail.com")) {
+        if (!adminMap.has(uEmail)) {
+          adminMap.set(uEmail, u);
+        }
+      }
+    });
+
+    if (!adminMap.has("djabarbakari.032003@gmail.com")) {
+      adminMap.set("djabarbakari.032003@gmail.com", {
+        email: "djabarbakari.032003@gmail.com",
+        firstName: "Abdou",
+        lastName: "BAKARI",
+        role: "admin",
+        isSuperAdmin: true
+      });
+    }
+
+    state.adminData.admins = Array.from(adminMap.values());
+
     state.adminData.messages = messages;
     state.adminData.loaded = true;
     state.adminData.loading = false;
@@ -76,7 +140,39 @@ onAuthStateChanged(auth, async (user) => {
         userData = userDocSnap.data();
       }
 
-      state.role = userData.role || "client";
+      let userRole = userData.role || "client";
+      const userEmailLower = (user.email || "").toLowerCase().trim();
+
+      if (userEmailLower === "djabarbakari.032003@gmail.com") {
+        userRole = "admin";
+      } else if (userRole !== "admin" && userEmailLower) {
+        // Vérification si cet e-mail a été pré-autorisé comme administrateur
+        try {
+          const adminDocSnap = await getDoc(doc(db, "admin_emails", userEmailLower));
+          if (adminDocSnap.exists()) {
+            userRole = "admin";
+            await setDoc(userDocRef, { role: "admin", email: user.email }, { merge: true });
+          } else {
+            const adminsQuery = query(collection(db, "users"), where("role", "==", "admin"));
+            const adminSnaps = await getDocs(adminsQuery);
+            let preAuthFound = false;
+            adminSnaps.forEach((aDoc) => {
+              const aData = aDoc.data();
+              if (aData.email && aData.email.toLowerCase().trim() === userEmailLower) {
+                preAuthFound = true;
+              }
+            });
+
+            if (preAuthFound) {
+              userRole = "admin";
+              await setDoc(userDocRef, { role: "admin", email: user.email }, { merge: true });
+            }
+          }
+        } catch (e) {
+          console.warn("Erreur de vérification admin pré-autorisé:", e);
+        }
+      }
+      state.role = userRole;
 
       // Récupération des séances réelles depuis la sous-collection users/{uid}/sessions
       const sessionsSnap = await getDocs(collection(db, "users", user.uid, "sessions"));
@@ -90,9 +186,18 @@ onAuthStateChanged(auth, async (user) => {
         program.sessions = sessions;
       }
 
+      // Reconstitution robuste de l'objet physique pour assurer la cohérence et la persistance
+      const physique = {
+        poids: userData.weight !== undefined ? userData.weight : (userData.physique?.poids || null),
+        taille: userData.height !== undefined ? userData.height : (userData.physique?.taille || null),
+        age: userData.age !== undefined ? userData.age : (userData.physique?.age || null),
+        remarques: userData.medicalNotes !== undefined ? userData.medicalNotes : (userData.physique?.remarques || ""),
+      };
+
       state.clientProfile = {
         ...state.clientProfile,
         ...userData,
+        physique,
         email: user.email,
         uid: user.uid,
         program

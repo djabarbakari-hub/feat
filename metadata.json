@@ -1,0 +1,6 @@
+{
+  "name": "MonProgrammeFit",
+  "description": "Des programmes sportifs personnalisés pour atteindre vos objectifs, avec ou sans matériel.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

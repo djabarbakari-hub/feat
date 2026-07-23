@@ -3,76 +3,117 @@
 
 /* ---------- ABOUT PAGE ---------- */
 .about-hero {
-  background: var(--bg-dark); /* #F7F5F0 */
-  padding: 64px 0;
-  color: var(--text-primary); /* #16232C */
+  background: transparent;
+  padding-top: 16px;
+  padding-bottom: 24px;
+  color: var(--text-primary);
 }
 
 .about-hero h1 {
   font-size: 28px;
-  color: var(--text-primary); /* #16232C */
+  color: var(--text-primary);
   margin: 0 0 16px;
+  line-height: 1.25;
+}
+
+@media (min-width: 768px) {
+  .about-hero h1 { font-size: 36px; }
 }
 
 .about-hero .hero-sub {
-  color: var(--slate); /* #6B7280 */
-  max-width: 620px;
+  color: var(--slate);
+  max-width: 640px;
   margin-top: 12px;
 }
 
 .about-story, .about-mission, .about-values, .about-team, .about-cta {
-  margin-top: 48px;
+  margin-top: 40px;
 }
 
-.about-story h2, .about-mission h2, .about-values h2, .about-team h2, .about-cta h2 {
-  color: var(--text-primary); /* #16232C */
-  margin-bottom: 24px;
-}
-
-.story-grid, .values-grid, .team-grid {
+.story-grid {
   display: grid;
-  gap: 24px;
+  gap: 20px;
 }
 
 @media (min-width: 768px) {
-  .story-grid, .values-grid {
+  .story-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
+.values-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
 .story-card, .value-card, .team-card {
-  background: var(--surface); /* #F1EFE9 */
-  padding: 20px;
-  border-radius: 12px;
-  color: var(--text-primary); /* #16232C */
+  background: var(--surface, #F1EFE9);
+  padding: 24px;
+  border-radius: 8px;
+  border: 1px solid var(--line, #e5e7eb);
+  color: var(--text-primary);
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.story-card:hover, .value-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}
+
+.story-step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--ember, #E2622D);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.value-icon {
+  margin-bottom: 12px;
+  display: inline-flex;
+  padding: 8px;
+  background: rgba(226, 98, 45, 0.1);
+  border-radius: 6px;
 }
 
 .story-card h3, .value-card h3, .team-card h3 {
-  color: var(--text-primary); /* #16232C */
-  margin: 0 0 12px;
+  color: var(--text-primary);
+  margin: 0 0 10px;
+  font-size: 18px;
 }
 
 .story-card p, .value-card p, .team-card p {
-  color: var(--slate); /* #6B7280 */
+  color: var(--slate);
   margin: 0;
   font-size: 14px;
+  line-height: 1.6;
 }
 
 .about-cta {
-  background: var(--surface); /* #F1EFE9 */
-  padding: 32px;
-  border-radius: 12px;
+  background: var(--surface, #F1EFE9);
+  padding: 36px 24px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
   text-align: center;
 }
 
 .about-cta h2 {
-  color: var(--text-primary); /* #16232C */
+  color: var(--text-primary);
+  margin: 0 0 8px;
 }
 
 .about-cta .btn {
-  background: var(--accent-primary); /* #E2622D */
-  color: var(--chalk); /* #F7F5F0 */
-  margin-top: 24px;
+  background: var(--ember, #E2622D);
+  color: #ffffff;
+  margin-top: 16px;
 }
 .h2 { font-size: 28px; color: var(--ink); margin: 0 0 40px; }
 @media (min-width: 768px) { .h2 { font-size: 32px; } }

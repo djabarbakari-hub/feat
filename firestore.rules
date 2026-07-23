@@ -1,0 +1,83 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: Utilisateur connecté
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Helper: Propriétaire de la ressource
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // Helper: Administrateur (email dédié, rôle admin, ou pré-autorisé dans admin_emails)
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'djabarbakari.032003@gmail.com' ||
+        (
+          exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
+        ) ||
+        (
+          request.auth.token.email != null &&
+          exists(/databases/$(database)/documents/admin_emails/$(request.auth.token.email))
+        )
+      );
+    }
+
+    // Collection admin_emails/{email} (pré-autorisation d'administrateurs par e-mail)
+    match /admin_emails/{emailDoc} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.auth.token.email == 'djabarbakari.032003@gmail.com';
+    }
+
+    // Collection users/{uid}
+    match /users/{uid} {
+      // Lecture : propriétaire, correspondance d'e-mail, ou administrateur
+      allow read: if isOwner(uid) || 
+                  (isSignedIn() && resource != null && resource.data.email == request.auth.token.email) || 
+                  isAdmin();
+
+      // Création
+      allow create: if (isOwner(uid) && (
+        !request.resource.data.keys().hasAny(['role']) ||
+        request.resource.data.role == 'client'
+      )) || isAdmin();
+
+      // Modification : Soit l'utilisateur modifie son propre profil (sans modifier son rôle), soit administrateur
+      allow update: if (isOwner(uid) && (
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']) ||
+        request.resource.data.role == resource.data.role
+      )) || isAdmin();
+
+      // Suppression : STRICTEMENT INTERDITE si le compte possède le rôle 'admin' ou est l'admin principal
+      allow delete: if (isOwner(uid) || isAdmin()) && 
+                      (!('role' in resource.data) || resource.data.role != 'admin') && 
+                      (!('email' in resource.data) || resource.data.email != 'djabarbakari.032003@gmail.com');
+
+      // Sous-collections de l'utilisateur
+      match /quizAnswers/{document=**} {
+        allow read, write: if isOwner(uid) || isAdmin();
+      }
+
+      match /sessions/{document=**} {
+        allow read, write: if isOwner(uid) || isAdmin();
+      }
+    }
+
+    // Collection messages/{docId}
+    match /messages/{docId} {
+      allow create: if request.resource.data.fromUid == null || (isSignedIn() && request.resource.data.fromUid == request.auth.uid);
+      allow read: if isAdmin();
+      allow update, delete: if isAdmin();
+    }
+
+    // Blocage strict par défaut
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

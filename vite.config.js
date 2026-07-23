@@ -4,8 +4,9 @@ export default defineConfig({
   // Pas de root spécial : index.html est déjà à la racine
   // Vite servira les fichiers statiques (css/, js/, images/) automatiquement
   server: {
-    port: 5173,
-    open: true,
+    host: '0.0.0.0',
+    port: 3000,
+    allowedHosts: 'all',
   },
   build: {
     outDir: 'dist',

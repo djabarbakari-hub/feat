@@ -1,0 +1,71 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Profile, physical metrics, preferences, and workout program of a client or administrator",
+      "type": "object",
+      "properties": {
+        "firstName": { "type": "string", "description": "User's first name" },
+        "lastName": { "type": "string", "description": "User's last name" },
+        "email": { "type": "string", "format": "email", "description": "User's unique email address" },
+        "phone": { "type": "string", "description": "User's telephone number" },
+        "role": { "type": "string", "enum": ["client", "admin"], "description": "System access role" },
+        "goal": { "type": "string", "description": "Fitness goal identifier" },
+        "track": { "type": "string", "description": "Selected training track ID" },
+        "niveau": { "type": "string", "description": "User experience level" },
+        "frequence": { "type": "string", "description": "Desired frequency of workouts" },
+        "weight": { "type": "number", "description": "Current body weight in kg" },
+        "height": { "type": "number", "description": "User height in cm" },
+        "age": { "type": "integer", "description": "User age in years" },
+        "medicalNotes": { "type": "string", "description": "Medical alerts or physical warnings" },
+        "dailyWaterLog": { "type": "object", "description": "Hydration tracking log map" },
+        "weightHistory": { "type": "array", "description": "Timeline of logged weights" },
+        "program": { "type": "object", "description": "The current week, progress history, and session list of the assigned workout program" },
+        "quizAnswers": { "type": "object", "description": "Onboarding quiz answers data structure" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "ISO date-time of the last document update" }
+      },
+      "required": ["email"]
+    },
+    "Message": {
+      "title": "Contact Message",
+      "description": "Message sent via the contact form by a guest or registered client",
+      "type": "object",
+      "properties": {
+        "fromUid": { "type": "string", "description": "The sending authenticated user's ID, or null if sent by a guest" },
+        "fromName": { "type": "string", "description": "Name of the sender" },
+        "fromEmail": { "type": "string", "format": "email", "description": "Email address of the sender" },
+        "subject": { "type": "string", "description": "Subject of the inquiry" },
+        "message": { "type": "string", "description": "Content of the message" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "ISO timestamp of creation" },
+        "read": { "type": "boolean", "description": "Whether the coach has marked this message as read" }
+      },
+      "required": ["fromName", "fromEmail", "subject", "message", "createdAt"]
+    },
+    "AdminEmail": {
+      "title": "Allowed Administrator",
+      "description": "White-listed email address that is pre-authorized to hold administrative privileges",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email", "description": "Unique email address authorized as admin" },
+        "role": { "type": "string", "enum": ["admin"], "description": "Administrative role designator" },
+        "addedBy": { "type": "string", "description": "Email address of the administrator who added this record" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "ISO timestamp of authorization" }
+      },
+      "required": ["email", "role"]
+    }
+  },
+  "firestore": {
+    "/users/{uid}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Collection of client and coach profiles indexed by their Firebase Auth User ID"
+    },
+    "/messages/{docId}": {
+      "schema": { "$ref": "#/entities/Message" },
+      "description": "Inquiries, requests, and contact forms sent to the coach"
+    },
+    "/admin_emails/{email}": {
+      "schema": { "$ref": "#/entities/AdminEmail" },
+      "description": "Registry of pre-authorized administrator e-mail addresses"
+    }
+  }
+}

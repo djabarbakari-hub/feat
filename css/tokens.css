@@ -138,10 +138,13 @@ h1, h2, h3, h4, h5, h6 { font-family: 'Archivo Black', 'Archivo', sans-serif; co
   width: min(100%, 1152px);
   max-width: 1152px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding-left: 28px;
+  padding-right: 28px;
+  box-sizing: border-box;
 }
 .section {
-  padding: 64px 0;
+  padding-top: 64px;
+  padding-bottom: 64px;
   overflow: hidden;
 }
 
@@ -161,6 +164,6 @@ button:active { transform: scale(0.98); }
 
 @media (max-width: 768px) {
   body { font-size: 16px; }
-  .wrap { padding: 0 18px; }
-  .section { padding: 36px 0; }
+  .wrap { padding-left: 20px; padding-right: 20px; }
+  .section { padding-top: 36px; padding-bottom: 36px; }
 }

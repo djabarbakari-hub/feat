@@ -1,5 +1,6 @@
 /* ---------- CARDS / GRIDS (generic) ---------- */
-.card { border: 1px solid var(--line); border-radius: 2px; padding: 24px; width: 100%; max-width: 100%; }
+.card { border: 1px solid var(--line); border-radius: 4px; padding: 28px 24px; width: 100%; max-width: 100%; }
+@media (max-width: 768px) { .card { padding: 20px 18px; } }
 .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
 @media (max-width: 768px) { .grid-3 { grid-template-columns: 1fr; } }
 .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
@@ -17,7 +18,7 @@
 .quiz-option:hover { border-color: var(--ink); }
 
 /* ---------- LOGIN ---------- */
-.login-wrap { max-width: 420px; width: 100%; margin: 0 auto; min-height: 60vh; display: flex; flex-direction: column; justify-content: center; padding: 0 12px; }
+.login-wrap { max-width: 440px; width: 100%; margin: 0 auto; min-height: 60vh; display: flex; flex-direction: column; justify-content: center; padding: 0 20px; }
 .tabs { display: flex; margin-bottom: 24px; border: 1px solid var(--line); border-radius: 2px; overflow: hidden; }
 .tab { flex: 1; padding: 10px 0; font-size: 14px; font-weight: 600; color: var(--slate); background: transparent; }
 .tab.active { background: var(--ink); color: var(--chalk); }
@@ -72,6 +73,7 @@ button {
   z-index: 100;
   transition: transform 0.2s, box-shadow 0.2s;
   text-decoration: none;
+  overflow: hidden;
 }
 
 .whatsapp-float:hover {
