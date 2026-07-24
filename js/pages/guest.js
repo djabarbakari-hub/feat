@@ -15,7 +15,8 @@ import { COACH_AVATAR } from "../assets.js";
  * @returns {string} HTML de la section héro + grille de programmes.
  */
 export function renderHome() {
-  const [t0, t1, t2] = TRACKS;
+  const list = state.tracks && state.tracks.length > 0 ? state.tracks : TRACKS;
+  const [t0, t1, t2] = list;
 
   const trailCardAnimation = `
     <style>
@@ -58,7 +59,7 @@ export function renderHome() {
       </div>
 
       <div class="trail-grid">
-        ${TRACKS.map((t) => `
+        ${list.map((t) => `
           <div class="trail-card">
             <div class="trail-photo">
               <img src="${t.img}" alt="${t.label}" loading="lazy"/>
@@ -110,13 +111,14 @@ export function renderHome() {
 }
 
 export function renderPrograms() {
+  const list = state.tracks && state.tracks.length > 0 ? state.tracks : TRACKS;
   return `
   <div class="section wrap">
     <p class="eyebrow-moss font-mono">LES TROIS DÉPARTS</p>
     <h1 class="h2 font-display">Nos programmes</h1>
     <p class="hero-sub" style="max-width:620px; margin-top:12px;">Chaque parcours a été conçu pour répondre à un contexte réel : salle, maison avec matériel, ou entraînement au poids de corps.</p>
     <div class="grid-3" style="margin-top:32px">
-      ${TRACKS.map((t) => `
+      ${list.map((t) => `
         <div class="card program-card">
           ${icon(t.icon, 26, "var(--ember)")}
           <h3 class="font-display" style="margin-top:16px;font-size:16px;color:var(--ink)">${t.label}</h3>

@@ -20,7 +20,10 @@ export const icon = (name, size = 16, color) =>
  * @param {string} id - ID du programme (ex: "gym").
  * @returns {Object} Objet programme correspondant ou le programme par défaut.
  */
-export const trackById = (id) => TRACKS.find((t) => t.id === id) || TRACKS[2];
+export const trackById = (id) => {
+  const list = state.tracks && state.tracks.length > 0 ? state.tracks : TRACKS;
+  return list.find((t) => t.id === id) || list[2];
+};
 
 /**
  * Vérifie si le quiz est complet.

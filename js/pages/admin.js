@@ -4,8 +4,9 @@
 
 import { TRACKS } from "../data.js";
 import { state } from "../state.js";
-import { icon, escapeHtml } from "../helpers.js";
-import { auth } from "../firebase.js";
+import { icon, escapeHtml, showToast } from "../helpers.js";
+import { auth, db } from "../firebase.js";
+import { doc, setDoc } from "firebase/firestore";
 
 /**
  * Helper pour formater l'initiale d'un client.
@@ -63,7 +64,8 @@ function formatTimeAgo(isoString) {
  * Helper pour traduire l'ID de parcours en libellé propre.
  */
 function getTrackLabel(trackId) {
-  const t = TRACKS.find(tr => tr.id === trackId);
+  const list = state.tracks && state.tracks.length > 0 ? state.tracks : TRACKS;
+  const t = list.find(tr => tr.id === trackId);
   return t ? t.label : (trackId || "Non défini");
 }
 
@@ -574,6 +576,7 @@ export function showClientDetailsModal(client) {
 export function renderAdminPrograms() {
   const clients = state.adminData.clients || [];
   const totalClients = clients.length;
+  const list = state.tracks && state.tracks.length > 0 ? state.tracks : TRACKS;
 
   return `
   <div class="wrap adm-page">
@@ -589,24 +592,24 @@ export function renderAdminPrograms() {
     ${renderNotice()}
 
     <div class="grid-3">
-      ${TRACKS.map((t) => {
+      ${list.map((t) => {
         const subs = clients.filter(c => c.track === t.id).length;
         const pctChoice = totalClients > 0 ? Math.round((subs / totalClients) * 100) : 0;
         
         return `
-        <div class="adm-prog-card">
+        <div class="adm-prog-card" style="display: flex; flex-direction: column; height: 100%;">
           <div style="display: flex; justify-content: space-between; align-items: flex-start;">
             <div class="adm-prog-icon">${icon(t.icon, 24)}</div>
           </div>
           <h3 style="font-size: 18px; margin: 12px 0 8px;">${t.label}</h3>
-          <p style="font-size: 13px; color: var(--slate); margin: 0 0 16px; line-height: 1.5;">${t.desc}</p>
+          <p style="font-size: 13px; color: var(--slate); margin: 0 0 16px; line-height: 1.5; flex-grow: 1;">${t.desc}</p>
           
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
             <span class="adm-badge active">${t.dist}</span>
             <span class="adm-badge" style="background: var(--chalk-soft); color: var(--slate);">3 séances/sem</span>
           </div>
 
-          <div class="adm-prog-stats">
+          <div class="adm-prog-stats" style="margin-bottom: 16px;">
             <div class="adm-prog-stat-item">
               <span class="adm-prog-stat-val">${subs}</span>
               <span class="adm-prog-stat-lbl">Clients inscrits</span>
@@ -616,10 +619,218 @@ export function renderAdminPrograms() {
               <span class="adm-prog-stat-lbl">Choix des clients</span>
             </div>
           </div>
+
+          <button class="btn btn-line btn-edit-program" data-program-id="${escapeHtml(t.id)}" style="width: 100%; justify-content: center; font-size: 13px; font-weight: 600; padding: 10px 0;">
+            ${icon("edit-2", 14)} Modifier le programme
+          </button>
         </div>`;
       }).join("")}
     </div>
   </div>`;
+}
+
+/**
+ * Modal d'édition d'un programme d'entraînement pour l'administrateur.
+ */
+export function showProgramEditModal(track) {
+  if (!track) return;
+
+  const existing = document.getElementById("program-edit-modal");
+  if (existing) existing.remove();
+
+  const modal = document.createElement("div");
+  modal.id = "program-edit-modal";
+  modal.style.cssText = `
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(10, 15, 20, 0.75);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.2s ease-out;
+  `;
+
+  modal.innerHTML = `
+    <div style="
+      background: var(--chalk, #ffffff);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      max-width: 550px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+      color: var(--ink);
+      font-family: inherit;
+    ">
+      <!-- HEADER -->
+      <div style="
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--surface, #f8f9fa);
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+      ">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="adm-prog-icon" style="margin: 0; padding: 8px; background: rgba(224, 86, 36, 0.1); color: var(--ember); border-radius: 8px;">
+            ${icon(track.icon || "dumbbell", 20)}
+          </div>
+          <div>
+            <h2 style="font-size: 18px; font-weight: 800; margin: 0; color: var(--ink);">Modifier le programme</h2>
+            <p style="font-size: 12px; color: var(--slate); margin: 2px 0 0;">ID : ${escapeHtml(track.id)}</p>
+          </div>
+        </div>
+        <button id="close-program-edit-modal" style="
+          background: transparent;
+          border: none;
+          font-size: 24px;
+          cursor: pointer;
+          color: var(--slate);
+          padding: 4px 8px;
+          border-radius: 4px;
+          line-height: 1;
+        " title="Fermer">&times;</button>
+      </div>
+
+      <!-- FORM BODY -->
+      <div style="padding: 24px; display: grid; gap: 16px;">
+        <div>
+          <label style="font-size: 12px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 6px;">Nom du programme</label>
+          <input type="text" id="edit-prog-label" class="text-input" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 6px;" value="${escapeHtml(track.label)}" />
+        </div>
+
+        <div>
+          <label style="font-size: 12px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 6px;">Slogan / Accroche</label>
+          <input type="text" id="edit-prog-tagline" class="text-input" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 6px;" value="${escapeHtml(track.tagline || "")}" />
+        </div>
+
+        <div>
+          <label style="font-size: 12px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 6px;">Durée du programme (ex : 12 semaines)</label>
+          <input type="text" id="edit-prog-dist" class="text-input" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 6px;" value="${escapeHtml(track.dist)}" />
+        </div>
+
+        <div>
+          <label style="font-size: 12px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 6px;">Nom de l'icône Lucide (ex: dumbbell, home, user)</label>
+          <input type="text" id="edit-prog-icon" class="text-input" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 6px;" value="${escapeHtml(track.icon)}" />
+        </div>
+
+        <div>
+          <label style="font-size: 12px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 6px;">URL de l'image de couverture</label>
+          <input type="text" id="edit-prog-img" class="text-input" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 6px;" value="${escapeHtml(track.img || "")}" />
+        </div>
+
+        <div>
+          <label style="font-size: 12px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 6px;">Description complète</label>
+          <textarea id="edit-prog-desc" class="text-input" style="width: 100%; min-height: 100px; padding: 10px; border: 1px solid var(--line); border-radius: 6px; resize: vertical; line-height: 1.5;">${escapeHtml(track.desc)}</textarea>
+        </div>
+
+        <div id="edit-prog-error" style="color: var(--ember); font-size: 13px; font-weight: 600; display: none; padding: 10px; background: rgba(224, 86, 36, 0.08); border-radius: 6px; border: 1px solid rgba(224, 86, 36, 0.15);"></div>
+      </div>
+
+      <!-- FOOTER ACTIONS -->
+      <div style="
+        padding: 16px 24px;
+        border-top: 1px solid var(--line);
+        background: var(--surface, #f8f9fa);
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+      ">
+        <button id="btn-cancel-program-edit" class="btn btn-outline-dark" style="font-size: 13px; padding: 10px 18px;">
+          Annuler
+        </button>
+        <button id="btn-save-program-edit" class="btn btn-ember" style="font-size: 13px; padding: 10px 18px; display: inline-flex; align-items: center; gap: 6px;">
+          ${icon("save", 14)} Enregistrer
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  const closeModal = () => modal.remove();
+  modal.querySelector("#close-program-edit-modal")?.addEventListener("click", closeModal);
+  modal.querySelector("#btn-cancel-program-edit")?.addEventListener("click", closeModal);
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  const saveBtn = modal.querySelector("#btn-save-program-edit");
+  saveBtn?.addEventListener("click", async () => {
+    const errorDiv = modal.querySelector("#edit-prog-error");
+    if (errorDiv) {
+      errorDiv.style.display = "none";
+      errorDiv.textContent = "";
+    }
+
+    const label = modal.querySelector("#edit-prog-label").value.trim();
+    const tagline = modal.querySelector("#edit-prog-tagline").value.trim();
+    const dist = modal.querySelector("#edit-prog-dist").value.trim();
+    const iconName = modal.querySelector("#edit-prog-icon").value.trim();
+    const img = modal.querySelector("#edit-prog-img").value.trim();
+    const desc = modal.querySelector("#edit-prog-desc").value.trim();
+
+    if (!label || !dist || !desc) {
+      if (errorDiv) {
+        errorDiv.textContent = "Veuillez remplir les champs obligatoires (Nom, Durée, Description).";
+        errorDiv.style.display = "block";
+      }
+      return;
+    }
+
+    const originalText = saveBtn.innerHTML;
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = `${icon("loader-2", 14)} Enregistrement...`;
+
+    const updatedTrack = {
+      id: track.id,
+      label,
+      tagline: tagline || track.tagline || "",
+      dist,
+      icon: iconName || track.icon || "dumbbell",
+      img: img || track.img || "",
+      desc,
+      updatedAt: new Date().toISOString()
+    };
+
+    try {
+      // Sauvegarder dans Firestore collection 'tracks'
+      await setDoc(doc(db, "tracks", track.id), updatedTrack);
+
+      // Mettre à jour l'état local immédiatement
+      if (!state.tracks) state.tracks = [];
+      const index = state.tracks.findIndex(t => t.id === track.id);
+      if (index !== -1) {
+        state.tracks[index] = updatedTrack;
+      } else {
+        state.tracks.push(updatedTrack);
+      }
+
+      state.adminNotice = `Le programme "${label}" a été mis à jour avec succès.`;
+      showToast("Programme mis à jour avec succès !");
+      closeModal();
+      
+      const { render } = await import("../render.js");
+      render();
+    } catch (err) {
+      console.error("Erreur d'enregistrement du programme dans Firestore:", err);
+      if (errorDiv) {
+        errorDiv.textContent = `Erreur lors de la sauvegarde: ${err.message || err}`;
+        errorDiv.style.display = "block";
+      }
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = originalText;
+    }
+  });
 }
 
 /**

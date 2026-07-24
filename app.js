@@ -19,10 +19,39 @@ import { auth, db } from "./js/firebase.js";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { state } from "./js/state.js";
+import { TRACKS } from "./js/data.js";
 
 setRenderer(render);
 
 restorePersistedState(Object.keys(PAGES));
+
+/**
+ * Charge les parcours / programmes dynamiquement depuis la collection 'tracks' de Firestore.
+ * S'il n'y a pas encore de document, utilise les TRACKS statiques d'origine.
+ */
+export async function loadTracks() {
+  try {
+    const tracksSnap = await getDocs(collection(db, "tracks"));
+    const list = [];
+    tracksSnap.forEach(docSnap => {
+      list.push({ id: docSnap.id, ...docSnap.data() });
+    });
+    if (list.length > 0) {
+      // Trier par id ou garder l'ordre d'origine
+      const order = ["gym", "home-equip", "bodyweight"];
+      list.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+      state.tracks = list;
+    } else {
+      state.tracks = [...TRACKS];
+    }
+  } catch (err) {
+    console.warn("Firestore tracks loading failed, using static fallback:", err);
+    state.tracks = [...TRACKS];
+  }
+}
+
+// Lancement immédiat du chargement des programmes
+loadTracks();
 window.addEventListener("popstate", handleBackNavigation);
 window.addEventListener("pageshow", () => {
   persistState();
@@ -36,6 +65,9 @@ export async function refreshAdminData() {
   if (state.role !== "admin") return;
   state.adminData.loading = true;
   try {
+    // Recharger également les programmes (tracks) pour s'assurer d'avoir les dernières modifications
+    await loadTracks();
+
     // 1. Tous les utilisateurs (clients et administrateurs)
     const usersSnap = await getDocs(collection(db, "users"));
     const allUsers = [];

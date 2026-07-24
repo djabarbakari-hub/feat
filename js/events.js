@@ -19,7 +19,7 @@
 import { state, persistState } from "./state.js";
 import { navigate, goBack } from "./router.js";
 import { render } from "./render.js";
-import { QUIZ_STEPS, COACH_PROGRAMS } from "./data.js";
+import { QUIZ_STEPS, COACH_PROGRAMS, TRACKS } from "./data.js";
 import { trackById, closeMobileMenu } from "./helpers.js";
 import { auth, db } from "./firebase.js";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
@@ -597,6 +597,18 @@ document.addEventListener("click", async (e) => {
     return;
   }
 
+  const editProgramBtn = e.target.closest(".btn-edit-program");
+  if (editProgramBtn) {
+    const programId = editProgramBtn.dataset.programId;
+    const list = state.tracks && state.tracks.length > 0 ? state.tracks : TRACKS;
+    const foundTrack = list.find(t => t.id === programId);
+    if (foundTrack) {
+      const { showProgramEditModal } = await import("./pages/admin.js");
+      showProgramEditModal(foundTrack);
+    }
+    return;
+  }
+
   const adminActionBtn = e.target.closest("[data-admin-action]");
   if (adminActionBtn) {
     const action = adminActionBtn.dataset.adminAction;
@@ -1135,20 +1147,6 @@ document.addEventListener("click", async (e) => {
   if (resetTimerBtn) {
     const { resetWorkoutTimer } = await import("./modules/workoutTimer.js");
     resetWorkoutTimer();
-    return;
-  }
-
-  const toggleVoiceBtn = e.target.closest("#btn-toggle-voice");
-  if (toggleVoiceBtn) {
-    const { toggleVoiceDiction } = await import("./modules/workoutTimer.js");
-    toggleVoiceDiction();
-    return;
-  }
-
-  const testVoiceBtn = e.target.closest("#btn-test-voice");
-  if (testVoiceBtn) {
-    const { speakTestVoice } = await import("./modules/workoutTimer.js");
-    speakTestVoice();
     return;
   }
 

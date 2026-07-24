@@ -15,6 +15,7 @@ export const state = {
   activeSession: "",
   adminNotice: "",
   lastVisitedAt: null,
+  tracks: [],
   adminStats: {
     clients: 0,
     activeToday: 0,
