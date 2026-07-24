@@ -71,8 +71,8 @@ service cloud.firestore {
     // Collection messages/{docId}
     match /messages/{docId} {
       allow create: if request.resource.data.fromUid == null || (isSignedIn() && request.resource.data.fromUid == request.auth.uid);
-      allow read: if isAdmin();
-      allow update, delete: if isAdmin();
+      allow read: if isAdmin() || (isSignedIn() && (resource.data.fromUid == request.auth.uid || (resource.data.fromEmail != null && resource.data.fromEmail == request.auth.token.email)));
+      allow update, delete: if isAdmin() || (isSignedIn() && (resource.data.fromUid == request.auth.uid || (resource.data.fromEmail != null && resource.data.fromEmail == request.auth.token.email)));
     }
 
     // Blocage strict par défaut

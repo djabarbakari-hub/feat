@@ -434,6 +434,9 @@ export function renderClientProgram() {
     const secs = (initSecs % 60).toString().padStart(2, '0');
     const formattedTime = `${mins}:${secs}`;
 
+    const isRunning = !!state.isTimerRunning;
+    const isVoice = state.voiceEnabled !== false;
+
     return `
     <div class="wrap client-page">
       <div class="client-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
@@ -444,10 +447,46 @@ export function renderClientProgram() {
           <p class="client-eyebrow" style="color: var(--ember); font-weight: 700; margin: 0;">💪 ENTRAÎNEMENT EN COURS</p>
           <h1 class="client-title" style="margin: 4px 0 0;">${escapeHtml(sessionName)}</h1>
         </div>
-        
-        <div style="background: rgba(224, 70, 50, 0.05); border: 1px solid rgba(224, 70, 50, 0.2); padding: 12px 20px; border-radius: 8px; text-align: center; min-width: 140px;">
-          <span style="font-size: 10px; font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; color: var(--slate); display: block;">Chronomètre actif</span>
-          <span id="workout-timer" style="font-size: 26px; font-family: 'IBM Plex Mono', monospace; font-weight: bold; color: var(--ember);">${formattedTime}</span>
+
+        <!-- Panneau de Contrôle Manuel du Chronomètre & Diction Vocale -->
+        <div style="background: white; border: 1px solid var(--line); padding: 16px 20px; border-radius: 12px; text-align: center; min-width: 280px; box-shadow: var(--shadow-sm); width: 100%; max-width: 420px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 11px; font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; color: var(--slate); font-weight: 700;">Chronomètre de Séance</span>
+            <span id="timer-status-badge" class="adm-badge ${isRunning ? 'active' : ''}" style="font-size: 11px; background: ${isRunning ? 'rgba(30,130,76,0.1)' : 'rgba(0,0,0,0.05)'}; color: ${isRunning ? 'var(--moss)' : 'var(--slate)'}; border: 1px solid ${isRunning ? 'var(--moss)' : 'var(--line)'};">
+              ${isRunning ? '▶ En cours' : '⏸ En pause'}
+            </span>
+          </div>
+
+          <div style="margin: 6px 0 14px;">
+            <span id="workout-timer" style="font-size: 38px; font-family: 'IBM Plex Mono', monospace; font-weight: 800; color: var(--ember); letter-spacing: 1px;">${formattedTime}</span>
+          </div>
+
+          <!-- Boutons de commande manuels -->
+          <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px;">
+            <button id="btn-toggle-timer" class="btn ${isRunning ? '' : 'btn-ember'}" style="${isRunning ? 'background: var(--ember); color: white;' : ''} display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 13px; padding: 8px 16px;">
+              ${isRunning ? `${icon("pause", 16)} Pause` : `${icon("play", 16)} Démarrer le chronomètre`}
+            </button>
+            <button id="btn-reset-timer" class="btn btn-outline-dark" style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 8px 12px;">
+              ${icon("rotate-ccw", 14)} Réinitialiser
+            </button>
+          </div>
+
+          <!-- Contrôle Diction Vocale & Test -->
+          <div style="padding-top: 10px; border-top: 1px dashed var(--line); display: flex; flex-direction: column; gap: 8px; align-items: center;">
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: center;">
+              <button id="btn-toggle-voice" class="btn btn-outline-dark" style="font-size: 11px; padding: 5px 10px; display: inline-flex; align-items: center; gap: 6px; ${isVoice ? 'border-color: var(--moss); color: var(--moss); background: rgba(30,130,76,0.06); font-weight:600;' : 'opacity: 0.7;'}">
+                ${icon(isVoice ? "volume-2" : "volume-x", 14)}
+                <span class="voice-label">${isVoice ? "Diction vocale : Activée (toutes les 10s)" : "Diction vocale : Désactivée"}</span>
+              </button>
+              <button id="btn-test-voice" class="btn btn-outline-dark" style="font-size: 11px; padding: 5px 10px;" title="Tester la voix">
+                🔊 Tester
+              </button>
+            </div>
+
+            <p style="font-size: 11px; color: var(--slate); margin: 4px 0 0; line-height: 1.35; text-align: center;">
+              📱 <strong>Maintien écran éteint :</strong> L'énumération vocale et le chronomètre continuent automatiquement de fonctionner même si vous verrouillez l'écran.
+            </p>
+          </div>
         </div>
       </div>
 

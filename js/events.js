@@ -530,8 +530,11 @@ document.addEventListener("click", async (e) => {
 
   const cancelWorkoutBtn = e.target.closest("#btn-cancel-workout") || e.target.closest("#btn-cancel-workout-btn");
   if (cancelWorkoutBtn) {
+    const { pauseWorkoutTimer } = await import("./modules/workoutTimer.js");
+    pauseWorkoutTimer();
     state.activeSession = "";
     state.activeSessionSeconds = 0;
+    state.isTimerRunning = false;
     render();
     return;
   }
@@ -542,6 +545,7 @@ document.addEventListener("click", async (e) => {
     const sessionName = sessionActionBtn.dataset.sessionName || "";
     state.activeSession = sessionName;
     state.activeSessionSeconds = 0; // Réinitialiser le chronomètre de séance
+    state.isTimerRunning = false; // L'utilisateur choisit explicitement de démarrer
     if (action === 'start' || action === 'review') {
       navigate('client-program');
       return;
@@ -1095,6 +1099,35 @@ document.addEventListener("click", async (e) => {
     return;
   }
 
+  // === ÉVÉNEMENTS CHRONOMÈTRE ET DICTION VOCALE ===
+  const toggleTimerBtn = e.target.closest("#btn-toggle-timer");
+  if (toggleTimerBtn) {
+    const { toggleWorkoutTimer } = await import("./modules/workoutTimer.js");
+    toggleWorkoutTimer();
+    return;
+  }
+
+  const resetTimerBtn = e.target.closest("#btn-reset-timer");
+  if (resetTimerBtn) {
+    const { resetWorkoutTimer } = await import("./modules/workoutTimer.js");
+    resetWorkoutTimer();
+    return;
+  }
+
+  const toggleVoiceBtn = e.target.closest("#btn-toggle-voice");
+  if (toggleVoiceBtn) {
+    const { toggleVoiceDiction } = await import("./modules/workoutTimer.js");
+    toggleVoiceDiction();
+    return;
+  }
+
+  const testVoiceBtn = e.target.closest("#btn-test-voice");
+  if (testVoiceBtn) {
+    const { speakTestVoice } = await import("./modules/workoutTimer.js");
+    speakTestVoice();
+    return;
+  }
+
   const forgotPwBtn = e.target.closest("#btn-forgot-password-link");
   if (forgotPwBtn) {
     showForgotPasswordModal();
@@ -1308,12 +1341,15 @@ document.addEventListener("submit", async (e) => {
     
     const { updateUserProfile } = await import("./modules/privacy.js");
     const { render } = await import("./render.js");
+    const { pauseWorkoutTimer } = await import("./modules/workoutTimer.js");
     
+    pauseWorkoutTimer();
     program.history = history;
     profile.program = program;
     state.clientProfile = profile;
     state.activeSession = "";
     state.activeSessionSeconds = 0;
+    state.isTimerRunning = false;
     
     if (auth.currentUser && !state.simulationActive) {
       await updateUserProfile({

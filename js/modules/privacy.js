@@ -6,7 +6,7 @@
 import { state, persistState, STORAGE_KEY } from "../state.js";
 import { showToast } from "../helpers.js";
 import { auth, db, handleFirestoreError } from "../firebase.js";
-import { doc, setDoc, deleteDoc } from "firebase/firestore";
+import { doc, setDoc, deleteDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { sendPasswordResetEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider, deleteUser, GoogleAuthProvider, reauthenticateWithPopup } from "firebase/auth";
 
 // Clés de stockage supplémentaires
@@ -189,31 +189,7 @@ export async function deleteClientProfile() {
  * Suppression complète du compte (DESTRUCTIVE).
  */
 export async function deleteEntireAccount() {
-  logDeletion("delete-entire-account", {
-    role: state.role,
-    hadProfile: !!state.clientProfile?.firstName,
-    hadQuizAnswers: Object.keys(state.quizAnswers || {}).length > 0,
-    timestamp: Date.now(),
-  });
-
-  const currentUser = auth.currentUser;
-  if (currentUser) {
-    try {
-      await deleteDoc(doc(db, "users", currentUser.uid));
-    } catch (e) {
-      console.warn("Firestore delete user error:", e);
-    }
-    try {
-      await auth.signOut();
-    } catch (e) {
-      console.warn("Auth signout error:", e);
-    }
-  }
-
-  window.localStorage.removeItem(STORAGE_KEY);
-  window.localStorage.removeItem(ANALYTICS_CONSENT_KEY);
-
-  window.location.href = window.location.pathname;
+  return await deleteAccountImmediately();
 }
 
 /**
@@ -563,10 +539,65 @@ export async function cancelAccountDeletion() {
 }
 
 /**
- * Supprime le compte immédiatement et sans délai.
+ * Supprime TOUTES les données Firestore associées à un utilisateur (document principal, sous-collections et messages).
  */
+export async function purgeAllFirestoreUserData(uid, email) {
+  if (!uid) return;
+
+  // 1. Suppression des sous-collections dans users/{uid} (sessions, quizAnswers, etc.)
+  const subcollections = ["sessions", "quizAnswers"];
+  for (const sub of subcollections) {
+    try {
+      const subSnap = await getDocs(collection(db, "users", uid, sub));
+      const subDeletes = [];
+      subSnap.forEach((subDoc) => {
+        subDeletes.push(deleteDoc(doc(db, "users", uid, sub, subDoc.id)));
+      });
+      await Promise.all(subDeletes);
+    } catch (e) {
+      console.warn(`Erreur lors de la suppression de la sous-collection ${sub}:`, e);
+    }
+  }
+
+  // 2. Suppression des messages associés au compte dans la collection "messages"
+  try {
+    const queries = [
+      query(collection(db, "messages"), where("fromUid", "==", uid))
+    ];
+    if (email) {
+      const emailLower = email.toLowerCase().trim();
+      queries.push(query(collection(db, "messages"), where("fromEmail", "==", email)));
+      queries.push(query(collection(db, "messages"), where("fromEmail", "==", emailLower)));
+      queries.push(query(collection(db, "messages"), where("clientEmail", "==", email)));
+      queries.push(query(collection(db, "messages"), where("clientEmail", "==", emailLower)));
+    }
+
+    for (const q of queries) {
+      try {
+        const msgSnap = await getDocs(q);
+        const msgDeletes = [];
+        msgSnap.forEach((mDoc) => {
+          msgDeletes.push(deleteDoc(doc(db, "messages", mDoc.id)));
+        });
+        await Promise.all(msgDeletes);
+      } catch (err) {
+        console.warn("Erreur suppression message individuel:", err);
+      }
+    }
+  } catch (e) {
+    console.warn("Erreur lors de la recherche des messages utilisateur à supprimer:", e);
+  }
+
+  // 3. Suppression du document principal de l'utilisateur dans users/{uid}
+  try {
+    await deleteDoc(doc(db, "users", uid));
+  } catch (e) {
+    console.warn("Erreur lors de la suppression du document utilisateur principal:", e);
+  }
+}
+
 /**
- * Supprime le compte immédiatement et sans délai.
+ * Supprime le compte immédiatement et sans délai avec purge intégrale de toutes les données.
  */
 export async function deleteAccountImmediately() {
   if (state.role === "admin") {
@@ -582,11 +613,11 @@ export async function deleteAccountImmediately() {
 
   const currentUser = auth.currentUser;
   if (currentUser) {
-    try {
-      await deleteDoc(doc(db, "users", currentUser.uid));
-    } catch (e) {
-      console.warn("Erreur suppression doc Firestore:", e);
-    }
+    const uid = currentUser.uid;
+    const email = currentUser.email || state.clientProfile?.email || "";
+
+    // Purge de toutes les données Firestore associées
+    await purgeAllFirestoreUserData(uid, email);
 
     try {
       await deleteUser(currentUser);
@@ -597,8 +628,8 @@ export async function deleteAccountImmediately() {
           showReauthModal(currentUser, async (success) => {
             if (success) {
               try {
-                // Tente de supprimer à nouveau après réauthentification réussie
-                await deleteDoc(doc(db, "users", currentUser.uid));
+                // Effectue à nouveau la purge complète après réauthentification réussie
+                await purgeAllFirestoreUserData(uid, email);
                 await deleteUser(currentUser);
                 finishDeletion();
                 resolve({ success: true });
@@ -623,9 +654,37 @@ export async function deleteAccountImmediately() {
 }
 
 function finishDeletion() {
-  window.localStorage.removeItem(STORAGE_KEY);
-  window.localStorage.removeItem(ANALYTICS_CONSENT_KEY);
-  window.location.href = window.location.pathname;
+  try {
+    window.localStorage.removeItem(STORAGE_KEY);
+    window.localStorage.removeItem(ANALYTICS_CONSENT_KEY);
+    window.localStorage.removeItem(DELETION_LOG_KEY);
+    window.localStorage.removeItem(TEMP_FILES_KEY);
+
+    // Supprime toutes les clés localStorage associées à l'application
+    Object.keys(window.localStorage).forEach((key) => {
+      if (key.includes("monprogrammefit") || key.includes("privacy") || key.includes("draft") || key.includes("quiz")) {
+        window.localStorage.removeItem(key);
+      }
+    });
+  } catch (e) {
+    console.warn("Erreur vidage localStorage:", e);
+  }
+
+  // Réinitialisation globale de l'état mémoire
+  state.role = "guest";
+  state.clientProfile = {};
+  state.quizAnswers = {};
+  state.clientProgram = null;
+  state.drafts = {
+    contact: { name: "", email: "", message: "", subject: "", captcha: "" },
+    signup: { firstName: "", lastName: "", email: "", password: "" },
+    login: { email: "", password: "" },
+  };
+
+  showToast("Votre compte et toutes vos données ont été définitivement supprimés.");
+  setTimeout(() => {
+    window.location.href = window.location.origin + window.location.pathname;
+  }, 100);
 }
 
 /**

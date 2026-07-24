@@ -7,67 +7,7 @@ import { renderNavbar, renderFooter } from "./navbar.js";
 import { PAGES } from "./pages/index.js";
 import { renderNotFound } from "./pages/guest.js";
 import { createIcons, icons } from "lucide";
-
-let stopwatchInterval = null;
-
-function speakWorkoutTime(totalSeconds) {
-  if (totalSeconds <= 0 || totalSeconds % 10 !== 0) return;
-
-  const mins = Math.floor(totalSeconds / 60);
-  const secs = totalSeconds % 60;
-
-  let phrase = "";
-  if (mins > 0) {
-    if (mins === 1) {
-      phrase += "1 minute";
-    } else {
-      phrase += `${mins} minutes`;
-    }
-
-    if (secs > 0) {
-      phrase += ` ${secs}`;
-    }
-  } else {
-    phrase += `${secs}`;
-  }
-
-  if ('speechSynthesis' in window) {
-    try {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(phrase);
-      utterance.lang = "fr-FR";
-      utterance.rate = 1.1; // Légèrement plus dynamique pour l'effort
-      window.speechSynthesis.speak(utterance);
-    } catch (e) {
-      console.warn("SpeechSynthesis error:", e);
-    }
-  }
-}
-
-function startWorkoutStopwatch() {
-  if (stopwatchInterval) return;
-  stopwatchInterval = setInterval(() => {
-    const el = document.getElementById("workout-timer");
-    if (el) {
-      state.activeSessionSeconds = (state.activeSessionSeconds || 0) + 1;
-      const mins = Math.floor(state.activeSessionSeconds / 60).toString().padStart(2, '0');
-      const secs = (state.activeSessionSeconds % 60).toString().padStart(2, '0');
-      el.textContent = `${mins}:${secs}`;
-      
-      // Notification vocale toutes les 10 secondes
-      speakWorkoutTime(state.activeSessionSeconds);
-    } else {
-      stopWorkoutStopwatch();
-    }
-  }, 1000);
-}
-
-function stopWorkoutStopwatch() {
-  if (stopwatchInterval) {
-    clearInterval(stopwatchInterval);
-    stopwatchInterval = null;
-  }
-}
+import { updateTimerUI } from "./modules/workoutTimer.js";
 
 export function render() {
   const navContainer = document.getElementById("app");
@@ -96,12 +36,11 @@ export function render() {
   if (main) main.innerHTML = pageHtml;
   if (footerContainer) footerContainer.innerHTML = renderFooter();
   
-  // Gérer le chronomètre de séance d'entraînement si présent dans le DOM
+  // Synchroniser le chronomètre d'entraînement si présent dans le DOM
   if (document.getElementById("workout-timer")) {
-    startWorkoutStopwatch();
-  } else {
-    stopWorkoutStopwatch();
+    updateTimerUI();
   }
   
   createIcons({ icons });
 }
+
