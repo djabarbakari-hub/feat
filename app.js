@@ -17,7 +17,7 @@ import { renderConsentModal } from "./js/modules/consent-modal.js";
 
 import { auth, db } from "./js/firebase.js";
 import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { doc, getDoc, collection, getDocs, query, where, onSnapshot, setDoc } from "firebase/firestore";
 import { state } from "./js/state.js";
 import { TRACKS } from "./js/data.js";
 
@@ -25,13 +25,18 @@ setRenderer(render);
 
 restorePersistedState(Object.keys(PAGES));
 
+// Variable pour stocker le désabonnement des programmes (tracks)
+let unsubscribeTracks = null;
+
 /**
- * Charge les parcours / programmes dynamiquement depuis la collection 'tracks' de Firestore.
+ * Charge et écoute en temps réel les parcours / programmes depuis la collection 'tracks' de Firestore.
  * S'il n'y a pas encore de document, utilise les TRACKS statiques d'origine.
  */
-export async function loadTracks() {
-  try {
-    const tracksSnap = await getDocs(collection(db, "tracks"));
+export function listenToTracks() {
+  if (unsubscribeTracks) {
+    unsubscribeTracks();
+  }
+  unsubscribeTracks = onSnapshot(collection(db, "tracks"), (tracksSnap) => {
     const list = [];
     tracksSnap.forEach(docSnap => {
       list.push({ id: docSnap.id, ...docSnap.data() });
@@ -44,213 +49,340 @@ export async function loadTracks() {
     } else {
       state.tracks = [...TRACKS];
     }
-  } catch (err) {
-    console.warn("Firestore tracks loading failed, using static fallback:", err);
+    persistState();
+    render();
+  }, (err) => {
+    console.warn("Firestore tracks loading in real-time failed, using static fallback:", err);
     state.tracks = [...TRACKS];
-  }
+  });
 }
 
-// Lancement immédiat du chargement des programmes
-loadTracks();
+// Lancement immédiat du chargement temps réel des programmes
+listenToTracks();
+
 window.addEventListener("popstate", handleBackNavigation);
 window.addEventListener("pageshow", () => {
   persistState();
 });
 
+// Écouteur d'événements de stockage local pour synchroniser instantanément les onglets sur le même appareil
+window.addEventListener("storage", (e) => {
+  if (e.key === "monprogrammefit-state-v1") {
+    restorePersistedState(Object.keys(PAGES));
+    render();
+  }
+});
+
+// Variables pour stocker les snapshots locaux de l'admin afin de les combiner
+let adminUsersData = [];
+let adminMessagesData = [];
+let adminEmailsData = [];
+
+let unsubscribeAdminUsers = null;
+let unsubscribeAdminMessages = null;
+let unsubscribeAdminEmails = null;
+
 /**
- * Charge les données Firestore réelles pour le panneau administrateur.
- * Explication : Récupère la liste des clients et des messages pour alimenter les KPIs.
+ * Combine les snapshots en temps réel et met à jour l'état de l'administrateur.
  */
-export async function refreshAdminData() {
-  if (state.role !== "admin") return;
-  state.adminData.loading = true;
-  try {
-    // Recharger également les programmes (tracks) pour s'assurer d'avoir les dernières modifications
-    await loadTracks();
+function updateAdminStateFromSnapshots() {
+  const allUsers = [...adminUsersData];
+  const messages = [...adminMessagesData];
+  const adminEmails = [...adminEmailsData];
 
-    // 1. Tous les utilisateurs (clients et administrateurs)
-    const usersSnap = await getDocs(collection(db, "users"));
-    const allUsers = [];
-    usersSnap.forEach((docSnap) => {
-      allUsers.push({ id: docSnap.id, uid: docSnap.id, ...docSnap.data() });
-    });
+  // Tri chronologique inverse (plus récents en premier)
+  messages.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
 
-    // 2. Tous les messages de contact envoyés par les clients/visiteurs
-    const messagesSnap = await getDocs(collection(db, "messages"));
-    const messages = [];
-    messagesSnap.forEach((docSnap) => {
-      messages.push({ id: docSnap.id, ...docSnap.data() });
-    });
+  state.adminData.allUsers = allUsers;
 
-    // Tri chronologique inverse (plus récents en premier)
-    messages.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-
-    state.adminData.allUsers = allUsers;
-
-    // 2. Récupération des e-mails d'administrateurs pré-autorisés dans admin_emails
-    try {
-      const adminEmailsSnap = await getDocs(collection(db, "admin_emails"));
-      adminEmailsSnap.forEach((aSnap) => {
-        const aData = aSnap.data();
-        const aEmail = (aData.email || aSnap.id || "").toLowerCase().trim();
-        if (aEmail) {
-          const found = allUsers.find(u => (u.email || "").toLowerCase().trim() === aEmail);
-          if (found) {
-            found.role = "admin";
-          } else {
-            allUsers.push({
-              id: aSnap.id,
-              uid: aSnap.id,
-              email: aEmail,
-              role: "admin",
-              preAuthorized: true
-            });
-          }
-        }
-      });
-    } catch (e) {
-      console.warn("Mise en garde chargement collection admin_emails:", e);
-    }
-
-    // Conservation des administrateurs ajoutés localement
-    (state.adminData.admins || []).forEach(localAdmin => {
-      const lEmail = (localAdmin.email || "").toLowerCase().trim();
-      if (lEmail && !allUsers.some(u => (u.email || "").toLowerCase().trim() === lEmail)) {
+  // Fusionner les adresses e-mails administratives pré-autorisées
+  adminEmails.forEach((aData) => {
+    const aEmail = (aData.email || aData.id || "").toLowerCase().trim();
+    if (aEmail) {
+      const found = allUsers.find(u => (u.email || "").toLowerCase().trim() === aEmail);
+      if (found) {
+        found.role = "admin";
+      } else {
         allUsers.push({
-          id: lEmail,
-          email: lEmail,
+          id: aData.id,
+          uid: aData.id,
+          email: aEmail,
           role: "admin",
-          firstName: localAdmin.firstName || "",
-          lastName: localAdmin.lastName || ""
+          preAuthorized: true
         });
       }
-    });
+    }
+  });
 
-    state.adminData.clients = allUsers.filter(u => u.role !== "admin" && (u.email || "").toLowerCase().trim() !== "djabarbakari.032003@gmail.com");
-    
-    // Construction de la liste des admins dédoublonnée par e-mail
-    const adminMap = new Map();
-    allUsers.forEach(u => {
-      const uEmail = (u.email || "").toLowerCase().trim();
-      if (uEmail && (u.role === "admin" || uEmail === "djabarbakari.032003@gmail.com")) {
-        if (!adminMap.has(uEmail)) {
-          adminMap.set(uEmail, u);
-        }
-      }
-    });
-
-    if (!adminMap.has("djabarbakari.032003@gmail.com")) {
-      adminMap.set("djabarbakari.032003@gmail.com", {
-        email: "djabarbakari.032003@gmail.com",
-        firstName: "Abdou",
-        lastName: "BAKARI",
+  // Conservation des administrateurs ajoutés localement
+  (state.adminData.admins || []).forEach(localAdmin => {
+    const lEmail = (localAdmin.email || "").toLowerCase().trim();
+    if (lEmail && !allUsers.some(u => (u.email || "").toLowerCase().trim() === lEmail)) {
+      allUsers.push({
+        id: lEmail,
+        email: lEmail,
         role: "admin",
-        isSuperAdmin: true
+        firstName: localAdmin.firstName || "",
+        lastName: localAdmin.lastName || ""
       });
     }
+  });
 
-    state.adminData.admins = Array.from(adminMap.values());
+  state.adminData.clients = allUsers.filter(u => u.role !== "admin" && (u.email || "").toLowerCase().trim() !== "djabarbakari.032003@gmail.com");
 
-    state.adminData.messages = messages;
-    state.adminData.loaded = true;
-    state.adminData.loading = false;
-  } catch (err) {
-    console.error("Erreur de chargement des données admin Firestore:", err);
-    state.adminData.loading = false;
+  // Construction de la liste des admins dédoublonnée par e-mail
+  const adminMap = new Map();
+  allUsers.forEach(u => {
+    const uEmail = (u.email || "").toLowerCase().trim();
+    if (uEmail && (u.role === "admin" || uEmail === "djabarbakari.032003@gmail.com")) {
+      if (!adminMap.has(uEmail)) {
+        adminMap.set(uEmail, u);
+      }
+    }
+  });
+
+  if (!adminMap.has("djabarbakari.032003@gmail.com")) {
+    adminMap.set("djabarbakari.032003@gmail.com", {
+      email: "djabarbakari.032003@gmail.com",
+      firstName: "Abdou",
+      lastName: "BAKARI",
+      role: "admin",
+      isSuperAdmin: true
+    });
+  }
+
+  state.adminData.admins = Array.from(adminMap.values());
+  state.adminData.messages = messages;
+  state.adminData.loaded = true;
+  state.adminData.loading = false;
+
+  persistState();
+  render();
+}
+
+/**
+ * Arrête tous les écouteurs d'administration temps réel.
+ */
+export function cleanupAdminRealTimeSync() {
+  if (unsubscribeAdminUsers) {
+    unsubscribeAdminUsers();
+    unsubscribeAdminUsers = null;
+  }
+  if (unsubscribeAdminMessages) {
+    unsubscribeAdminMessages();
+    unsubscribeAdminMessages = null;
+  }
+  if (unsubscribeAdminEmails) {
+    unsubscribeAdminEmails();
+    unsubscribeAdminEmails = null;
   }
 }
 
+/**
+ * Démarre ou rafraîchit la synchronisation temps réel globale de toutes les collections administratives.
+ */
+export function setupAdminRealTimeSync() {
+  if (state.role !== "admin") return;
+
+  // Si déjà abonnés, ne pas se réabonner inutilement
+  if (unsubscribeAdminUsers && unsubscribeAdminMessages && unsubscribeAdminEmails) {
+    return;
+  }
+
+  cleanupAdminRealTimeSync();
+  state.adminData.loading = true;
+
+  // 1. Écoute temps réel de tous les utilisateurs
+  unsubscribeAdminUsers = onSnapshot(collection(db, "users"), (usersSnap) => {
+    const list = [];
+    usersSnap.forEach((docSnap) => {
+      list.push({ id: docSnap.id, uid: docSnap.id, ...docSnap.data() });
+    });
+    adminUsersData = list;
+    updateAdminStateFromSnapshots();
+  }, (err) => {
+    console.warn("Erreur écoute temps réel collection users:", err);
+  });
+
+  // 2. Écoute temps réel de tous les messages
+  unsubscribeAdminMessages = onSnapshot(collection(db, "messages"), (messagesSnap) => {
+    const list = [];
+    messagesSnap.forEach((docSnap) => {
+      list.push({ id: docSnap.id, ...docSnap.data() });
+    });
+    adminMessagesData = list;
+    updateAdminStateFromSnapshots();
+  }, (err) => {
+    console.warn("Erreur écoute temps réel collection messages:", err);
+  });
+
+  // 3. Écoute temps réel des admin_emails
+  unsubscribeAdminEmails = onSnapshot(collection(db, "admin_emails"), (adminEmailsSnap) => {
+    const list = [];
+    adminEmailsSnap.forEach((docSnap) => {
+      list.push({ id: docSnap.id, ...docSnap.data() });
+    });
+    adminEmailsData = list;
+    updateAdminStateFromSnapshots();
+  }, (err) => {
+    console.warn("Erreur écoute temps réel collection admin_emails:", err);
+  });
+}
+
+/**
+ * Déclencheur manuel ou de compatibilité pour actualiser les données de l'administrateur.
+ * Désormais géré à 100% en temps réel pour une synchronisation instantanée multi-appareils.
+ */
+export async function refreshAdminData() {
+  if (state.role !== "admin") return;
+  setupAdminRealTimeSync();
+}
+
+// Écouteur d'état d'authentification Firebase (restauration automatique de la session)
+// Variables pour stocker les désabonnements des écouteurs temps réel Firestore
+let unsubscribeUserDoc = null;
+let unsubscribeUserSessions = null;
+
 // Écouteur d'état d'authentification Firebase (restauration automatique de la session)
 onAuthStateChanged(auth, async (user) => {
+  // Désabonner les écouteurs précédents s'ils existent pour éviter les fuites de mémoire et les erreurs de permission
+  if (unsubscribeUserDoc) {
+    unsubscribeUserDoc();
+    unsubscribeUserDoc = null;
+  }
+  if (unsubscribeUserSessions) {
+    unsubscribeUserSessions();
+    unsubscribeUserSessions = null;
+  }
+
   if (user) {
     try {
       const userDocRef = doc(db, "users", user.uid);
-      const userDocSnap = await getDoc(userDocRef);
 
-      let userData = {};
-      if (userDocSnap.exists()) {
-        userData = userDocSnap.data();
-      }
+      // Écoute temps réel du document principal de l'utilisateur
+      unsubscribeUserDoc = onSnapshot(userDocRef, async (userDocSnap) => {
+        if (!userDocSnap.exists()) {
+          // Si le document n'existe pas encore (onboarding/signup en cours), initialiser le profil de base
+          state.role = "client";
+          state.clientProfile = {
+            ...state.clientProfile,
+            email: user.email,
+            uid: user.uid,
+            physique: state.clientProfile.physique || { poids: null, taille: null, age: null, remarques: "" }
+          };
+          render();
+          return;
+        }
 
-      let userRole = userData.role || "client";
-      const userEmailLower = (user.email || "").toLowerCase().trim();
+        const userData = userDocSnap.data();
+        let userRole = userData.role || "client";
+        const userEmailLower = (user.email || "").toLowerCase().trim();
 
-      if (userEmailLower === "djabarbakari.032003@gmail.com") {
-        userRole = "admin";
-      } else if (userRole !== "admin" && userEmailLower) {
-        // Vérification si cet e-mail a été pré-autorisé comme administrateur
-        try {
-          const adminDocSnap = await getDoc(doc(db, "admin_emails", userEmailLower));
-          if (adminDocSnap.exists()) {
-            userRole = "admin";
-            await setDoc(userDocRef, { role: "admin", email: user.email }, { merge: true });
-          } else {
-            const adminsQuery = query(collection(db, "users"), where("role", "==", "admin"));
-            const adminSnaps = await getDocs(adminsQuery);
-            let preAuthFound = false;
-            adminSnaps.forEach((aDoc) => {
-              const aData = aDoc.data();
-              if (aData.email && aData.email.toLowerCase().trim() === userEmailLower) {
-                preAuthFound = true;
-              }
-            });
-
-            if (preAuthFound) {
+        // Gestion de l'autorisation administrateur
+        if (userEmailLower === "djabarbakari.032003@gmail.com") {
+          userRole = "admin";
+        } else if (userRole !== "admin" && userEmailLower) {
+          // Vérification si cet e-mail a été pré-autorisé comme administrateur
+          try {
+            const adminDocSnap = await getDoc(doc(db, "admin_emails", userEmailLower));
+            if (adminDocSnap.exists()) {
               userRole = "admin";
               await setDoc(userDocRef, { role: "admin", email: user.email }, { merge: true });
-            }
-          }
-        } catch (e) {
-          console.warn("Erreur de vérification admin pré-autorisé:", e);
-        }
-      }
-      state.role = userRole;
+            } else {
+              const adminsQuery = query(collection(db, "users"), where("role", "==", "admin"));
+              const adminSnaps = await getDocs(adminsQuery);
+              let preAuthFound = false;
+              adminSnaps.forEach((aDoc) => {
+                const aData = aDoc.data();
+                if (aData.email && aData.email.toLowerCase().trim() === userEmailLower) {
+                  preAuthFound = true;
+                }
+              });
 
-      // Récupération des séances réelles depuis la sous-collection users/{uid}/sessions
-      const sessionsSnap = await getDocs(collection(db, "users", user.uid, "sessions"));
-      const sessions = [];
-      sessionsSnap.forEach((sDoc) => {
-        sessions.push({ id: sDoc.id, ...sDoc.data() });
+              if (preAuthFound) {
+                userRole = "admin";
+                await setDoc(userDocRef, { role: "admin", email: user.email }, { merge: true });
+              }
+            }
+          } catch (e) {
+            console.warn("Erreur de vérification admin pré-autorisé:", e);
+          }
+        }
+        
+        state.role = userRole;
+
+        // Reconstitution robuste de l'objet physique
+        const physique = {
+          poids: userData.weight !== undefined ? userData.weight : (userData.physique?.poids || null),
+          taille: userData.height !== undefined ? userData.height : (userData.physique?.taille || null),
+          age: userData.age !== undefined ? userData.age : (userData.physique?.age || null),
+          remarques: userData.medicalNotes !== undefined ? userData.medicalNotes : (userData.physique?.remarques || ""),
+        };
+
+        const program = userData.program || {};
+        // Conserver les séances déjà chargées en temps réel si présentes
+        if (state.clientProfile?.program?.sessions) {
+          program.sessions = state.clientProfile.program.sessions;
+        }
+
+        state.clientProfile = {
+          ...state.clientProfile,
+          ...userData,
+          physique,
+          email: user.email,
+          uid: user.uid,
+          program: {
+            ...(state.clientProfile?.program || {}),
+            ...program
+          }
+        };
+
+        if (state.role === "admin") {
+          await refreshAdminData();
+        }
+
+        persistState();
+        render();
+      }, (error) => {
+        console.warn("Erreur écoute temps réel profil utilisateur:", error);
       });
 
-      const program = userData.program || {};
-      if (sessions.length > 0) {
-        program.sessions = sessions;
-      }
+      // Écoute temps réel des séances d'entraînement associées
+      const sessionsColRef = collection(db, "users", user.uid, "sessions");
+      unsubscribeUserSessions = onSnapshot(sessionsColRef, (sessionsSnap) => {
+        const sessions = [];
+        sessionsSnap.forEach((sDoc) => {
+          sessions.push({ id: sDoc.id, ...sDoc.data() });
+        });
 
-      // Reconstitution robuste de l'objet physique pour assurer la cohérence et la persistance
-      const physique = {
-        poids: userData.weight !== undefined ? userData.weight : (userData.physique?.poids || null),
-        taille: userData.height !== undefined ? userData.height : (userData.physique?.taille || null),
-        age: userData.age !== undefined ? userData.age : (userData.physique?.age || null),
-        remarques: userData.medicalNotes !== undefined ? userData.medicalNotes : (userData.physique?.remarques || ""),
-      };
+        if (sessions.length > 0) {
+          if (!state.clientProfile.program) {
+            state.clientProfile.program = {};
+          }
+          state.clientProfile.program.sessions = sessions;
+          
+          persistState();
+          render();
+        }
+      }, (error) => {
+        console.warn("Erreur écoute temps réel séances d'entraînement:", error);
+      });
 
-      state.clientProfile = {
-        ...state.clientProfile,
-        ...userData,
-        physique,
-        email: user.email,
-        uid: user.uid,
-        program
-      };
-
-      if (state.role === "admin") {
-        await refreshAdminData();
-      }
     } catch (error) {
-      console.warn("Impossible d'obtenir les données Firestore:", error);
+      console.warn("Impossible d'établir la synchronisation Firestore:", error);
       state.role = "client";
     }
   } else {
+    cleanupAdminRealTimeSync();
     state.role = "guest";
     state.clientProfile = {};
     state.adminData = { clients: [], messages: [], loaded: false, loading: false };
     if (state.page.startsWith("client") || state.page.startsWith("admin")) {
       state.page = "home";
     }
+    persistState();
+    render();
   }
-  render();
 });
 
 // 1. Nettoyage automatique des données expirées (14 jours)

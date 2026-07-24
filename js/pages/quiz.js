@@ -51,6 +51,16 @@ export function renderQuiz() {
   const s = QUIZ_STEPS[state.quizStep];
   const pct = Math.round((state.quizStep / (QUIZ_STEPS.length - 1)) * 100); // Exclut l'étape "resume"
 
+  let options = s.options || [];
+  if (s.key === "lieu") {
+    const list = state.tracks && state.tracks.length > 0 ? state.tracks : s.options;
+    options = list.map(t => ({
+      v: t.id,
+      l: t.label,
+      icon: t.icon
+    }));
+  }
+
   let content;
   if (s.type === "text") {
     content = `
@@ -129,7 +139,7 @@ export function renderQuiz() {
   } else {
     content = `
       <div class="quiz-options" style="margin-top:1.75rem">
-        ${s.options.map(opt => `
+        ${options.map(opt => `
           <button type="button" class="quiz-option" data-quiz-answer="${s.key}:${opt.v}" aria-label="${opt.l}">
             ${opt.icon ? icon(opt.icon, 1) : ""}
             <span>${opt.l}</span>

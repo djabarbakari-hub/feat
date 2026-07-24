@@ -1,6 +1,25 @@
 # Journal des Décisions Techniques — MonProgrammeFit
 
 ---
+### ADR-008 — Synchronisation Multi-Appareils en Temps Réel Totale de Toutes les Données via Firestore onSnapshot et Événement de Stockage
+
+- **Date** : 2026-07-24
+- **Statut** : Acceptée
+- **Contexte** : Lorsque le même utilisateur ou l'administrateur est connecté simultanément sur plusieurs appareils ou plusieurs onglets (ex: ordinateur et smartphone, ou deux onglets du même navigateur), les modifications effectuées sur un appareil (ex: hydratation, suivi de poids, complétion d'entraînement, nouveaux messages, édition de programmes, pré-autorisations d'administrateurs) n'apparaissaient pas automatiquement sur l'autre. Le système utilisait un pattern "pull-based" avec une récupération unique (`getDoc`/`getDocs`) au chargement.
+- **Décision** :
+  1. Remplacer TOUTES les requêtes ponctuelles au chargement par des écoutes actives en temps réel via la méthode `onSnapshot` de Firestore pour toutes les collections :
+     - Profil individuel (`users/{uid}`) et séances (`users/{uid}/sessions`) pour l'espace athlète.
+     - Liste complète des utilisateurs (`users`), des messages de contact (`messages`) et des e-mails administratifs pré-autorisés (`admin_emails`) pour le panneau d'administration.
+     - Catalogue des parcours dynamiques (`tracks`) pour la cohérence des programmes disponibles.
+  2. Implémenter des gestionnaires de cycle de vie robustes (`setupAdminRealTimeSync()` et `cleanupAdminRealTimeSync()`) pour démarrer/arrêter les écoutes actives de manière ciblée selon le rôle et l'authentification de l'utilisateur afin d'éviter les fuites de mémoire.
+  3. Ajouter un écouteur sur l'événement global `storage` de la fenêtre du navigateur pour propager instantanément les transitions de pages et d'états entre différents onglets ouverts sur le même appareil.
+  4. Assurer la persistance immédiate dans le `localStorage` local à chaque réception de snapshot pour garantir la fluidité hors-ligne combinée à la fraîcheur en ligne.
+- **Conséquences** :
+  - Positives : Synchronisation instantanée et absolue entre tous les appareils et onglets en temps réel (<1s). Garantie d'aucune incohérence visuelle ou de données entre les versions mobiles, tablettes et ordinateurs des clients et des coachs/administrateurs.
+  - Négatives : Aucune. Les lectures Firestore sont hautement optimisées grâce à la mise en cache locale intégrée du SDK Firebase.
+- **Documents impactés** : `app.js`, `docs/decisions_log.md`, `docs/architecture.md`
+
+---
 ### ADR-007 — Inlining Base64 des Assets Visuels Critiques (Photo Coach & Icône WhatsApp)
 
 - **Date** : 2026-07-24

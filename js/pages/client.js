@@ -502,7 +502,11 @@ export function renderClientProgram() {
           </p>
 
           <div style="display: grid; gap: 20px;">
-            ${listExos.map((exo, idx) => `
+            ${listExos.map((exo, idx) => {
+              const match = String(exo.detail || "").match(/(\d+)\s*séries?/i);
+              const setsCount = match ? parseInt(match[1], 10) : 4;
+              const setsArray = Array.from({ length: setsCount }, (_, i) => i + 1);
+              return `
               <div style="padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: rgba(0,0,0,0.01); display: flex; flex-direction: column; gap: 10px;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap;">
                   <div>
@@ -517,25 +521,16 @@ export function renderClientProgram() {
                 
                 <!-- Séries interactives locales -->
                 <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; padding-top: 10px; border-top: 1px dashed var(--line);">
-                  <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; background: white; border: 1px solid var(--line); padding: 5px 10px; border-radius: 4px; user-select: none;">
-                    <input type="checkbox" style="width: 14px; height: 14px; accent-color: var(--moss);" />
-                    <span>Série 1</span>
-                  </label>
-                  <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; background: white; border: 1px solid var(--line); padding: 5px 10px; border-radius: 4px; user-select: none;">
-                    <input type="checkbox" style="width: 14px; height: 14px; accent-color: var(--moss);" />
-                    <span>Série 2</span>
-                  </label>
-                  <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; background: white; border: 1px solid var(--line); padding: 5px 10px; border-radius: 4px; user-select: none;">
-                    <input type="checkbox" style="width: 14px; height: 14px; accent-color: var(--moss);" />
-                    <span>Série 3</span>
-                  </label>
-                  <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; background: white; border: 1px solid var(--line); padding: 5px 10px; border-radius: 4px; user-select: none;">
-                    <input type="checkbox" style="width: 14px; height: 14px; accent-color: var(--moss);" />
-                    <span>Série 4</span>
-                  </label>
+                  ${setsArray.map(setNum => `
+                    <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; background: white; border: 1px solid var(--line); padding: 5px 10px; border-radius: 4px; user-select: none;">
+                      <input type="checkbox" style="width: 14px; height: 14px; accent-color: var(--moss);" />
+                      <span>Série ${setNum}</span>
+                    </label>
+                  `).join("")}
                 </div>
               </div>
-            `).join("")}
+              `;
+            }).join("")}
           </div>
         </div>
 

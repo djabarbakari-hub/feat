@@ -222,7 +222,8 @@ document.addEventListener("click", async (e) => {
         }))
       };
     } else {
-      const weekLength = track.id === "gym" ? 12 : 8;
+      const matches = track.dist ? String(track.dist).match(/\d+/) : null;
+      const weekLength = matches ? parseInt(matches[0], 10) : (track.id === "gym" ? 12 : 8);
       program = {
         trackLabel: track.label,
         track: track.id,
