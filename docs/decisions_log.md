@@ -1,6 +1,21 @@
 # Journal des Décisions Techniques — MonProgrammeFit
 
 ---
+### ADR-007 — Inlining Base64 des Assets Visuels Critiques (Photo Coach & Icône WhatsApp)
+
+- **Date** : 2026-07-24
+- **Statut** : Acceptée
+- **Contexte** : Lors des déploiements sur Vercel, Netlify ou environnements serverless, les requêtes d'images relatives (`/images/...`) peuvent échouer (404 / réécriture SPA `index.html`) en raison de règles d'URL ou de réécriture de chemin.
+- **Décision** :
+  1. Générer le module `js/assets.js` exportant la photo du coach (`COACH_AVATAR`) et l'icône WhatsApp (`WHATSAPP_ICON`) sous forme de Data URIs Base64 autonomes.
+  2. Importer ces constantes directement dans `js/pages/guest.js` et `js/navbar.js`.
+  3. Conserver un fallback dynamique d'URL en cas d'erreur réseau alternative.
+- **Conséquences** :
+  - Positives : Chargement instantané à 100% garanti sur Vercel, Netlify, Cloudflare Pages, preview AI Studio et en mode hors-ligne sans dépendance aux requêtes HTTP d'assets externes.
+  - Négatives : Augmentation minime du bundle JavaScript (~70 KB gzippé).
+- **Documents impactés** : `js/assets.js`, `js/pages/guest.js`, `js/navbar.js`, `docs/architecture.md`
+
+---
 ### ADR-005 — Exécution du Chronomètre et de la Diction Vocale sur Écran Verrouillé / Éteint
 
 - **Date** : 2026-07-24

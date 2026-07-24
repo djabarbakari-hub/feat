@@ -4,7 +4,7 @@
 
 import { state } from "./state.js";
 import { icon, escapeHtml } from "./helpers.js";
-import whatsappImg from "../images/icone-whatsapp.png";
+import { WHATSAPP_ICON } from "./assets.js";
 
 /**
  * Génère les liens de navigation en fonction du rôle de l'utilisateur.
@@ -110,6 +110,6 @@ export function renderFooter() {
   
   <!-- Bouton WhatsApp flottant -->
   <a href="https://wa.me/2290191720596" class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Contacter sur WhatsApp">
-    <img src="${whatsappImg}" alt="WhatsApp" style="width:100%;height:100%;object-fit:cover;border-radius:50%;transform:scale(1.4);" onerror="this.onerror=null;this.src='/images/icone-whatsapp.png';" />
+    <img src="${WHATSAPP_ICON}" alt="WhatsApp" style="width:100%;height:100%;object-fit:cover;border-radius:50%;transform:scale(1.4);" onerror="this.onerror=null;this.src='/images/icone-whatsapp.png';" />
   </a>`;
 }

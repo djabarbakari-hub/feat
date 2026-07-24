@@ -49,4 +49,5 @@
 |------------|---------|-------------|--------|----------------------|
 | 2026-07-22 | 1.0     | Initialisation du projet avec Vite et Firebase. | Majeur | `architecture.md`, `cahier_des_charges.md` |
 | 2026-07-22 | 1.1     | Mise à jour de la documentation pour refléter l'état actuel du projet. | Mineur | `historique_projet.md`, `decisions_log.md`, `tasks_tracking.md` |
-| 2026-07-24 | 1.2     | Chronomètre manuel & diction vocale écran éteint (Web Worker + Audio Session + MediaSession), purge intégrale Firestore des données utilisateur, fixation des assets Bundled ES Module pour Vercel. | Majeur | `workoutTimer.js`, `privacy.js`, `guest.js`, `navbar.js`, `vercel.json`, `architecture.md`, `decisions_log.md`, `tasks_tracking.md` |
+| 2026-07-24 | 1.2     | Chronomètre manuel & diction vocale écran éteint (Web Worker + Audio Session + MediaSession), purge intégrale Firestore des données utilisateur. | Majeur | `workoutTimer.js`, `privacy.js`, `architecture.md`, `decisions_log.md`, `tasks_tracking.md` |
+| 2026-07-24 | 1.3     | Résolution définitive des d'assets sur Vercel : inlining Base64 autonomes dans `js/assets.js` (`COACH_AVATAR`, `WHATSAPP_ICON`). | Majeur | `assets.js`, `guest.js`, `navbar.js`, `decisions_log.md`, `historique_projet.md` |
