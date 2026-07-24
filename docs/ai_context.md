@@ -45,4 +45,6 @@
 
 ### Bonnes Pratiques
 - **Échappement HTML** : Utiliser `escapeHtml()` de `js/helpers.js` pour toute valeur utilisateur injectée dans le DOM.
-- **Modularisation** : Chaque page a son fichier dans `js/pages/` (ex: `quiz.js`, `admin.js`).
+- **Modularisation** : Chaque page a son fichier dans `js/pages/` (ex: `quiz.js`, `admin.js`), et les fonctionnalités autonomes sont isolées dans `js/modules/` (`workoutTimer.js`, `privacy.js`, `consent-modal.js`).
+- **Chronomètre & Diction Écran Éteint** : `js/modules/workoutTimer.js` combine Web Worker, Web Audio API, Screen Wake Lock et MediaSession API pour assurer l'énonciation vocale continue même smartphone verrouillé.
+- **Assets Bundlés** : Les images statiques (ex: photo du coach `abdou_bakari.jpg` et icône `icone-whatsapp.png`) doivent être importées sous forme de modules ES dans les composants JS pour que Vite les intègre de manière garantie dans `dist/assets/` et qu'elles restent accessibles sur tout déploiement Vercel.

@@ -22,6 +22,8 @@ Application monopage (SPA) en JavaScript modulaire, bundlée avec Vite. L'état 
 | `index.html`         | Point d'entrée HTML. Charge les assets et initialise l'app.         | Structure de base, meta tags.           | L'app ne se lance pas.                   |
 | `styles.css`         | Styles globaux et tokens de design.                                  | Palette, typographie, animations.       | UI cassée (couleurs, espacements).       |
 | `app.js`             | Logique métier et rendu dynamique.                                  | État, navigation, interactions.         | Aucune fonctionnalité ne marche.         |
+| `js/modules/workoutTimer.js` | Chronomètre et diction vocale écran éteint.                    | Web Worker, Web Audio, MediaSession, WakeLock. | Chronomètre et voix ne marchent pas.  |
+| `js/modules/privacy.js` | RGPD, export et purge intégrale Firestore.                          | Consentement, effacement de données.    | Violation RGPD et fonctions de compte.  |
 | `js/pages/quiz.js`   | Gestion du quiz de personnalisation.                                 | Rendu des étapes, animations.           | Le quiz ne s'affiche pas.                |
 | `js/pages/admin.js`  | Espace admin (clients, programmes, messages).                        | Tableau de bord, statistiques.          | L'admin ne fonctionne plus.              |
 | `docs/`              | Documentation technique et mémoire du projet.                       | Traçabilité, onboarding.                | Perte de contexte pour les futurs devs.  |

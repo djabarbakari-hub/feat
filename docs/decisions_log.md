@@ -1,6 +1,40 @@
 # Journal des Décisions Techniques — MonProgrammeFit
 
 ---
+### ADR-005 — Exécution du Chronomètre et de la Diction Vocale sur Écran Verrouillé / Éteint
+
+- **Date** : 2026-07-24
+- **Statut** : Acceptée
+- **Contexte** : Lorsque l'utilisateur met en veille ou verrouille son smartphone pendant son entraînement, les `setInterval` standard du navigateur s'arrêtent ou ralentissent fortement, et le moteur de synthèse vocale (`SpeechSynthesis`) est mis en pause par le système d'exploitation mobile (iOS/Android).
+- **Décision** : Implémenter un système multi-couche dédié dans `js/modules/workoutTimer.js` :
+  1. **Web Worker inline** pour maintenir un cadenceur temporel sur un thread système indépendant insensible au ralentissement de la boucle d'événements principale.
+  2. **Calcul temporel basé sur l'horloge système (`Date.now()`)** pour garantir zéro dérive de temps en cas de reprise de veille.
+  3. **Boucle audio silencieuse HTML5 + Web Audio API** pour notifier au système d'exploitation que l'application gère une session média active.
+  4. **MediaSession API & Screen Wake Lock API** pour maintenir le canal audio ouvert sur l'écran de verrouillage et réveiller le moteur de synthèse vocale (`window.speechSynthesis.resume()`) à chaque tick d'énonciation.
+  5. **Contrôle manuel explicite** : l'utilisateur déclenche et arrête lui-même le chronomètre via des boutons d'action dédiés (`Démarrer`, `Pause`, `Réinitialiser`).
+- **Conséquences** :
+  - Positives : Fonctionnement ininterrompu du chronomètre et de la diction vocale toutes les 10 secondes même écran éteint.
+  - Négatives : Nécessite une interaction utilisateur initiale (clic) pour autoriser le démarrage du contexte Web Audio / Media Session selon les politiques autostart des navigateurs mobiles.
+- **Documents impactés** : `js/modules/workoutTimer.js`, `js/pages/client.js`, `js/events.js`, `docs/architecture.md`
+
+---
+### ADR-006 — Purge Intégrale Destructive des Données lors de la Suppression de Compte
+
+- **Date** : 2026-07-24
+- **Statut** : Acceptée
+- **Contexte** : En conformité avec le RGPD et le principe du droit à l'oubli, la suppression d'un compte utilisateur doit supprimer la totalité des données personnelles sans laisser d'orphelins dans Firestore.
+- **Décision** : Lors de la suppression de compte (`deleteAccountAndData` dans `js/modules/privacy.js`), la procédure effectue :
+  1. La suppression de toutes les sous-collections de l'utilisateur (ex: `users/{uid}/sessions`).
+  2. La suppression du document principal de profil `users/{uid}`.
+  3. La suppression de tous les messages ou requêtes associés à l'email ou à l'ID de l'utilisateur dans la collection `messages`.
+  4. La réinitialisation intégrale de l'état local et du `localStorage`.
+  5. La suppression définitive de l'identifiant d'authentification dans Firebase Auth.
+- **Conséquences** :
+  - Positives : Conformité totale au RGPD et absence de données résiduelles dans Firestore.
+  - Négatives : Action irréversible.
+- **Documents impactés** : `js/modules/privacy.js`, `docs/architecture.md`
+
+---
 ### ADR-003 — Stockage des Données Sensibles (Risque de Sécurité)
 
 - **Date** : 2026-07-19

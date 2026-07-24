@@ -7,6 +7,10 @@
 - [x] Espace admin (statistiques, messages). — 2026-07-14
 - [x] Navigation responsive (mobile/desktop). — 2026-07-14
 - [x] Refonte premium (palette, typographie, animations). — 2026-07-14
+- [x] Chronomètre de séance manuel avec commandes Démarrer / Pause / Réinitialiser. — 2026-07-24
+- [x] Diction vocale continue (SpeechSynthesis) avec écran verrouillé / éteint via Web Worker, Web Audio API, Screen Wake Lock et MediaSession API. — 2026-07-24
+- [x] Purge intégrale destructive de toutes les données Firestore associées à un utilisateur (document principal, sous-collections et messages). — 2026-07-24
+- [x] Bundling des assets statiques (photo du coach et icône WhatsApp) via imports ES Module et configuration des réécritures Vercel (`vercel.json`). — 2026-07-24
 
 ## Fonctionnalités Supprimées
 - [~] Authentification Firebase (reporté). — 2026-07-14 — Raison : MVP sans backend.

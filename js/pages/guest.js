@@ -8,6 +8,7 @@
 import { TRACKS } from "../data.js";
 import { state } from "../state.js";
 import { icon, escapeHtml } from "../helpers.js";
+import abdouBakariImg from "../../images/team/abdou_bakari.jpg";
 
 /**
  * Rend la page d'accueil avec un héros animé et une grille de programmes.
@@ -404,7 +405,7 @@ export function renderAbout() {
       </div>
       <div class="team-card card" style="display:flex;gap:28px;align-items:center;flex-wrap:wrap;padding:28px;">
         <div style="flex:0 0 330px;width:330px;height:360px;border-radius:12px;overflow:hidden;background:var(--line, #e5e7eb);box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
-          <img src="/images/team/abdou_bakari.jpg" alt="Photo de Abdou BAKARI" loading="lazy" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+          <img src="${abdouBakariImg}" alt="Photo de Abdou BAKARI" loading="lazy" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null;this.src='/images/team/abdou_bakari.jpg';if(this.nextElementSibling)this.nextElementSibling.style.display='flex';" />
           <div style="display:none;width:100%;height:100%;background:var(--ink, #1f2937);color:#ffffff;align-items:center;justify-content:center;font-weight:700;font-size:48px;">AB</div>
         </div>
         <div style="flex:1;min-width:240px;">
