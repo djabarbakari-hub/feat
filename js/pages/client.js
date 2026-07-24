@@ -5,6 +5,7 @@
 
 import { state } from "../state.js";
 import { icon, escapeHtml } from "../helpers.js";
+import { COACH_PROGRAMS } from "../data.js";
 
 /**
  * 1. TABLEAU DE BORD (DASHBOARD)
@@ -359,6 +360,24 @@ export function renderClientDashboard() {
  * Exercices prédéfinis pour la simulation et les séances d'entraînement.
  */
 export function getExercisesForSession(sessionName) {
+  const normName = (sessionName || "").toLowerCase().trim();
+
+  // 1. Recherche prioritaire dans les programmes officiels rédigés par Coach Abdou BAKARI
+  for (const prog of COACH_PROGRAMS) {
+    const matchedSession = prog.sessions.find(s => 
+      s.name.toLowerCase().trim() === normName ||
+      normName.includes(s.day.toLowerCase()) ||
+      normName.includes(s.name.toLowerCase())
+    );
+    if (matchedSession) {
+      return matchedSession.exercises.map(ex => ({
+        name: ex.name,
+        desc: ex.desc,
+        detail: `${ex.sets} séries × ${ex.reps} (Repos: ${ex.rest})`
+      }));
+    }
+  }
+
   const goal = state.clientProfile?.goal || "musculation";
   const track = state.clientProfile?.track || "gym";
 
@@ -562,6 +581,71 @@ export function renderClientProgram() {
   }
 
   // --- RENDU NORMAL : LISTE DES SÉANCES DU PROGRAMME ---
+  const coachProg = COACH_PROGRAMS[0];
+  const isCoachProgram = program.track === "home-equip" || program.track === "prise-de-muscle-home" || (program.trackLabel && program.trackLabel.includes("Abdou"));
+
+  const coachInstructionsHtml = isCoachProgram ? `
+    <div class="client-card" style="margin-bottom: 28px; border-left: 4px solid var(--ember); background: linear-gradient(135deg, rgba(224, 70, 50, 0.03) 0%, rgba(255, 255, 255, 1) 100%);">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;">
+        <div>
+          <span style="background: var(--ember); color: white; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace;">Programme Officiel Coach Abdou BAKARI</span>
+          <h2 style="font-size: 20px; font-weight: 800; color: var(--ink); margin: 6px 0 2px;">MONPROGRAMMEFIT : PRISE DE MUSCLE</h2>
+          <p style="font-size: 13px; color: var(--slate); margin: 0;">Maison avec matériel · 8 semaines · 5 séances / semaine</p>
+        </div>
+        <div style="font-size: 12px; font-weight: 700; color: var(--moss); background: rgba(60, 90, 70, 0.08); padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(60, 90, 70, 0.15);">
+          🎯 Progression & Hypertrophie
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; padding-top: 12px; border-top: 1px solid var(--line);">
+        <div>
+          <h4 style="font-size: 12px; text-transform: uppercase; color: var(--ember); font-weight: 700; margin: 0 0 6px;">⏱ Consignes de Repos & Tempo</h4>
+          <p style="font-size: 12px; color: var(--ink); margin: 0 0 4px; line-height: 1.5;"><strong>Exercices principaux :</strong> 90 secondes</p>
+          <p style="font-size: 12px; color: var(--ink); margin: 0 0 4px; line-height: 1.5;"><strong>Isolation :</strong> 45 à 60 secondes</p>
+          <p style="font-size: 12px; color: var(--slate); margin: 0; line-height: 1.5;"><strong>Tempo :</strong> Descente 2s · Pause 0-1s · Montée 2s</p>
+        </div>
+
+        <div>
+          <h4 style="font-size: 12px; text-transform: uppercase; color: var(--ember); font-weight: 700; margin: 0 0 6px;">🏋️‍♂️ Matériel Requis</h4>
+          <p style="font-size: 12px; color: var(--slate); margin: 0; line-height: 1.5;">
+            • 2 haltères réglables<br/>
+            • Elastiques de résistance<br/>
+            • Banc réglable (ou surface stable)<br/>
+            • Barre de traction (facultative)
+          </p>
+        </div>
+
+        <div>
+          <h4 style="font-size: 12px; text-transform: uppercase; color: var(--ember); font-weight: 700; margin: 0 0 6px;">🔥 Échauffement (10 min)</h4>
+          <p style="font-size: 12px; color: var(--slate); margin: 0; line-height: 1.5;">
+            • 2-3 min de corde / jumping jacks<br/>
+            • Rotations articulaires (15 reps)<br/>
+            • 2 séries légères du 1er exercice
+          </p>
+        </div>
+      </div>
+
+      <details style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--line);">
+        <summary style="font-size: 12px; font-weight: 700; color: var(--ink); cursor: pointer; user-select: none; display: flex; align-items: center; gap: 6px;">
+          <span>📖 Consulter le plan de progression sur 8 semaines & étirements</span>
+        </summary>
+        <div style="margin-top: 12px; font-size: 12px; color: var(--slate); line-height: 1.6; display: grid; gap: 12px;">
+          <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid var(--line);">
+            <strong style="color: var(--ink); display: block; margin-bottom: 4px;">Cycle de Progression :</strong>
+            • <strong>Semaines 1–2 :</strong> Apprentissage des mouvements et calage des charges.<br/>
+            • <strong>Semaines 3–4 :</strong> Augmentation progressive des répétitions ou des charges.<br/>
+            • <strong>Semaines 5–6 :</strong> Ajout d'une série supplémentaire sur les exercices principaux.<br/>
+            • <strong>Semaines 7–8 :</strong> Intensification avec supersets (ex: développé couché + pompes) en conservant une technique stricte.
+          </div>
+          <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid var(--line);">
+            <strong style="color: var(--ink); display: block; margin-bottom: 4px;">Étirements après séance (5–10 min) :</strong>
+            Pectoraux, Dos, Épaules, Quadriceps, Ischio-jambiers & Mollets (30s × 2 chacun).
+          </div>
+        </div>
+      </details>
+    </div>
+  ` : "";
+
   return `
   <div class="wrap client-page">
     <div class="client-header">
@@ -569,6 +653,8 @@ export function renderClientProgram() {
       <h1 class="client-title">${escapeHtml(program.trackLabel || "Parcours sur-mesure")}</h1>
       <p class="client-subtitle">Semaine ${program.week} — Retrouvez ci-dessous le détail de vos séances. Cochez-les au fur et à mesure pour suivre votre avancée.</p>
     </div>
+
+    ${coachInstructionsHtml}
 
     <div class="client-timeline">
       ${program.sessions.map((s) => `

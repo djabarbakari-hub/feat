@@ -19,7 +19,7 @@
 import { state, persistState } from "./state.js";
 import { navigate, goBack } from "./router.js";
 import { render } from "./render.js";
-import { QUIZ_STEPS } from "./data.js";
+import { QUIZ_STEPS, COACH_PROGRAMS } from "./data.js";
 import { trackById, closeMobileMenu } from "./helpers.js";
 import { auth, db } from "./firebase.js";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
@@ -199,22 +199,46 @@ document.addEventListener("click", async (e) => {
   if (quizConfirmBtn) {
     const answers = state.quizAnswers || {};
     const track = trackById(answers.lieu || "home-equip");
-    const weekLength = track.id === "gym" ? 12 : track.id === "bodyweight" ? 8 : 10;
-    const program = {
-      trackLabel: track.label,
-      track: track.id,
-      week: 1,
-      totalWeeks: weekLength,
-      nextSession: `${track.label} — Séance 1`,
-      history: [
-        { name: "Semaine 1", done: 0, total: 3 }
-      ],
-      sessions: [
-        { id: "s1", name: "Séance 1 — Focus technique", exos: 6, duree: "35 min", done: false, weekNumber: 1 },
-        { id: "s2", name: "Séance 2 — Intensité maîtrisée", exos: 7, duree: "40 min", done: false, weekNumber: 1 },
-        { id: "s3", name: "Séance 3 — Endurance active", exos: 5, duree: "30 min", done: false, weekNumber: 1 },
-      ]
-    };
+    const coachP = COACH_PROGRAMS[0];
+
+    let program;
+    if (track.id === "home-equip" || answers.objectif === "musculation") {
+      program = {
+        trackLabel: "Prise de Muscle (Maison avec matériel) — Coach Abdou BAKARI",
+        track: track.id,
+        week: 1,
+        totalWeeks: 8,
+        nextSession: coachP.sessions[0].name,
+        history: [
+          { name: "Semaine 1", done: 0, total: coachP.sessions.length }
+        ],
+        sessions: coachP.sessions.map((s, idx) => ({
+          id: `s${idx + 1}`,
+          name: s.name,
+          exos: s.exosCount,
+          duree: s.duration,
+          done: false,
+          weekNumber: 1
+        }))
+      };
+    } else {
+      const weekLength = track.id === "gym" ? 12 : 8;
+      program = {
+        trackLabel: track.label,
+        track: track.id,
+        week: 1,
+        totalWeeks: weekLength,
+        nextSession: `${track.label} — Séance 1`,
+        history: [
+          { name: "Semaine 1", done: 0, total: 3 }
+        ],
+        sessions: [
+          { id: "s1", name: "Séance 1 — Focus technique", exos: 6, duree: "35 min", done: false, weekNumber: 1 },
+          { id: "s2", name: "Séance 2 — Intensité maîtrisée", exos: 7, duree: "40 min", done: false, weekNumber: 1 },
+          { id: "s3", name: "Séance 3 — Endurance active", exos: 5, duree: "30 min", done: false, weekNumber: 1 },
+        ]
+      };
+    }
 
     state.clientProfile = {
       ...state.clientProfile,

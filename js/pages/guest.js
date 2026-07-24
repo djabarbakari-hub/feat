@@ -182,16 +182,25 @@ export function renderTrialProgram(id) {
   }
   if (id === "home-equip") {
     return `
-      <div class="trial-program">
-        <div class="font-mono" style="font-size:12px;color:var(--ink-muted3);margin-bottom:6px">Programme d'essai gratuit</div>
-        <div style="font-weight:600;color:var(--ink);margin-bottom:8px">5 séances / semaine — Haltères (maison)</div>
-        <ul style="font-size:14px;color:var(--slate);margin:0 0 8px 16px">
-          <li><strong>Séance 1 — Haut</strong> : développé incliné haltères, rowing unilatéral — 40 min</li>
-          <li><strong>Séance 2 — Bas</strong> : squat goblet, fente bulgare, soulevé jambe tendue — 45 min</li>
-          <li><strong>Séance 3 — Full</strong> : circuit haltères + core — 35–40 min</li>
-          <li><strong>Séance 4 — Push</strong> : épaules, triceps, pompes lestées — 40 min</li>
-          <li><strong>Séance 5 — Pull / Cardio</strong> : tirage, curls + 20 min cardio léger — 40–45 min</li>
+      <div class="trial-program" style="border-left: 3px solid var(--ember); padding-left: 12px; background: rgba(224, 70, 50, 0.03); border-radius: 6px;">
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+          <span style="background: var(--ember); color: white; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">Officiel Coach Abdou</span>
+          <span style="font-size: 11px; font-weight: 700; color: var(--ink);">MONPROGRAMMEFIT</span>
+        </div>
+        <div style="font-weight:700;color:var(--ink);margin-bottom:6px;font-size:14px;">PROGRAMME PRISE DE MUSCLE — 5 séances / semaine</div>
+        <p style="font-size: 12px; color: var(--slate); margin: 0 0 8px; line-height: 1.4;">
+          8 semaines pour développer votre masse musculaire à domicile avec haltères, élastiques et banc.
+        </p>
+        <ul style="font-size:13px;color:var(--slate);margin:0 0 8px 16px; line-height: 1.5;">
+          <li><strong>Lundi</strong> : Pectoraux & Biceps (7 exercices · 45 min)</li>
+          <li><strong>Mardi</strong> : Dos & Triceps (7 exercices · 45 min)</li>
+          <li><strong>Mercredi</strong> : Jambes (6 exercices · 45 min)</li>
+          <li><strong>Jeudi</strong> : Haut du corps Push/Pull (6 exercices · 40 min)</li>
+          <li><strong>Vendredi</strong> : Épaules & Bras (8 exercices · 50 min)</li>
         </ul>
+        <div style="font-size:11px; color:var(--moss); font-weight:600; font-family:'IBM Plex Mono', monospace;">
+          ⏱ Repos 90s (principaux) / 45-60s (isolation) · Tempo 2-0-2
+        </div>
       </div>`;
   }
   // bodyweight
