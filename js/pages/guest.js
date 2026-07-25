@@ -85,6 +85,51 @@ export function renderHome() {
     </div>
   </div>
 
+    <!-- Section Tarification -->
+    <div class="card" style="margin-top:48px; padding:32px" id="tarifs-section">
+      <p class="eyebrow-moss font-mono" id="tarifs-eyebrow">TARIFS TRANSPARENTS</p>
+      <h2 class="h2 font-display" style="font-size:24px; margin-bottom:20px" id="tarifs-title">Choisissez l'offre qui vous correspond</h2>
+      <p style="font-size:14px; color:var(--slate); margin-bottom:24px; max-width:650px;">Un accompagnement sur-mesure pour votre transformation physique. Paiement direct et sécurisé en FCFA.</p>
+      
+      <div class="grid-3" id="tarifs-grid">
+        <div class="card" style="padding:24px; background: white; border: 1px solid var(--line); display: flex; flex-direction: column;" id="tarif-flex">
+          <h3 class="font-display" style="font-size:18px; color:var(--ink); margin-bottom:8px">Abonnement Flex</h3>
+          <p style="font-size:13px; color:var(--slate); margin-bottom:16px; flex-grow: 1;">Accès illimité à tous les programmes du Coach Abdou BAKARI (Maison, Salle, Sans matériel).</p>
+          <div class="stat-val font-display" style="font-size: 20px; color: var(--ember);">8 000 FCFA <span style="font-size: 13px; font-family: var(--font-sans); font-weight: normal; color: var(--slate);">/ mois</span></div>
+          <div class="font-mono" style="font-size:11px; color:var(--moss); margin-top:12px; margin-bottom: 16px; font-weight:600;">Sans engagement</div>
+          <a href="https://wa.me/2290191720596?text=${encodeURIComponent('Bonjour Coach Abdou, je souhaite souscrire à l\'Abonnement Flex à 8000 FCFA/mois.')}" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="width: 100%; justify-content: center; text-decoration: none;">Souscrire via WhatsApp</a>
+        </div>
+        
+        <div class="card" style="padding:24px; background: white; border: 2px solid var(--ember); position: relative; display: flex; flex-direction: column;" id="tarif-premium">
+          <div style="position: absolute; top: -12px; right: 16px; background: var(--ember); color: white; font-size: 9px; font-weight: 800; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace;">Recommandé</div>
+          <h3 class="font-display" style="font-size:18px; color:var(--ink); margin-bottom:8px">Abonnement Premium</h3>
+          <p style="font-size:13px; color:var(--slate); margin-bottom:16px; flex-grow: 1;">Tous les programmes + 1 consultation de suivi visio par mois et ajustements en direct par le coach.</p>
+          <div class="stat-val font-display" style="font-size: 20px; color: var(--ember);">15 000 FCFA <span style="font-size: 13px; font-family: var(--font-sans); font-weight: normal; color: var(--slate);">/ mois</span></div>
+          <div class="font-mono" style="font-size:11px; color:var(--moss); margin-top:12px; margin-bottom: 16px; font-weight:600;">Suivi prioritaire inclus</div>
+          <a href="https://wa.me/2290191720596?text=${encodeURIComponent('Bonjour Coach Abdou, je souhaite souscrire à l\'Abonnement Premium à 15000 FCFA/mois avec suivi.')}" target="_blank" rel="noopener noreferrer" class="btn btn-ember" style="width: 100%; justify-content: center; text-decoration: none;">Souscrire via WhatsApp</a>
+        </div>
+        
+        <div class="card" style="padding:24px; background: white; border: 1px solid var(--line); display: flex; flex-direction: column;" id="tarif-defi">
+          <h3 class="font-display" style="font-size:18px; color:var(--ink); margin-bottom:8px">Programme 30 Jours Défi</h3>
+          <p style="font-size:13px; color:var(--slate); margin-bottom:16px; flex-grow: 1;">Formule de choc intensive sur 30 jours pour relancer la forme avec objectif ciblé et messagerie directe.</p>
+          <div class="stat-val font-display" style="font-size: 20px; color: var(--ember);">15 000 FCFA</div>
+          <div class="font-mono" style="font-size:11px; color:var(--moss); margin-top:12px; margin-bottom: 16px; font-weight:600;">Paiement unique</div>
+          <a href="https://wa.me/2290191720596?text=${encodeURIComponent('Bonjour Coach Abdou, je souhaite participer au Programme 30 Jours Défi (15000 FCFA).')}" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="width: 100%; justify-content: center; text-decoration: none;">Souscrire via WhatsApp</a>
+        </div>
+      </div>
+      
+      <div class="card" style="margin-top:24px; padding:20px; background:var(--chalk-soft); border: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;" id="tarif-decouverte">
+        <div>
+          <h3 class="font-display" style="font-size:16px; color:var(--ink); margin-bottom:4px">Séance Découverte Gratuite</h3>
+          <p style="font-size:13px; color:var(--slate); margin:0">Bénéficiez de 1 semaine d'accès complet à nos séances d'essai pour évaluer votre motivation.</p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="font-mono" style="font-size:12px; color:var(--moss); font-weight: 700; background: rgba(60, 90, 70, 0.08); padding: 4px 10px; border-radius: 4px;">100% GRATUIT</div>
+          <a href="https://wa.me/2290191720596?text=${encodeURIComponent('Bonjour Coach Abdou, je suis intéressé(e) par la séance découverte gratuite.')}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark" style="text-decoration: none; font-size: 12px; padding: 8px 12px;">Demander l'accès</a>
+        </div>
+      </div>
+    </div>
+
   <div class="cta-band">
     <div class="wrap">
       <h3 class="font-display">5 secondes de questionnaire pour obtenir un programme sur mesure.</h3>
@@ -233,51 +278,6 @@ export function renderPrograms() {
           </div>
         </div>`;
       }).join("")}
-    </div>
-
-    <!-- Section Tarification -->
-    <div class="card" style="margin-top:48px; padding:32px" id="tarifs-section">
-      <p class="eyebrow-moss font-mono" id="tarifs-eyebrow">TARIFS TRANSPARENTS</p>
-      <h2 class="h2 font-display" style="font-size:24px; margin-bottom:20px" id="tarifs-title">Choisissez l'offre qui vous correspond</h2>
-      <p style="font-size:14px; color:var(--slate); margin-bottom:24px; max-width:650px;">Un accompagnement sur-mesure pour votre transformation physique. Paiement direct et sécurisé en FCFA.</p>
-      
-      <div class="grid-3" id="tarifs-grid">
-        <div class="card" style="padding:24px; background: white; border: 1px solid var(--line); display: flex; flex-direction: column;" id="tarif-flex">
-          <h3 class="font-display" style="font-size:18px; color:var(--ink); margin-bottom:8px">Abonnement Flex</h3>
-          <p style="font-size:13px; color:var(--slate); margin-bottom:16px; flex-grow: 1;">Accès illimité à tous les programmes du Coach Abdou BAKARI (Maison, Salle, Sans matériel).</p>
-          <div class="stat-val font-display" style="font-size: 20px; color: var(--ember);">8 000 FCFA <span style="font-size: 13px; font-family: var(--font-sans); font-weight: normal; color: var(--slate);">/ mois</span></div>
-          <div class="font-mono" style="font-size:11px; color:var(--moss); margin-top:12px; margin-bottom: 16px; font-weight:600;">Sans engagement</div>
-          <a href="https://wa.me/2290191720596?text=${encodeURIComponent('Bonjour Coach Abdou, je souhaite souscrire à l\'Abonnement Flex à 8000 FCFA/mois.')}" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="width: 100%; justify-content: center; text-decoration: none;">Souscrire via WhatsApp</a>
-        </div>
-        
-        <div class="card" style="padding:24px; background: white; border: 2px solid var(--ember); position: relative; display: flex; flex-direction: column;" id="tarif-premium">
-          <div style="position: absolute; top: -12px; right: 16px; background: var(--ember); color: white; font-size: 9px; font-weight: 800; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace;">Recommandé</div>
-          <h3 class="font-display" style="font-size:18px; color:var(--ink); margin-bottom:8px">Abonnement Premium</h3>
-          <p style="font-size:13px; color:var(--slate); margin-bottom:16px; flex-grow: 1;">Tous les programmes + 1 consultation de suivi visio par mois et ajustements en direct par le coach.</p>
-          <div class="stat-val font-display" style="font-size: 20px; color: var(--ember);">15 000 FCFA <span style="font-size: 13px; font-family: var(--font-sans); font-weight: normal; color: var(--slate);">/ mois</span></div>
-          <div class="font-mono" style="font-size:11px; color:var(--moss); margin-top:12px; margin-bottom: 16px; font-weight:600;">Suivi prioritaire inclus</div>
-          <a href="https://wa.me/2290191720596?text=${encodeURIComponent('Bonjour Coach Abdou, je souhaite souscrire à l\'Abonnement Premium à 15000 FCFA/mois avec suivi.')}" target="_blank" rel="noopener noreferrer" class="btn btn-ember" style="width: 100%; justify-content: center; text-decoration: none;">Souscrire via WhatsApp</a>
-        </div>
-        
-        <div class="card" style="padding:24px; background: white; border: 1px solid var(--line); display: flex; flex-direction: column;" id="tarif-defi">
-          <h3 class="font-display" style="font-size:18px; color:var(--ink); margin-bottom:8px">Programme 30 Jours Défi</h3>
-          <p style="font-size:13px; color:var(--slate); margin-bottom:16px; flex-grow: 1;">Formule de choc intensive sur 30 jours pour relancer la forme avec objectif ciblé et messagerie directe.</p>
-          <div class="stat-val font-display" style="font-size: 20px; color: var(--ember);">15 000 FCFA</div>
-          <div class="font-mono" style="font-size:11px; color:var(--moss); margin-top:12px; margin-bottom: 16px; font-weight:600;">Paiement unique</div>
-          <a href="https://wa.me/2290191720596?text=${encodeURIComponent('Bonjour Coach Abdou, je souhaite participer au Programme 30 Jours Défi (15000 FCFA).')}" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="width: 100%; justify-content: center; text-decoration: none;">Souscrire via WhatsApp</a>
-        </div>
-      </div>
-      
-      <div class="card" style="margin-top:24px; padding:20px; background:var(--chalk-soft); border: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;" id="tarif-decouverte">
-        <div>
-          <h3 class="font-display" style="font-size:16px; color:var(--ink); margin-bottom:4px">Séance Découverte Gratuite</h3>
-          <p style="font-size:13px; color:var(--slate); margin:0">Bénéficiez de 1 semaine d'accès complet à nos séances d'essai pour évaluer votre motivation.</p>
-        </div>
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <div class="font-mono" style="font-size:12px; color:var(--moss); font-weight: 700; background: rgba(60, 90, 70, 0.08); padding: 4px 10px; border-radius: 4px;">100% GRATUIT</div>
-          <a href="https://wa.me/2290191720596?text=${encodeURIComponent('Bonjour Coach Abdou, je suis intéressé(e) par la séance découverte gratuite.')}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark" style="text-decoration: none; font-size: 12px; padding: 8px 12px;">Demander l'accès</a>
-        </div>
-      </div>
     </div>
 
     <!-- Bandeau Appel à l'action -->
