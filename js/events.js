@@ -1361,6 +1361,9 @@ document.addEventListener("click", async (e) => {
   // === EVENTS HYDRATATION CLIENT ===
   const waterAdd250 = e.target.closest("#btn-water-add-250");
   if (waterAdd250) {
+    waterAdd250.disabled = true;
+    waterAdd250.innerHTML = '<span class="btn-spinner" style="border-color: var(--ink); border-right-color: transparent; width: 12px; height: 12px; margin-right: 6px;"></span>...';
+    
     const profile = state.clientProfile || {};
     const todayStr = new Date().toDateString();
     if (!profile.dailyWaterLog || profile.dailyWaterLog.date !== todayStr) {
@@ -1377,6 +1380,9 @@ document.addEventListener("click", async (e) => {
 
   const waterAdd500 = e.target.closest("#btn-water-add-500");
   if (waterAdd500) {
+    waterAdd500.disabled = true;
+    waterAdd500.innerHTML = '<span class="btn-spinner" style="border-color: var(--ink); border-right-color: transparent; width: 12px; height: 12px; margin-right: 6px;"></span>...';
+
     const profile = state.clientProfile || {};
     const todayStr = new Date().toDateString();
     if (!profile.dailyWaterLog || profile.dailyWaterLog.date !== todayStr) {
@@ -1394,6 +1400,9 @@ document.addEventListener("click", async (e) => {
   const waterReset = e.target.closest("#btn-water-reset");
   if (waterReset) {
     if (confirm("Voulez-vous réinitialiser votre hydratation du jour ?")) {
+      waterReset.disabled = true;
+      waterReset.innerHTML = '<span class="btn-spinner" style="border-color: var(--ink); border-right-color: transparent; width: 12px; height: 12px; margin-right: 6px;"></span>...';
+
       const profile = state.clientProfile || {};
       const todayStr = new Date().toDateString();
       profile.dailyWaterLog = { date: todayStr, amount: 0 };
@@ -1422,6 +1431,12 @@ document.addEventListener("submit", async (e) => {
     const notesInput = document.getElementById("workout-notes-input");
     const notes = notesInput ? notesInput.value.trim() : "";
     
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="btn-spinner"></span> Enregistrement...';
+    }
+
     const profile = state.clientProfile || {};
     const program = profile.program || {};
     const sessions = program.sessions || [];
@@ -1462,6 +1477,7 @@ document.addEventListener("submit", async (e) => {
     const { updateUserProfile } = await import("./modules/privacy.js");
     const { render } = await import("./render.js");
     const { pauseWorkoutTimer } = await import("./modules/workoutTimer.js");
+    const { showToast } = await import("./helpers.js");
     
     pauseWorkoutTimer();
     program.history = history;
@@ -1479,7 +1495,7 @@ document.addEventListener("submit", async (e) => {
     
     persistState();
     render();
-    alert("Entraînement enregistré avec succès ! Félicitations pour vos efforts ! 🎉🏆");
+    showToast("Entraînement enregistré avec succès ! Félicitations pour vos efforts ! 🎉🏆");
     navigate("client-progress");
     return;
   }
@@ -1491,6 +1507,12 @@ document.addEventListener("submit", async (e) => {
     const val = parseFloat(input.value);
     if (isNaN(val) || val <= 0) return;
 
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="btn-spinner"></span> Enregistrement...';
+    }
+
     const { updateUserProfile } = await import("./modules/privacy.js");
     const { render } = await import("./render.js");
 
@@ -1498,7 +1520,13 @@ document.addEventListener("submit", async (e) => {
     const history = profile.weightHistory || [];
     const dateStr = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
     history.push({ date: dateStr, weight: val });
+    
+    // Assurer la consistance des données
     profile.weightHistory = history;
+    profile.weight = val;
+    profile.physique = profile.physique || {};
+    profile.physique.poids = val;
+    state.clientProfile = profile;
 
     await updateUserProfile({
       poids: val,
@@ -1990,6 +2018,12 @@ export function showQuickMetricsModal() {
     const w = parseFloat(e.target.weight.value);
     const h = parseInt(e.target.height.value);
     const a = parseInt(e.target.age.value);
+
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="btn-spinner"></span> Enregistrement...';
+    }
 
     const { updateUserProfile } = await import("./modules/privacy.js");
     const { render } = await import("./render.js");

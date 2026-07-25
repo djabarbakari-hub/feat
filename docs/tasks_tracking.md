@@ -11,6 +11,8 @@
 - [x] Diction vocale continue (SpeechSynthesis) avec écran verrouillé / éteint via Web Worker, Web Audio API, Screen Wake Lock et MediaSession API. — 2026-07-24
 - [x] Purge intégrale destructive de toutes les données Firestore associées à un utilisateur (document principal, sous-collections et messages). — 2026-07-24
 - [x] Bundling des assets statiques (photo du coach et icône WhatsApp) via imports ES Module et configuration des réécritures Vercel (`vercel.json`). — 2026-07-24
+- [x] Ajout des états de chargement (spinners, désactivation au clic) pour les formulaires de mise à jour (hydratation, profil, entraînement). — 2026-07-24
+- [x] Synchronisation en temps réel de l'état local du profil (poids, hydratation) pour conserver la cohérence entre les pages. — 2026-07-24
 
 ## Fonctionnalités Supprimées
 - [~] Authentification Firebase (reporté). — 2026-07-14 — Raison : MVP sans backend.
