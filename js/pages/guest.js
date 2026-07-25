@@ -39,23 +39,6 @@ export function renderHome() {
             <button class="btn btn-line" data-nav="programs" aria-label="Voir les programmes">Voir les programmes</button>
           </div>
         </div>
-        <div class="hero-photos">
-          <div class="photo-card tall">
-            <img src="${t0.img}" alt="${t0.label} — Entraînement en salle de sport" loading="lazy"/>
-            <div class="overlay"></div>
-            <span class="caption font-mono">${t0.label}</span>
-          </div>
-          <div class="photo-card">
-            <img src="${t1.img}" alt="${t1.label} — Entraînement à domicile avec matériel" loading="lazy"/>
-            <div class="overlay"></div>
-            <span class="caption font-mono">${t1.label}</span>
-          </div>
-          <div class="photo-card">
-            <img src="${t2.img}" alt="${t2.label} — Entraînement au poids du corps" loading="lazy"/>
-            <div class="overlay"></div>
-            <span class="caption font-mono">${t2.label}</span>
-          </div>
-        </div>
       </div>
 
       <div class="trail-grid">
