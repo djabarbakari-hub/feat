@@ -58,17 +58,6 @@ export const QUIZ_STEPS = [
     { v: "home-equip", l: "Chez moi, avec un peu de matériel", icon: "home" },
     { v: "bodyweight", l: "Chez moi, sans matériel", icon: "footprints" },
   ]},
-  { q: "Ton niveau actuel en activité physique ?", key: "niveau", options: [
-    { v: "debutant", l: "Débutant (moins de 6 mois)", icon: "user" },
-    { v: "intermediaire", l: "Intermédiaire (6 mois à 2 ans)", icon: "calendar" },
-    { v: "avance", l: "Avancé (plus de 2 ans)", icon: "zap" },
-  ]},
-  { q: "Combien de séances par semaine vises-tu ?", key: "frequence", options: [
-    { v: "2", l: "2 séances par semaine", icon: "calendar" },
-    { v: "3", l: "3 séances par semaine", icon: "calendar" },
-    { v: "4", l: "4 séances par semaine", icon: "calendar" },
-    { v: "5", l: "5 séances ou plus", icon: "plus-circle" },
-  ]},
   {
     q: "Pour aller plus loin (optionnel)",
     key: "physique",

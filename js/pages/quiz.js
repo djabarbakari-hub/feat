@@ -83,7 +83,7 @@ export function renderQuiz() {
     // Écran d'accueil du quiz
     content = `
       <div style="margin-top: 1.75rem;">
-        <p style="font-size: 1.125rem; color: var(--slate); line-height: 1.7; max-width: 500px;">Réponds simplement à 5 questions pour découvrir un programme d'entraînement complètement personnalisé en fonction de ton environnement et tes objectifs.</p>
+        <p style="font-size: 1.125rem; color: var(--slate); line-height: 1.7; max-width: 500px;">Réponds simplement à 2 questions pour découvrir le programme d'entraînement idéal en fonction de ton environnement et de tes objectifs.</p>
         <div class="quiz-buttons" style="margin-top: 2rem;">
           <button type="button" class="btn btn-ember" data-quiz-next>${s.button || "Commencer"}</button>
         </div>
@@ -124,8 +124,6 @@ export function renderQuiz() {
       <div class="quiz-resume">
         <div class="quiz-resume-item">Objectif : <strong>${escapeHtml(state.quizAnswers.objectif)}</strong></div>
         <div class="quiz-resume-item">Lieu : <strong>${escapeHtml(result.label)}</strong></div>
-        <div class="quiz-resume-item">Niveau : <strong>${escapeHtml(state.quizAnswers.niveau)}</strong></div>
-        <div class="quiz-resume-item">Fréquence : <strong>${escapeHtml(state.quizAnswers.frequence)}</strong></div>
         ${state.quizAnswers.physique?.poids ? `<div class="quiz-resume-item">Poids : <strong>${escapeHtml(state.quizAnswers.physique.poids)} kg</strong></div>` : ""}
         ${state.quizAnswers.physique?.taille ? `<div class="quiz-resume-item">Taille : <strong>${escapeHtml(state.quizAnswers.physique.taille)} cm</strong></div>` : ""}
         ${state.quizAnswers.physique?.age ? `<div class="quiz-resume-item">Âge : <strong>${escapeHtml(state.quizAnswers.physique.age)} ans</strong></div>` : ""}

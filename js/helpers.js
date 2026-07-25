@@ -30,8 +30,8 @@ export const trackById = (id) => {
  * @returns {boolean} True si toutes les réponses obligatoires du quiz sont remplies.
  */
 export function isQuizComplete() {
-  // Les étapes obligatoires sont toutes sauf "physique" (optionnelle)
-  const requiredSteps = QUIZ_STEPS.filter(step => step.key !== "physique");
+  // Les étapes obligatoires sont les questions à choix multiples (hors info, optional, resume)
+  const requiredSteps = QUIZ_STEPS.filter(step => step.type !== "info" && step.type !== "optional" && step.type !== "resume");
   return requiredSteps.every((step) => !!state.quizAnswers[step.key]);
 }
 
