@@ -19,7 +19,7 @@ import { auth, db } from "./js/firebase.js";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, collection, getDocs, query, where, onSnapshot, setDoc } from "firebase/firestore";
 import { state } from "./js/state.js";
-import { TRACKS } from "./js/data.js";
+import { TRACKS, COACH_PROGRAMS } from "./js/data.js";
 
 setRenderer(render);
 
@@ -57,8 +57,52 @@ export function listenToTracks() {
   });
 }
 
+// Variable pour stocker le désabonnement des programmes officiels du coach
+let unsubscribeCoachPrograms = null;
+
+/**
+ * Charge et écoute en temps réel les programmes officiels du coach depuis la collection 'coach_programs' de Firestore.
+ * S'il n'y a pas de documents, utilise les COACH_PROGRAMS statiques et les initialise dans Firestore si admin.
+ */
+export function listenToCoachPrograms() {
+  if (unsubscribeCoachPrograms) {
+    unsubscribeCoachPrograms();
+  }
+  unsubscribeCoachPrograms = onSnapshot(collection(db, "coach_programs"), (progSnap) => {
+    const list = [];
+    progSnap.forEach(docSnap => {
+      list.push({ id: docSnap.id, ...docSnap.data() });
+    });
+    if (list.length > 0) {
+      // Met à jour COACH_PROGRAMS en place pour propager à tous les modules
+      COACH_PROGRAMS.length = 0;
+      COACH_PROGRAMS.push(...list);
+      state.coachPrograms = [...COACH_PROGRAMS];
+    } else {
+      state.coachPrograms = [...COACH_PROGRAMS];
+      // Si on est admin et que la collection est vide, on l'initialise dans Firestore
+      if (state.role === "admin" && COACH_PROGRAMS.length > 0) {
+        console.log("Initialisation des coach_programs dans Firestore...");
+        COACH_PROGRAMS.forEach(async (p) => {
+          try {
+            await setDoc(doc(db, "coach_programs", p.id), p);
+          } catch (e) {
+            console.error("Erreur d'initialisation du programme:", p.id, e);
+          }
+        });
+      }
+    }
+    persistState();
+    render();
+  }, (err) => {
+    console.warn("Firestore coach_programs loading in real-time failed, using static fallback:", err);
+    state.coachPrograms = [...COACH_PROGRAMS];
+  });
+}
+
 // Lancement immédiat du chargement temps réel des programmes
 listenToTracks();
+listenToCoachPrograms();
 
 window.addEventListener("popstate", handleBackNavigation);
 window.addEventListener("pageshow", () => {
@@ -378,7 +422,9 @@ onAuthStateChanged(auth, async (user) => {
     state.clientProfile = {};
     state.adminData = { clients: [], messages: [], loaded: false, loading: false };
     if (state.page.startsWith("client") || state.page.startsWith("admin")) {
-      state.page = "home";
+      state.page = "signup";
+    } else if (state.page === "quiz") {
+      state.page = "signup";
     }
     persistState();
     render();

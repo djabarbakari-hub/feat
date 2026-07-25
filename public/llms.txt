@@ -1,0 +1,108 @@
+# MonProgrammeFit
+
+> Une application web de coaching sportif personnalisé avec programmes sur mesure, chronomètre intégré et suivi de progression, avec ou sans équipement.
+
+MonProgrammeFit permet aux utilisateurs de déterminer le meilleur programme selon leurs besoins via un quiz d'onboarding, et offre un suivi des séances via des tableaux de bord client et administrateur.
+
+## Objectif
+
+Aider les utilisateurs à atteindre leurs objectifs de forme physique (perte de poids, prise de muscle, santé générale) grâce à un accompagnement guidé, structuré et des séances d'entraînement interactives.
+
+## Fonctionnalités
+
+- Authentification sécurisée des utilisateurs et rôles (client, administrateur).
+- Quiz d'onboarding interactif pour attribuer le programme optimal.
+- Tableau de bord client avec suivi de progression et historique des séances.
+- Chronomètre d'entraînement intégré pour les exercices.
+- Espace administrateur complet pour la gestion des utilisateurs, des programmes et la communication.
+- Synchronisation en temps réel via base de données cloud.
+
+## Public cible
+
+Personnes souhaitant s'entraîner à la maison (avec ou sans équipement) ou en salle de sport, cherchant un accompagnement structuré pour perdre du poids, prendre du muscle ou améliorer leur santé.
+
+## Fonctionnement
+
+L'utilisateur crée un compte et remplit un quiz déterminant ses capacités, objectifs et équipements. Il est ensuite redirigé vers son espace client où un programme sur mesure lui est attribué. Il peut démarrer et valider ses séances directement depuis l'application via un timer intégré, tandis que le coach suit sa progression depuis l'interface administrateur.
+
+## Navigation
+
+- [Accueil](/#home) : Page d'accueil publique de l'application
+- [Programmes](/#programs) : Présentation des programmes d'entraînement proposés
+- [Quiz d'onboarding](/#quiz) : Détermination du programme adapté (nécessite un compte)
+- [Espace Client](/#client-dashboard) : Suivi des séances et de la progression
+- [Tableau de bord Admin](/#admin-dashboard) : Gestion des clients et des programmes
+- [À propos](/#about) : Informations sur le Coach Abdou BAKARI
+- [Contact](/#contact) : Formulaire de contact pour joindre le coach
+- [Blog](/#blog) : Articles et conseils sportifs
+- [Connexion](/#login) : Accès au compte existant
+- [Inscription](/#signup) : Création d'un nouveau compte
+
+## Documentation
+
+- [Documentation Développeur](/docs/) : Documentation de l'architecture, du setup et de l'historique du projet
+- [FAQ] : Manquant (aucune page de FAQ dédiée actuellement)
+- [Pages d'aide] : Manquant (aucune page d'aide utilisateur spécifique actuellement)
+
+## APIs
+
+- Firebase Authentication : Gestion de l'authentification des utilisateurs
+- Firebase Firestore : Stockage et synchronisation en temps réel de la base de données
+
+## Technologies
+
+- Vanilla JavaScript (ES modules)
+- Vite
+- Firebase
+- CSS personnalisé
+
+## Formats supportés
+
+- Fichiers acceptés en entrée : Manquant (pas d'upload de fichiers implémenté)
+- Formats d'export : Manquant (pas d'export de données implémenté)
+
+## Intelligence artificielle
+
+Manquant. L'application n'intègre actuellement aucun modèle d'Intelligence Artificielle ou de LLM en son sein (uniquement des algorithmes classiques pour l'attribution des programmes).
+
+## Confidentialité et sécurité
+
+L'application sécurise les accès via l'authentification Firebase et les Security Rules de Firestore. Les données de santé et de profil sont privées. Pour en savoir plus, consultez la [Politique de Confidentialité](/#privacy).
+
+## Limitations actuelles
+
+- Migration CSS complète en attente.
+- Absence de couverture par des tests unitaires (dette technique).
+- Aucune fonctionnalité d'upload ou d'export de médias.
+
+## Contact
+
+Page de contact : [Formulaire de Contact](/#contact)
+
+## Sitemap logique
+
+- [Accueil](/#home)
+  - [À propos](/#about)
+  - [Programmes](/#programs)
+  - [Blog](/#blog)
+  - [Contact](/#contact)
+  - [Mentions Légales](/#legal)
+  - [Politique de Confidentialité](/#privacy)
+  - [Connexion](/#login)
+  - [Inscription](/#signup)
+  - [Quiz](/#quiz)
+  - [Espace Client](/#client-dashboard)
+    - [Détail de la Séance](/#client-program)
+    - [Progression](/#client-progress)
+  - [Espace Admin](/#admin-dashboard)
+    - [Gestion des Clients](/#admin-clients)
+    - [Gestion des Programmes](/#admin-programs)
+    - [Messagerie](/#admin-messages)
+
+## Optional
+
+Les informations relatives aux modèles IA, formats d'export, et FAQ ne sont pas encore présentes dans l'application. La conformité SEO et les fichiers annexes (robots.txt, sitemap) sont générés.
+
+---
+
+MonProgrammeFit est une SPA (Single Page Application) Vanilla JS et Firebase dédiée au coaching sportif. Elle s'adresse aux particuliers souhaitant suivre des entraînements ciblés via un quiz personnalisé, une vue détaillée des exercices, et un chronomètre de séance intégré, tout en permettant au coach de suivre leur progression depuis son interface d'administration.

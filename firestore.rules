@@ -81,6 +81,12 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Collection coach_programs/{id} (Programmes officiels du coach)
+    match /coach_programs/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Blocage strict par défaut
     match /{document=**} {
       allow read, write: if false;

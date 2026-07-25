@@ -2,7 +2,7 @@
    pages/admin.js — Espace admin connecté aux données Firestore réelles.
    ========================================================== */
 
-import { TRACKS } from "../data.js";
+import { TRACKS, COACH_PROGRAMS } from "../data.js";
 import { state } from "../state.js";
 import { icon, escapeHtml, showToast } from "../helpers.js";
 import { auth, db } from "../firebase.js";
@@ -76,6 +76,7 @@ function getGoalLabel(goalId) {
   const map = {
     "perte-poids": "Perte de poids",
     "prise-muscle": "Prise de muscle",
+    "musculation": "Prise de muscle / Hypertrophie",
     "endurance-sante": "Endurance & Santé",
     "remise": "Remise en forme",
   };
@@ -577,6 +578,7 @@ export function renderAdminPrograms() {
   const clients = state.adminData.clients || [];
   const totalClients = clients.length;
   const list = state.tracks && state.tracks.length > 0 ? state.tracks : TRACKS;
+  const coachProgs = COACH_PROGRAMS;
 
   return `
   <div class="wrap adm-page">
@@ -584,47 +586,109 @@ export function renderAdminPrograms() {
       <div class="adm-header-inner">
         <div>
           <p class="adm-eyebrow">Catalogue & Statistiques</p>
-          <h1 class="adm-title">Programmes d'entraînement</h1>
+          <h1 class="adm-title">Gestion des Programmes</h1>
         </div>
       </div>
     </div>
 
     ${renderNotice()}
 
-    <div class="grid-3">
-      ${list.map((t) => {
-        const subs = clients.filter(c => c.track === t.id).length;
-        const pctChoice = totalClients > 0 ? Math.round((subs / totalClients) * 100) : 0;
-        
-        return `
-        <div class="adm-prog-card" style="display: flex; flex-direction: column; height: 100%;">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-            <div class="adm-prog-icon">${icon(t.icon, 24)}</div>
-          </div>
-          <h3 style="font-size: 18px; margin: 12px 0 8px;">${t.label}</h3>
-          <p style="font-size: 13px; color: var(--slate); margin: 0 0 16px; line-height: 1.5; flex-grow: 1;">${t.desc}</p>
+    <!-- SECTION 1: PISTES D'ONBOARDING -->
+    <div style="margin-bottom: 40px;">
+      <h2 class="font-display" style="font-size: 22px; margin-bottom: 12px; color: var(--ink); border-left: 4px solid var(--ember); padding-left: 12px; font-weight: 800;">
+        Pistes Globales d'Onboarding (${list.length})
+      </h2>
+      <p style="font-size: 14px; color: var(--slate); margin-bottom: 24px; max-width: 800px;">
+        Ces pistes représentent les grands parcours d'orientation proposés aux clients lors du questionnaire d'onboarding. Elles déterminent le type d'environnement et de matériel.
+      </p>
+      <div class="grid-3">
+        ${list.map((t) => {
+          const subs = clients.filter(c => c.track === t.id).length;
+          const pctChoice = totalClients > 0 ? Math.round((subs / totalClients) * 100) : 0;
           
-          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
-            <span class="adm-badge active">${t.dist}</span>
-            <span class="adm-badge" style="background: var(--chalk-soft); color: var(--slate);">3 séances/sem</span>
-          </div>
-
-          <div class="adm-prog-stats" style="margin-bottom: 16px;">
-            <div class="adm-prog-stat-item">
-              <span class="adm-prog-stat-val">${subs}</span>
-              <span class="adm-prog-stat-lbl">Clients inscrits</span>
+          return `
+          <div class="adm-prog-card" style="display: flex; flex-direction: column; height: 100%;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div class="adm-prog-icon">${icon(t.icon, 24)}</div>
             </div>
-            <div class="adm-prog-stat-item">
-              <span class="adm-prog-stat-val">${pctChoice}%</span>
-              <span class="adm-prog-stat-lbl">Choix des clients</span>
+            <h3 style="font-size: 18px; margin: 12px 0 8px;">${t.label}</h3>
+            <p style="font-size: 13px; color: var(--slate); margin: 0 0 16px; line-height: 1.5; flex-grow: 1;">${t.desc}</p>
+            
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
+              <span class="adm-badge active">${t.dist}</span>
+              <span class="adm-badge" style="background: var(--chalk-soft); color: var(--slate);">3 séances/sem</span>
             </div>
-          </div>
 
-          <button class="btn btn-line btn-edit-program" data-program-id="${escapeHtml(t.id)}" style="width: 100%; justify-content: center; font-size: 13px; font-weight: 600; padding: 10px 0;">
-            ${icon("edit-2", 14)} Modifier le programme
-          </button>
-        </div>`;
-      }).join("")}
+            <div class="adm-prog-stats" style="margin-bottom: 16px;">
+              <div class="adm-prog-stat-item">
+                <span class="adm-prog-stat-val">${subs}</span>
+                <span class="adm-prog-stat-lbl">Clients inscrits</span>
+              </div>
+              <div class="adm-prog-stat-item">
+                <span class="adm-prog-stat-val">${pctChoice}%</span>
+                <span class="adm-prog-stat-lbl">Choix des clients</span>
+              </div>
+            </div>
+
+            <button class="btn btn-line btn-edit-program" data-program-id="${escapeHtml(t.id)}" style="width: 100%; justify-content: center; font-size: 13px; font-weight: 600; padding: 10px 0;">
+              ${icon("edit-2", 14)} Modifier la piste
+            </button>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>
+
+    <!-- SECTION 2: PROGRAMMES COCHÉS DÉTAILLÉS -->
+    <div style="margin-top: 48px; border-top: 1px dashed var(--line); padding-top: 40px; margin-bottom: 40px;">
+      <h2 class="font-display" style="font-size: 22px; margin-bottom: 12px; color: var(--ink); border-left: 4px solid var(--moss); padding-left: 12px; font-weight: 800;">
+        Fiches de Programmes Détaillées (${coachProgs.length})
+      </h2>
+      <p style="font-size: 14px; color: var(--slate); margin-bottom: 24px; max-width: 800px;">
+        Ces fiches contiennent le contenu réel des séances d'entraînement (lundi, mercredi, vendredi...), les exercices, les répétitions, les temps de repos et les échauffements. Toute modification est répercutée instantanément pour tous les clients concernés.
+      </p>
+      <div class="grid-3" style="gap: 24px;">
+        ${coachProgs.map((p) => {
+          const isPriseDeMuscle = p.id.includes("prise-de-muscle");
+          const isPertePoids = p.id.includes("perte-poids");
+          const goalLabel = isPriseDeMuscle ? "Hypertrophie" : (isPertePoids ? "Perte de Poids" : "Santé & Endurance");
+          const badgeColor = isPriseDeMuscle ? "var(--ember)" : (isPertePoids ? "#f2a654" : "var(--moss)");
+          
+          return `
+          <div class="card" style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid ${badgeColor}; background: var(--surface); box-shadow: 0 4px 20px rgba(0,0,0,0.02); border-radius: 8px;">
+            <div>
+              <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+                <span style="font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; background: ${badgeColor}; color: white;">
+                  ${goalLabel}
+                </span>
+                <span style="font-size: 10px; font-weight: 700; color: var(--slate); background: rgba(0,0,0,0.05); padding: 3px 8px; border-radius: 4px; font-family: 'IBM Plex Mono', monospace;">
+                  ${p.level || "Tous niveaux"}
+                </span>
+              </div>
+              <h3 class="font-display" style="font-size: 16px; font-weight: 800; line-height: 1.3; margin: 0 0 6px; color: var(--ink);">
+                ${p.title.replace("MONPROGRAMMEFIT : ", "")}
+              </h3>
+              <p style="font-size: 13px; font-weight: 600; color: var(--slate); margin-bottom: 12px;">
+                ${p.subtitle}
+              </p>
+              <div style="font-size: 12px; color: var(--slate); margin-bottom: 16px; line-height: 1.5;">
+                <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                  ${icon("calendar", 12)} <span>Durée : <strong>${p.duration || "12 semaines"}</strong></span>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                  ${icon("activity", 12)} <span>Séances : <strong>${p.sessions?.length || 0} par semaine</strong></span>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  ${icon("dumbbell", 12)} <span>Exercices : <strong>${p.sessions?.reduce((acc, s) => acc + (s.exercises?.length || 0), 0) || 0} au total</strong></span>
+                </div>
+              </div>
+            </div>
+            
+            <button class="btn btn-line btn-edit-coach-program" data-program-id="${escapeHtml(p.id)}" style="width: 100%; justify-content: center; font-size: 13px; font-weight: 600; padding: 10px 0; border-color: ${badgeColor}; color: ${badgeColor};">
+              ${icon("settings", 14)} Éditer le contenu
+            </button>
+          </div>`;
+        }).join("")}
+      </div>
     </div>
   </div>`;
 }
@@ -878,4 +942,437 @@ export function renderAdminMessages() {
 
     </div>
   </div>`;
+}
+
+/**
+ * Modal d'édition des programmes officiels (COACH_PROGRAMS) par le coach.
+ */
+export function showCoachProgramEditModal(program) {
+  if (!program) return;
+
+  const existing = document.getElementById("coach-program-edit-modal");
+  if (existing) existing.remove();
+
+  const modal = document.createElement("div");
+  modal.id = "coach-program-edit-modal";
+  modal.style.cssText = `
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(10, 15, 20, 0.8);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.2s ease-out;
+  `;
+
+  // Clone profond pour ne pas modifier l'original en mémoire de manière transitoire
+  const progClone = JSON.parse(JSON.stringify(program));
+
+  // Générateur HTML pour les exercices d'une séance
+  const renderExercisesHTML = (sessionIndex) => {
+    const session = progClone.sessions[sessionIndex];
+    if (!session || !session.exercises) return "";
+    return session.exercises.map((ex, exIndex) => `
+      <div class="exercise-row" data-session="${sessionIndex}" data-index="${exIndex}" style="background: var(--chalk-soft, #f8f9fa); padding: 16px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid var(--ember); position: relative; border: 1px solid var(--line);">
+        <button class="btn-delete-exercise" data-session="${sessionIndex}" data-index="${exIndex}" style="position: absolute; top: 12px; right: 12px; background: none; border: none; color: var(--ember); cursor: pointer; font-size: 13px; font-weight: bold; padding: 4px;" title="Supprimer cet exercice">
+          &times; Supprimer
+        </button>
+        <div class="grid-2" style="gap: 12px; margin-bottom: 10px; margin-right: 90px;">
+          <div>
+            <label style="font-size: 11px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 4px;">Nom de l'exercice</label>
+            <input type="text" class="text-input input-ex-name" style="width: 100%; padding: 6px 10px; border: 1px solid var(--line); border-radius: 4px; font-size: 13px; background:white; color:var(--ink);" value="${escapeHtml(ex.name || "")}" />
+          </div>
+          <div>
+            <label style="font-size: 11px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 4px;">Séries</label>
+            <input type="text" class="text-input input-ex-sets" style="width: 100%; padding: 6px 10px; border: 1px solid var(--line); border-radius: 4px; font-size: 13px; background:white; color:var(--ink);" value="${escapeHtml(String(ex.sets || ""))}" />
+          </div>
+        </div>
+        <div class="grid-3" style="gap: 12px; margin-bottom: 10px;">
+          <div>
+            <label style="font-size: 11px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 4px;">Répétitions</label>
+            <input type="text" class="text-input input-ex-reps" style="width: 100%; padding: 6px 10px; border: 1px solid var(--line); border-radius: 4px; font-size: 13px; background:white; color:var(--ink);" value="${escapeHtml(ex.reps || "")}" />
+          </div>
+          <div>
+            <label style="font-size: 11px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 4px;">Récupération / Repos</label>
+            <input type="text" class="text-input input-ex-rest" style="width: 100%; padding: 6px 10px; border: 1px solid var(--line); border-radius: 4px; font-size: 13px; background:white; color:var(--ink);" value="${escapeHtml(ex.rest || "")}" />
+          </div>
+          <div>
+            <label style="font-size: 11px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 4px;">Type / Intensité</label>
+            <input type="text" class="text-input input-ex-type" style="width: 100%; padding: 6px 10px; border: 1px solid var(--line); border-radius: 4px; font-size: 13px; background:white; color:var(--ink);" value="${escapeHtml(ex.type || "")}" />
+          </div>
+        </div>
+        <div>
+          <label style="font-size: 11px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 4px;">Consigne technique / Description</label>
+          <textarea class="text-input input-ex-desc" style="width: 100%; padding: 6px 10px; border: 1px solid var(--line); border-radius: 4px; font-size: 13px; height: 50px; resize: vertical; line-height: 1.4; background:white; color:var(--ink);">${escapeHtml(ex.desc || "")}</textarea>
+        </div>
+      </div>
+    `).join("");
+  };
+
+  modal.innerHTML = `
+    <div style="
+      background: var(--chalk, #ffffff);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      max-width: 850px;
+      width: 100%;
+      max-height: 92vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      color: var(--ink);
+      font-family: inherit;
+      display: flex;
+      flex-direction: column;
+    ">
+      <!-- HEADER -->
+      <div style="
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--surface, #f8f9fa);
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+      ">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="adm-prog-icon" style="margin: 0; padding: 8px; background: rgba(60, 90, 70, 0.1); color: var(--moss); border-radius: 8px;">
+            ${icon("settings", 20)}
+          </div>
+          <div>
+            <h2 style="font-size: 18px; font-weight: 800; margin: 0; color: var(--ink);">Édition du Programme Officiel</h2>
+            <p style="font-size: 12px; color: var(--slate); margin: 2px 0 0;">Fiche : <strong>${escapeHtml(program.title.replace("MONPROGRAMMEFIT : ", "") + " (" + program.subtitle + ")")}</strong></p>
+          </div>
+        </div>
+        <button id="close-coach-program-edit-modal" style="
+          background: transparent;
+          border: none;
+          font-size: 24px;
+          cursor: pointer;
+          color: var(--slate);
+          padding: 4px 8px;
+          border-radius: 4px;
+          line-height: 1;
+        " title="Fermer">&times;</button>
+      </div>
+
+      <!-- TABS HEADER -->
+      <div style="
+        display: flex;
+        background: var(--chalk-soft, #f8f9fa);
+        border-bottom: 1px solid var(--line);
+        padding: 0 16px;
+      ">
+        <button class="coach-tab-btn active" data-tab="infos" style="padding: 14px 20px; font-size: 13px; font-weight: 700; border: none; background: none; color: var(--slate); cursor: pointer; border-bottom: 2px solid transparent; outline: none; transition: all 0.2s;">
+          1. Informations Générales
+        </button>
+        <button class="coach-tab-btn" data-tab="sessions" style="padding: 14px 20px; font-size: 13px; font-weight: 700; border: none; background: none; color: var(--slate); cursor: pointer; border-bottom: 2px solid transparent; outline: none; transition: all 0.2s;">
+          2. Séances & Exercices
+        </button>
+        <button class="coach-tab-btn" data-tab="progression" style="padding: 14px 20px; font-size: 13px; font-weight: 700; border: none; background: none; color: var(--slate); cursor: pointer; border-bottom: 2px solid transparent; outline: none; transition: all 0.2s;">
+          3. Échauffement & Conseils
+        </button>
+      </div>
+
+      <!-- FORM CONTENT -->
+      <div style="padding: 24px; flex-grow: 1; overflow-y: auto; max-height: 60vh;">
+        
+        <!-- TAB 1: INFOS GENERALES -->
+        <div class="coach-tab-pane active" id="pane-infos">
+          <div class="grid-2" style="gap: 16px; margin-bottom: 16px;">
+            <div>
+              <label style="font-size: 12px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 6px;">Titre du programme</label>
+              <input type="text" id="coach-edit-title" class="text-input" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 6px;" value="${escapeHtml(progClone.title)}" />
+            </div>
+            <div>
+              <label style="font-size: 12px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 6px;">Sous-titre (Environnement)</label>
+              <input type="text" id="coach-edit-subtitle" class="text-input" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 6px;" value="${escapeHtml(progClone.subtitle)}" />
+            </div>
+          </div>
+
+          <div class="grid-3" style="gap: 16px; margin-bottom: 16px;">
+            <div>
+              <label style="font-size: 12px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 6px;">Durée (ex: 12 semaines)</label>
+              <input type="text" id="coach-edit-duration" class="text-input" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 6px;" value="${escapeHtml(progClone.duration || "12 semaines")}" />
+            </div>
+            <div>
+              <label style="font-size: 12px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 6px;">Niveau (ex: Tous niveaux)</label>
+              <input type="text" id="coach-edit-level" class="text-input" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 6px;" value="${escapeHtml(progClone.level || "Tous niveaux")}" />
+            </div>
+            <div>
+              <label style="font-size: 12px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 6px;">Fréquence (ex: 3 séances/semaine)</label>
+              <input type="text" id="coach-edit-frequency" class="text-input" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 6px;" value="${escapeHtml(progClone.frequency || "3 séances / semaine")}" />
+            </div>
+          </div>
+
+          <div style="background: var(--surface); padding: 16px; border-radius: 8px; border: 1px dashed var(--line); margin-bottom: 16px;">
+            <h4 style="font-size: 14px; margin: 0 0 12px; font-weight: 700; color: var(--moss);">Règles d'Entraînement Générales</h4>
+            <div class="grid-3" style="gap: 16px;">
+              <div>
+                <label style="font-size: 11px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 4px;">Temps de repos général</label>
+                <input type="text" id="coach-edit-rules-rest" class="text-input" style="width: 100%; padding: 8px; border: 1px solid var(--line); border-radius: 6px;" value="${escapeHtml(progClone.generalRules?.rest || "1 min 30 à 2 min")}" />
+              </div>
+              <div>
+                <label style="font-size: 11px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 4px;">Tempo d'exécution</label>
+                <input type="text" id="coach-edit-rules-tempo" class="text-input" style="width: 100%; padding: 8px; border: 1px solid var(--line); border-radius: 6px;" value="${escapeHtml(progClone.generalRules?.tempo || "Contrôlé")}" />
+              </div>
+              <div>
+                <label style="font-size: 11px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 4px;">Intensité (RPE / Effort)</label>
+                <input type="text" id="coach-edit-rules-intensity" class="text-input" style="width: 100%; padding: 8px; border: 1px solid var(--line); border-radius: 6px;" value="${escapeHtml(progClone.generalRules?.intensity || "Proche de l'échec (RPE 8-9)")}" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: SEANCES & EXERCICES -->
+        <div class="coach-tab-pane" id="pane-sessions" style="display:none;">
+          <div style="display: flex; gap: 8px; border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 20px; overflow-x: auto;">
+            ${progClone.sessions.map((s, idx) => `
+              <button class="coach-session-tab-btn ${idx === 0 ? "active" : ""}" data-session-idx="${idx}" style="padding: 8px 16px; font-size: 12px; font-weight: 700; border-radius: 20px; border: 1px solid var(--line); background: white; color: var(--slate); cursor: pointer; white-space: nowrap;">
+                ${escapeHtml(s.day)} : ${escapeHtml(s.name.split(":")[0])}
+              </button>
+            `).join("")}
+          </div>
+
+          ${progClone.sessions.map((s, idx) => `
+            <div class="coach-session-pane" id="session-pane-${idx}" style="${idx === 0 ? "" : "display:none;"}">
+              <div class="grid-2" style="gap: 16px; margin-bottom: 16px; background: rgba(60, 90, 70, 0.04); padding: 16px; border-radius: 8px;">
+                <div>
+                  <label style="font-size: 12px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 6px;">Nom de la séance (ex: Séance A : Poussée)</label>
+                  <input type="text" class="text-input edit-session-name" data-session="${idx}" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 6px; font-weight: 700;" value="${escapeHtml(s.name)}" />
+                </div>
+                <div>
+                  <label style="font-size: 12px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 6px;">Durée estimée (ex: 45-60 min)</label>
+                  <input type="text" class="text-input edit-session-duration" data-session="${idx}" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 6px;" value="${escapeHtml(s.duration || "45-60 min")}" />
+                </div>
+              </div>
+
+              <div style="margin-bottom: 12px;">
+                <label style="font-size: 12px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 6px;">Consignes de repos de la séance</label>
+                <input type="text" class="text-input edit-session-rest-note" data-session="${idx}" style="width: 100%; padding: 8px 12px; border: 1px solid var(--line); border-radius: 6px; font-size: 13px;" value="${escapeHtml(s.restNote || "1 min 30 à 2 min entre les séries")}" />
+              </div>
+
+              <h4 style="font-size: 14px; font-weight: 800; color: var(--ink); margin: 24px 0 12px; display: flex; align-items: center; gap: 8px;">
+                ${icon("dumbbell", 16)} Exercices de la séance (${s.exercises?.length || 0})
+              </h4>
+
+              <div class="exercises-container" id="exercises-container-${idx}">
+                ${renderExercisesHTML(idx)}
+              </div>
+
+              <button class="btn btn-outline-dark btn-add-exercise" data-session="${idx}" style="width: 100%; justify-content: center; padding: 12px; border-style: dashed; border-width: 2px; font-weight: 700; margin-top: 12px;">
+                + Ajouter un exercice à la séance
+              </button>
+            </div>
+          `).join("")}
+        </div>
+
+        <!-- TAB 3: PROGRESSION & CONSEILS -->
+        <div class="coach-tab-pane" id="pane-progression" style="display:none;">
+          <div style="margin-bottom: 24px;">
+            <label style="font-size: 12px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 6px;">Échauffement : Durée</label>
+            <input type="text" id="coach-edit-warmup-duration" class="text-input" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 6px;" value="${escapeHtml(progClone.warmup?.duration || "5-10 min")}" />
+          </div>
+
+          <div style="margin-bottom: 24px;">
+            <label style="font-size: 12px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 6px;">Étapes de l'échauffement (Une consigne par ligne)</label>
+            <textarea id="coach-edit-warmup-steps" class="text-input" style="width: 100%; min-height: 120px; padding: 10px; border: 1px solid var(--line); border-radius: 6px; resize: vertical; line-height: 1.5; font-size: 13px;">${(progClone.warmup?.steps || []).join("\n")}</textarea>
+          </div>
+
+          <div style="margin-bottom: 24px; border-top: 1px dashed var(--line); padding-top: 20px;">
+            <label style="font-size: 12px; font-weight: 700; color: var(--slate); display: block; margin-bottom: 6px;">Conseils clés du coach (Un conseil par ligne)</label>
+            <textarea id="coach-edit-keytips" class="text-input" style="width: 100%; min-height: 120px; padding: 10px; border: 1px solid var(--line); border-radius: 6px; resize: vertical; line-height: 1.5; font-size: 13px;">${(progClone.keyTips || []).join("\n")}</textarea>
+          </div>
+        </div>
+
+        <div id="coach-edit-prog-error" style="color: var(--ember); font-size: 13px; font-weight: 600; display: none; padding: 10px; background: rgba(224, 86, 36, 0.08); border-radius: 6px; border: 1px solid rgba(224, 86, 36, 0.15); margin-top: 16px;"></div>
+      </div>
+
+      <!-- FOOTER ACTIONS -->
+      <div style="
+        padding: 16px 24px;
+        border-top: 1px solid var(--line);
+        background: var(--surface, #f8f9fa);
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+      ">
+        <button id="btn-cancel-coach-program-edit" class="btn btn-outline-dark" style="font-size: 13px; padding: 10px 18px;">
+          Annuler
+        </button>
+        <button id="btn-save-coach-program-edit" class="btn btn-ember" style="font-size: 13px; padding: 10px 18px; display: inline-flex; align-items: center; gap: 6px;">
+          ${icon("save", 14)} Enregistrer pour tous
+        </button>
+      </div>
+    </div>
+  `;
+
+  // Injecter des styles d'appui
+  const styles = document.createElement("style");
+  styles.id = "coach-editor-custom-styles";
+  styles.textContent = `
+    .coach-tab-btn {
+      border-radius: 0 !important;
+    }
+    .coach-tab-btn.active {
+      color: var(--ember) !important;
+      border-bottom: 2px solid var(--ember) !important;
+    }
+    .coach-session-tab-btn.active {
+      background: var(--moss) !important;
+      color: white !important;
+      border-color: var(--moss) !important;
+    }
+  `;
+  document.head.appendChild(styles);
+
+  document.body.appendChild(modal);
+
+  const closeModal = () => {
+    modal.remove();
+    styles.remove();
+  };
+
+  modal.querySelector("#close-coach-program-edit-modal")?.addEventListener("click", closeModal);
+  modal.querySelector("#btn-cancel-coach-program-edit")?.addEventListener("click", closeModal);
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  // Switch tabs
+  const tabBtns = modal.querySelectorAll(".coach-tab-btn");
+  tabBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      tabBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const targetTab = btn.dataset.tab;
+      modal.querySelectorAll(".coach-tab-pane").forEach(pane => pane.style.display = "none");
+      modal.querySelector(`#pane-${targetTab}`).style.display = "block";
+    });
+  });
+
+  // Switch sessions
+  const sessionBtns = modal.querySelectorAll(".coach-session-tab-btn");
+  sessionBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      sessionBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const idx = btn.dataset.sessionIdx;
+      modal.querySelectorAll(".coach-session-pane").forEach(pane => pane.style.display = "none");
+      modal.querySelector(`#session-pane-${idx}`).style.display = "block";
+    });
+  });
+
+  // Gérer l'ajout et suppression des exercices via délégation sur le modal
+  modal.addEventListener("click", (e) => {
+    const addBtn = e.target.closest(".btn-add-exercise");
+    if (addBtn) {
+      const sessionIndex = parseInt(addBtn.dataset.session);
+      if (!progClone.sessions[sessionIndex].exercises) {
+        progClone.sessions[sessionIndex].exercises = [];
+      }
+      progClone.sessions[sessionIndex].exercises.push({
+        name: "Nouvel Exercice",
+        sets: "3",
+        reps: "10-12",
+        rest: "90s",
+        type: "Hypertrophie",
+        desc: "Description technique de l'exercice."
+      });
+      modal.querySelector(`#exercises-container-${sessionIndex}`).innerHTML = renderExercisesHTML(sessionIndex);
+    }
+
+    const delBtn = e.target.closest(".btn-delete-exercise");
+    if (delBtn) {
+      const sessionIndex = parseInt(delBtn.dataset.session);
+      const exIndex = parseInt(delBtn.dataset.index);
+      progClone.sessions[sessionIndex].exercises.splice(exIndex, 1);
+      modal.querySelector(`#exercises-container-${sessionIndex}`).innerHTML = renderExercisesHTML(sessionIndex);
+    }
+  });
+
+  // Sauvegarder
+  const saveBtn = modal.querySelector("#btn-save-coach-program-edit");
+  saveBtn.addEventListener("click", async () => {
+    // 1. Rassembler les infos globales
+    progClone.title = modal.querySelector("#coach-edit-title").value.trim();
+    progClone.subtitle = modal.querySelector("#coach-edit-subtitle").value.trim();
+    progClone.duration = modal.querySelector("#coach-edit-duration").value.trim();
+    progClone.level = modal.querySelector("#coach-edit-level").value.trim();
+    progClone.frequency = modal.querySelector("#coach-edit-frequency").value.trim();
+
+    // Règles
+    if (!progClone.generalRules) progClone.generalRules = {};
+    progClone.generalRules.rest = modal.querySelector("#coach-edit-rules-rest").value.trim();
+    progClone.generalRules.tempo = modal.querySelector("#coach-edit-rules-tempo").value.trim();
+    progClone.generalRules.intensity = modal.querySelector("#coach-edit-rules-intensity").value.trim();
+
+    // 2. Rassembler le nom de séance, durée, consigne de repos et exercices
+    progClone.sessions.forEach((s, sIdx) => {
+      const nameInput = modal.querySelector(`.edit-session-name[data-session="${sIdx}"]`);
+      if (nameInput) s.name = nameInput.value.trim();
+      const durInput = modal.querySelector(`.edit-session-duration[data-session="${sIdx}"]`);
+      if (durInput) s.duration = durInput.value.trim();
+      const restInput = modal.querySelector(`.edit-session-rest-note[data-session="${sIdx}"]`);
+      if (restInput) s.restNote = restInput.value.trim();
+
+      // Parcourir les lignes d'exercices
+      const exRows = modal.querySelectorAll(`.exercise-row[data-session="${sIdx}"]`);
+      s.exercises = [];
+      exRows.forEach((row) => {
+        const name = row.querySelector(".input-ex-name").value.trim();
+        const sets = row.querySelector(".input-ex-sets").value.trim();
+        const reps = row.querySelector(".input-ex-reps").value.trim();
+        const rest = row.querySelector(".input-ex-rest").value.trim();
+        const type = row.querySelector(".input-ex-type").value.trim();
+        const desc = row.querySelector(".input-ex-desc").value.trim();
+
+        s.exercises.push({ name, sets, reps, rest, type, desc });
+      });
+    });
+
+    // 3. Échauffement
+    if (!progClone.warmup) progClone.warmup = {};
+    progClone.warmup.duration = modal.querySelector("#coach-edit-warmup-duration").value.trim();
+    const warmupStepsRaw = modal.querySelector("#coach-edit-warmup-steps").value;
+    progClone.warmup.steps = warmupStepsRaw.split("\n").map(line => line.trim()).filter(Boolean);
+
+    // 4. Conseils clés
+    const keyTipsRaw = modal.querySelector("#coach-edit-keytips").value;
+    progClone.keyTips = keyTipsRaw.split("\n").map(line => line.trim()).filter(Boolean);
+
+    // Validation simple
+    if (!progClone.title || !progClone.subtitle) {
+      const errDiv = modal.querySelector("#coach-edit-prog-error");
+      errDiv.textContent = "Le titre et le sous-titre sont obligatoires.";
+      errDiv.style.display = "block";
+      return;
+    }
+
+    // Sauvegarde Firestore
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = `${icon("loader-2", 14)} Sauvegarde...`;
+
+    try {
+      await setDoc(doc(db, "coach_programs", program.id), progClone);
+      showToast("Programme officiel sauvegardé avec succès et mis à jour pour tous !");
+      closeModal();
+      
+      const { render } = await import("../render.js");
+      render();
+    } catch (err) {
+      console.error("Erreur d'enregistrement:", err);
+      const errDiv = modal.querySelector("#coach-edit-prog-error");
+      errDiv.textContent = `Erreur lors de la sauvegarde: ${err.message || err}`;
+      errDiv.style.display = "block";
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = `${icon("save", 14)} Enregistrer pour tous`;
+    }
+  });
 }

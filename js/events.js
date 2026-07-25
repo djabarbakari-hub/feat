@@ -20,7 +20,7 @@ import { state, persistState } from "./state.js";
 import { navigate, goBack } from "./router.js";
 import { render } from "./render.js";
 import { QUIZ_STEPS, COACH_PROGRAMS, TRACKS } from "./data.js";
-import { trackById, closeMobileMenu } from "./helpers.js";
+import { trackById, closeMobileMenu, showToast } from "./helpers.js";
 import { auth, db } from "./firebase.js";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { doc, setDoc, getDoc, addDoc, collection, writeBatch, query, where, getDocs, updateDoc, deleteDoc } from "firebase/firestore";
@@ -199,47 +199,59 @@ document.addEventListener("click", async (e) => {
   if (quizConfirmBtn) {
     const answers = state.quizAnswers || {};
     const track = trackById(answers.lieu || "home-equip");
-    const coachP = COACH_PROGRAMS[0];
+    const goal = answers.objectif || "";
 
-    let program;
-    if (track.id === "home-equip" || answers.objectif === "musculation") {
-      program = {
-        trackLabel: "Prise de Muscle (Maison avec matériel) — Coach Abdou BAKARI",
-        track: track.id,
-        week: 1,
-        totalWeeks: 8,
-        nextSession: coachP.sessions[0].name,
-        history: [
-          { name: "Semaine 1", done: 0, total: coachP.sessions.length }
-        ],
-        sessions: coachP.sessions.map((s, idx) => ({
-          id: `s${idx + 1}`,
-          name: s.name,
-          exos: s.exosCount,
-          duree: s.duration,
-          done: false,
-          weekNumber: 1
-        }))
-      };
-    } else {
-      const matches = track.dist ? String(track.dist).match(/\d+/) : null;
-      const weekLength = matches ? parseInt(matches[0], 10) : (track.id === "gym" ? 12 : 8);
-      program = {
-        trackLabel: track.label,
-        track: track.id,
-        week: 1,
-        totalWeeks: weekLength,
-        nextSession: `${track.label} — Séance 1`,
-        history: [
-          { name: "Semaine 1", done: 0, total: 3 }
-        ],
-        sessions: [
-          { id: "s1", name: "Séance 1 — Focus technique", exos: 6, duree: "35 min", done: false, weekNumber: 1 },
-          { id: "s2", name: "Séance 2 — Intensité maîtrisée", exos: 7, duree: "40 min", done: false, weekNumber: 1 },
-          { id: "s3", name: "Séance 3 — Endurance active", exos: 5, duree: "30 min", done: false, weekNumber: 1 },
-        ]
-      };
+    // Trouver le programme officiel du Coach Abdou BAKARI correspondant
+    let coachP = null;
+    if (goal === "endurance-sante") {
+      coachP = COACH_PROGRAMS.find(p => p.id === `sante-endurance-${track.id}`);
+    } else if (goal === "musculation") {
+      if (track.id === "home-equip") {
+        coachP = COACH_PROGRAMS.find(p => p.id === "prise-de-muscle-home");
+      } else if (track.id === "bodyweight") {
+        coachP = COACH_PROGRAMS.find(p => p.id === "prise-de-muscle-bodyweight");
+      } else if (track.id === "gym") {
+        coachP = COACH_PROGRAMS.find(p => p.id === "prise-de-muscle-gym");
+      }
+    } else if (goal === "perte-poids") {
+      if (track.id === "home-equip") {
+        coachP = COACH_PROGRAMS.find(p => p.id === "perte-poids-home");
+      } else if (track.id === "bodyweight") {
+        coachP = COACH_PROGRAMS.find(p => p.id === "perte-poids-bodyweight");
+      } else if (track.id === "gym") {
+        coachP = COACH_PROGRAMS.find(p => p.id === "perte-poids-gym");
+      }
     }
+
+    // Fallback : si pas de correspondance exacte par objectif, on cherche n'importe quel programme de la même piste
+    if (!coachP) {
+      coachP = COACH_PROGRAMS.find(p => p.trackId === track.id);
+    }
+
+    // Fallback ultime de sécurité
+    if (!coachP) {
+      coachP = COACH_PROGRAMS[0];
+    }
+
+    const program = {
+      coachProgramId: coachP.id,
+      trackLabel: `${coachP.title.replace("MONPROGRAMMEFIT : ", "")} (${coachP.subtitle}) — Coach Abdou BAKARI`,
+      track: track.id,
+      week: 1,
+      totalWeeks: 8,
+      nextSession: coachP.sessions[0].name,
+      history: [
+        { name: "Semaine 1", done: 0, total: coachP.sessions.length }
+      ],
+      sessions: coachP.sessions.map((s, idx) => ({
+        id: `s${idx + 1}`,
+        name: s.name,
+        exos: s.exercises.length,
+        duree: s.duration,
+        done: false,
+        weekNumber: 1
+      }))
+    };
 
     state.clientProfile = {
       ...state.clientProfile,
@@ -286,6 +298,68 @@ document.addEventListener("click", async (e) => {
 
     render();
     navigate("client-dashboard");
+    return;
+  }
+
+  const selectProgBtn = e.target.closest(".btn-select-program");
+  if (selectProgBtn) {
+    const programId = selectProgBtn.dataset.programId;
+    const coachP = COACH_PROGRAMS.find(p => p.id === programId);
+    if (coachP) {
+      const program = {
+        coachProgramId: coachP.id,
+        trackLabel: `${coachP.title.replace("MONPROGRAMMEFIT : ", "")} (${coachP.subtitle}) — Coach Abdou BAKARI`,
+        track: coachP.trackId,
+        week: 1,
+        totalWeeks: 8,
+        nextSession: coachP.sessions[0].name,
+        history: [
+          { name: "Semaine 1", done: 0, total: coachP.sessions.length }
+        ],
+        sessions: coachP.sessions.map((s, idx) => ({
+          id: `s${idx + 1}`,
+          name: s.name,
+          exos: s.exercises.length,
+          duree: s.duration,
+          done: false,
+          weekNumber: 1
+        }))
+      };
+
+      state.clientProfile = {
+        ...state.clientProfile,
+        track: coachP.trackId,
+        program,
+      };
+
+      persistState();
+
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        try {
+          const userRef = doc(db, "users", currentUser.uid);
+          await setDoc(userRef, {
+            track: coachP.trackId,
+            program,
+            updatedAt: new Date().toISOString()
+          }, { merge: true });
+
+          // Enregistrement des séances dans la sous-collection users/{uid}/sessions
+          const batch = writeBatch(db);
+          program.sessions.forEach((s) => {
+            const sRef = doc(db, "users", currentUser.uid, "sessions", s.id);
+            batch.set(sRef, s);
+          });
+          await batch.commit();
+        } catch (err) {
+          console.error("Erreur d'enregistrement du changement de programme dans Firestore:", err);
+        }
+      }
+
+      showToast("Programme activé avec succès !");
+      render();
+      navigate("client-program");
+    }
     return;
   }
 
@@ -606,6 +680,17 @@ document.addEventListener("click", async (e) => {
     if (foundTrack) {
       const { showProgramEditModal } = await import("./pages/admin.js");
       showProgramEditModal(foundTrack);
+    }
+    return;
+  }
+
+  const editCoachProgramBtn = e.target.closest(".btn-edit-coach-program");
+  if (editCoachProgramBtn) {
+    const programId = editCoachProgramBtn.dataset.programId;
+    const foundProg = COACH_PROGRAMS.find(p => p.id === programId);
+    if (foundProg) {
+      const { showCoachProgramEditModal } = await import("./pages/admin.js");
+      showCoachProgramEditModal(foundProg);
     }
     return;
   }
@@ -1071,6 +1156,18 @@ document.addEventListener("click", async (e) => {
         } catch (e) {
           console.warn("Google auth check admin error via admin_emails:", e);
         }
+      }
+
+      const authAction = googleAuthBtn.dataset.googleAuth;
+
+      if (!userDocSnap.exists() && userRole !== "admin" && authAction === "login") {
+        await signOut(auth);
+        state.ui.googleAuthPending = false;
+        state.ui.loginError = "Aucun compte n'est enregistré avec ce compte Google. Veuillez créer un compte.";
+        persistState();
+        navigate("signup");
+        render();
+        return;
       }
 
       userProfile.role = userRole;

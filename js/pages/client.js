@@ -512,7 +512,10 @@ export function renderClientProgram() {
                   <div>
                     <span style="font-size: 11px; font-weight: 700; color: var(--ember); font-family: 'IBM Plex Mono', monospace; text-transform: uppercase;">Exercice ${idx + 1}</span>
                     <h4 style="font-size: 16px; font-weight: 700; margin: 2px 0 4px; color: var(--ink);">${escapeHtml(exo.name)}</h4>
-                    <p style="font-size: 13px; color: var(--slate); margin: 0; line-height: 1.4;">${escapeHtml(exo.desc)}</p>
+                    <p style="font-size: 13px; color: var(--slate); margin: 0 0 8px; line-height: 1.4;">${escapeHtml(exo.desc)}</p>
+                    <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(exo.name + ' exercice de musculation')}" target="_blank" rel="noopener noreferrer" style="font-size: 11px; font-weight: 600; color: white; background-color: #ff0000; padding: 4px 8px; border-radius: 4px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                      ${icon("play-circle", 12)} Voir en vidéo (YouTube)
+                    </a>
                   </div>
                   <span class="adm-badge active" style="background: var(--chalk-soft); color: var(--ink); border: 1px solid var(--line); font-size: 12px; white-space: nowrap; height: fit-content;">
                     ${escapeHtml(exo.detail)}
@@ -559,66 +562,66 @@ export function renderClientProgram() {
   }
 
   // --- RENDU NORMAL : LISTE DES SÉANCES DU PROGRAMME ---
-  const coachProg = COACH_PROGRAMS[0];
-  const isCoachProgram = program.track === "home-equip" || program.track === "prise-de-muscle-home" || (program.trackLabel && program.trackLabel.includes("Abdou"));
+  const coachProg = COACH_PROGRAMS.find(p => p.id === program.coachProgramId) || 
+                    COACH_PROGRAMS.find(p => p.trackId === program.track) || 
+                    COACH_PROGRAMS[0];
+  const isCoachProgram = program.track === "home-equip" || program.track === "prise-de-muscle-home" || program.track === "bodyweight" || program.track === "gym" || (program.trackLabel && program.trackLabel.includes("Abdou"));
 
   const coachInstructionsHtml = isCoachProgram ? `
     <div class="client-card" style="margin-bottom: 28px; border-left: 4px solid var(--ember); background: linear-gradient(135deg, rgba(224, 70, 50, 0.03) 0%, rgba(255, 255, 255, 1) 100%);">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;">
         <div>
           <span style="background: var(--ember); color: white; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace;">Programme Officiel Coach Abdou BAKARI</span>
-          <h2 style="font-size: 20px; font-weight: 800; color: var(--ink); margin: 6px 0 2px;">MONPROGRAMMEFIT : PRISE DE MUSCLE</h2>
-          <p style="font-size: 13px; color: var(--slate); margin: 0;">Maison avec matériel · 8 semaines · 5 séances / semaine</p>
+          <h2 style="font-size: 20px; font-weight: 800; color: var(--ink); margin: 6px 0 2px;">${escapeHtml(coachProg.title)}</h2>
+          <p style="font-size: 13px; color: var(--slate); margin: 0;">${escapeHtml(coachProg.subtitle)} · ${escapeHtml(coachProg.duration)} · ${escapeHtml(coachProg.frequency)}</p>
         </div>
         <div style="font-size: 12px; font-weight: 700; color: var(--moss); background: rgba(60, 90, 70, 0.08); padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(60, 90, 70, 0.15);">
-          🎯 Progression & Hypertrophie
+          🎯 ${escapeHtml(coachProg.id.includes("prise-de-muscle") ? "Progression & Hypertrophie" : (coachProg.id.includes("perte-poids") ? "Perte de Poids" : "Santé & Endurance"))}
         </div>
       </div>
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; padding-top: 12px; border-top: 1px solid var(--line);">
         <div>
-          <h4 style="font-size: 12px; text-transform: uppercase; color: var(--ember); font-weight: 700; margin: 0 0 6px;">⏱ Consignes de Repos & Tempo</h4>
-          <p style="font-size: 12px; color: var(--ink); margin: 0 0 4px; line-height: 1.5;"><strong>Exercices principaux :</strong> 90 secondes</p>
-          <p style="font-size: 12px; color: var(--ink); margin: 0 0 4px; line-height: 1.5;"><strong>Isolation :</strong> 45 à 60 secondes</p>
-          <p style="font-size: 12px; color: var(--slate); margin: 0; line-height: 1.5;"><strong>Tempo :</strong> Descente 2s · Pause 0-1s · Montée 2s</p>
+          <h4 style="font-size: 12px; text-transform: uppercase; color: var(--ember); font-weight: 700; margin: 0 0 6px;">⏱ Consignes de Repos</h4>
+          <p style="font-size: 12px; color: var(--ink); margin: 0; line-height: 1.5;">${escapeHtml(coachProg.generalRules.rest)}</p>
+          ${coachProg.generalRules.tempo ? `<p style="font-size: 12px; color: var(--slate); margin: 4px 0 0; line-height: 1.5;"><strong>Tempo :</strong> ${escapeHtml(coachProg.generalRules.tempo)}</p>` : ""}
+          ${coachProg.generalRules.intensity ? `<p style="font-size: 12px; color: var(--slate); margin: 4px 0 0; line-height: 1.5;"><strong>Intensité :</strong> ${escapeHtml(coachProg.generalRules.intensity)}</p>` : ""}
         </div>
 
         <div>
           <h4 style="font-size: 12px; text-transform: uppercase; color: var(--ember); font-weight: 700; margin: 0 0 6px;">🏋️‍♂️ Matériel Requis</h4>
           <p style="font-size: 12px; color: var(--slate); margin: 0; line-height: 1.5;">
-            • 2 haltères réglables<br/>
-            • Elastiques de résistance<br/>
-            • Banc réglable (ou surface stable)<br/>
-            • Barre de traction (facultative)
+            ${coachProg.equipment.map(item => `• ${escapeHtml(item)}`).join("<br/>")}
           </p>
         </div>
 
         <div>
-          <h4 style="font-size: 12px; text-transform: uppercase; color: var(--ember); font-weight: 700; margin: 0 0 6px;">🔥 Échauffement (10 min)</h4>
+          <h4 style="font-size: 12px; text-transform: uppercase; color: var(--ember); font-weight: 700; margin: 0 0 6px;">🔥 Échauffement (${escapeHtml(coachProg.warmup.duration)})</h4>
           <p style="font-size: 12px; color: var(--slate); margin: 0; line-height: 1.5;">
-            • 2-3 min de corde / jumping jacks<br/>
-            • Rotations articulaires (15 reps)<br/>
-            • 2 séries légères du 1er exercice
+            ${coachProg.warmup.steps.map(step => `• ${escapeHtml(step)}`).join("<br/>")}
           </p>
         </div>
       </div>
 
       <details style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--line);">
         <summary style="font-size: 12px; font-weight: 700; color: var(--ink); cursor: pointer; user-select: none; display: flex; align-items: center; gap: 6px;">
-          <span>📖 Consulter le plan de progression sur 8 semaines & étirements</span>
+          <span>📖 Consulter le plan de progression sur ${escapeHtml(coachProg.duration)} & conseils</span>
         </summary>
         <div style="margin-top: 12px; font-size: 12px; color: var(--slate); line-height: 1.6; display: grid; gap: 12px;">
           <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid var(--line);">
             <strong style="color: var(--ink); display: block; margin-bottom: 4px;">Cycle de Progression :</strong>
-            • <strong>Semaines 1–2 :</strong> Apprentissage des mouvements et calage des charges.<br/>
-            • <strong>Semaines 3–4 :</strong> Augmentation progressive des répétitions ou des charges.<br/>
-            • <strong>Semaines 5–6 :</strong> Ajout d'une série supplémentaire sur les exercices principaux.<br/>
-            • <strong>Semaines 7–8 :</strong> Intensification avec supersets (ex: développé couché + pompes) en conservant une technique stricte.
+            ${coachProg.progressionPlan.map(p => `• <strong>${escapeHtml(p.period)} :</strong> ${escapeHtml(p.desc)}`).join("<br/>")}
           </div>
           <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid var(--line);">
-            <strong style="color: var(--ink); display: block; margin-bottom: 4px;">Étirements après séance (5–10 min) :</strong>
-            Pectoraux, Dos, Épaules, Quadriceps, Ischio-jambiers & Mollets (30s × 2 chacun).
+            <strong style="color: var(--ink); display: block; margin-bottom: 4px;">Étirements après séance (${escapeHtml(coachProg.stretching.duration)}) :</strong>
+            ${coachProg.stretching.exercises.map(ex => `• ${escapeHtml(ex)}`).join("<br/>")}
           </div>
+          ${coachProg.keyTips ? `
+          <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid var(--line);">
+            <strong style="color: var(--ink); display: block; margin-bottom: 4px;">💡 Conseils Clés du Coach :</strong>
+            ${coachProg.keyTips.map(tip => `• ${escapeHtml(tip)}`).join("<br/>")}
+          </div>
+          ` : ""}
         </div>
       </details>
     </div>
@@ -635,22 +638,48 @@ export function renderClientProgram() {
     ${coachInstructionsHtml}
 
     <div class="client-timeline">
-      ${program.sessions.map((s) => `
-        <div class="client-tl-item ${s.done ? 'done' : ''}">
-          <div class="client-tl-icon">
-            ${icon(s.done ? "check" : "play", 20)}
+      ${program.sessions.map((s) => {
+        const sessionExercises = getExercisesForSession(s.name);
+        return `
+        <div class="client-tl-item ${s.done ? 'done' : ''}" style="display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <div class="client-tl-icon">
+                ${icon(s.done ? "check" : "play", 20)}
+              </div>
+              <div class="client-tl-content" style="margin: 0;">
+                <h3 class="client-tl-title">${escapeHtml(s.name)}</h3>
+                <div class="client-tl-meta">${s.exos} exercices · ${s.duree} estimée</div>
+              </div>
+            </div>
+            <div>
+              <button type="button" class="${s.done ? 'btn btn-outline-dark' : 'btn btn-primary'}" data-session-action="${s.done ? 'review' : 'start'}" data-session-name="${escapeHtml(s.name)}">
+                ${s.done ? "Revoir la séance" : "Commencer"}
+              </button>
+            </div>
           </div>
-          <div class="client-tl-content">
-            <h3 class="client-tl-title">${escapeHtml(s.name)}</h3>
-            <div class="client-tl-meta">${s.exos} exercices · ${s.duree} estimée</div>
-          </div>
-          <div>
-            <button type="button" class="${s.done ? 'btn btn-outline-dark' : 'btn btn-primary'}" data-session-action="${s.done ? 'review' : 'start'}" data-session-name="${escapeHtml(s.name)}">
-              ${s.done ? "Revoir la séance" : "Commencer"}
-            </button>
-          </div>
+          
+          <details style="padding-left: 52px;">
+            <summary style="font-size: 12px; font-weight: 700; color: var(--slate); cursor: pointer; user-select: none; display: flex; align-items: center; gap: 6px;">
+              ${icon("list", 14)} Aperçu des exercices
+            </summary>
+            <div style="margin-top: 12px; display: grid; gap: 10px;">
+              ${sessionExercises.map((exo, idx) => `
+                <div style="background: rgba(0,0,0,0.02); border: 1px solid var(--line); border-radius: 6px; padding: 12px; display: flex; flex-direction: column; gap: 6px;">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <strong style="font-size: 13px; color: var(--ink);">${idx + 1}. ${escapeHtml(exo.name)}</strong>
+                    <span style="font-size: 11px; background: white; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--line); color: var(--slate); font-family: monospace;">${escapeHtml(exo.detail)}</span>
+                  </div>
+                  <p style="font-size: 12px; color: var(--slate); margin: 0; line-height: 1.4;">${escapeHtml(exo.desc)}</p>
+                  <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(exo.name + ' exercice de musculation')}" target="_blank" rel="noopener noreferrer" style="font-size: 11px; font-weight: 600; color: white; background-color: #ff0000; padding: 4px 8px; border-radius: 4px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; width: fit-content; margin-top: 4px;">
+                    ${icon("play-circle", 12)} Voir en vidéo (YouTube)
+                  </a>
+                </div>
+              `).join("")}
+            </div>
+          </details>
         </div>
-      `).join("")}
+      `}).join("")}
     </div>
   </div>`;
 }

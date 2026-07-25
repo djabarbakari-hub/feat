@@ -5,7 +5,7 @@
    et non du JSX. Ne pas le traiter comme du JSX/TSX.
    ========================================================== */
 
-import { TRACKS } from "../data.js";
+import { TRACKS, COACH_PROGRAMS } from "../data.js";
 import { state } from "../state.js";
 import { icon, escapeHtml } from "../helpers.js";
 import { COACH_AVATAR } from "../assets.js";
@@ -111,113 +111,204 @@ export function renderHome() {
 }
 
 export function renderPrograms() {
-  const list = state.tracks && state.tracks.length > 0 ? state.tracks : TRACKS;
   return `
   <div class="section wrap">
-    <p class="eyebrow-moss font-mono">LES TROIS DÉPARTS</p>
-    <h1 class="h2 font-display">Nos programmes</h1>
-    <p class="hero-sub" style="max-width:620px; margin-top:12px;">Chaque parcours a été conçu pour répondre à un contexte réel : salle, maison avec matériel, ou entraînement au poids de corps.</p>
-    <div class="grid-3" style="margin-top:32px">
-      ${list.map((t) => `
-        <div class="card program-card">
-          ${icon(t.icon, 26, "var(--ember)")}
-          <h3 class="font-display" style="margin-top:16px;font-size:16px;color:var(--ink)">${t.label}</h3>
-          <p style="font-size:14px;color:var(--slate);margin-top:4px">${t.tagline}</p>
-          <p class="desc">${t.desc}</p>
-          <div class="font-mono" style="font-size:12px;color:var(--moss)">${t.dist} · 3 séances / semaine</div>
-          <div style="margin-top:12px">${renderTrialProgram(t.id)}</div>
-        </div>`).join("")}
+    <p class="eyebrow-moss font-mono" id="prog-eyebrow">PROGRAMMES OFFICIELS</p>
+    <h1 class="h2 font-display" id="prog-title">Nos Programmes d'Entraînement</h1>
+    <p class="hero-sub" style="max-width:700px; margin-top:12px;" id="prog-subtitle">Découvrez les 9 programmes complets et précis rédigés sur-mesure par le <strong>Coach Abdou BAKARI</strong>. Chaque parcours est adapté à vos objectifs et à votre environnement.</p>
+    
+    <div class="grid-2" style="margin-top:40px; gap:32px;" id="programs-grid">
+      ${COACH_PROGRAMS.map((p) => {
+        const isPriseDeMuscle = p.id.includes("prise-de-muscle");
+        const isPertePoids = p.id.includes("perte-poids");
+        const goalLabel = isPriseDeMuscle ? "Hypertrophie" : (isPertePoids ? "Perte de Poids" : "Santé & Endurance");
+        return `
+        <div class="card" id="program-card-${p.id}" style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid var(--ember); background: var(--surface); box-shadow: 0 4px 20px rgba(0,0,0,0.03); border-radius: 8px;">
+          <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 8px; flex-wrap: wrap;">
+              <span style="background: var(--ember); color: white; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace;">Programme Officiel</span>
+              <span style="font-size: 11px; font-weight: 700; color: var(--moss); background: rgba(60, 90, 70, 0.08); padding: 4px 8px; border-radius: 4px; font-family: 'IBM Plex Mono', monospace;">
+                🎯 ${goalLabel}
+              </span>
+            </div>
+            
+            <h3 class="font-display" style="font-size: 18px; color: var(--ink); margin: 0 0 4px; font-weight: 800; line-height: 1.3;">
+              ${escapeHtml(p.title.replace("MONPROGRAMMEFIT : ", ""))}
+            </h3>
+            <p style="font-size: 13px; font-weight: 600; color: var(--slate); margin-bottom: 16px;">
+              ${escapeHtml(p.subtitle)}
+            </p>
+
+            <!-- Grid de Statistiques -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: var(--chalk-soft); padding: 12px; border-radius: 6px; margin-bottom: 16px; border: 1px solid var(--line);">
+              <div style="text-align: center;">
+                <span style="display: block; font-size: 9px; color: var(--slate); text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 2px;">Durée</span>
+                <strong style="font-size: 12px; color: var(--ink);">${escapeHtml(p.duration)}</strong>
+              </div>
+              <div style="text-align: center; border-left: 1px solid var(--line); border-right: 1px solid var(--line);">
+                <span style="display: block; font-size: 9px; color: var(--slate); text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 2px;">Fréquence</span>
+                <strong style="font-size: 12px; color: var(--ink);">${escapeHtml(p.frequency)}</strong>
+              </div>
+              <div style="text-align: center;">
+                <span style="display: block; font-size: 9px; color: var(--slate); text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 2px;">Niveau</span>
+                <strong style="font-size: 11px; color: var(--ink);">${escapeHtml(p.level)}</strong>
+              </div>
+            </div>
+
+            <!-- Objectif -->
+            <p style="font-size: 13px; color: var(--slate); margin-bottom: 16px; line-height: 1.5; min-height: 60px;">
+              ${escapeHtml(p.objective)}
+            </p>
+
+            <!-- Équipement Requis -->
+            <div style="margin-bottom: 20px;">
+              <h4 style="font-size: 11px; text-transform: uppercase; color: var(--ink); font-weight: 700; margin: 0 0 8px; font-family: 'IBM Plex Mono', monospace;">🛠 Équipement requis</h4>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                ${p.equipment.map(eq => `<span style="font-size: 11px; background: white; border: 1px solid var(--line); color: var(--slate); padding: 4px 8px; border-radius: 4px;">• ${escapeHtml(eq)}</span>`).join("")}
+              </div>
+            </div>
+
+            <!-- Accordéon Interactif pour Dévoiler les Détails -->
+            <details style="border-top: 1px dashed var(--line); margin-top: 16px; padding-top: 12px;">
+              <summary style="font-size: 12px; font-weight: 700; color: var(--ember); user-select: none; display: flex; align-items: center; gap: 6px; outline: none; cursor: pointer;">
+                <span>📖 Consulter le programme détaillé & séances</span>
+              </summary>
+              
+              <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 16px; text-align: left; cursor: default;" onclick="event.stopPropagation();">
+                
+                <!-- Échauffement -->
+                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid var(--line);">
+                  <h4 style="font-size: 11px; text-transform: uppercase; color: var(--ember); font-weight: 800; margin: 0 0 6px; font-family: 'IBM Plex Mono', monospace;">🔥 Échauffement (${escapeHtml(p.warmup.duration)})</h4>
+                  <ul style="margin: 0; padding-left: 16px; font-size: 12px; color: var(--slate); line-height: 1.5;">
+                    ${p.warmup.steps.map(step => `<li>${escapeHtml(step)}</li>`).join("")}
+                  </ul>
+                </div>
+
+                <!-- Consignes & Repos -->
+                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid var(--line);">
+                  <h4 style="font-size: 11px; text-transform: uppercase; color: var(--moss); font-weight: 800; margin: 0 0 6px; font-family: 'IBM Plex Mono', monospace;">⏱ Consignes de Repos & Tempo</h4>
+                  <p style="font-size: 12px; color: var(--ink); margin: 0 0 4px; line-height: 1.5;"><strong>Récupération :</strong> ${escapeHtml(p.generalRules.rest)}</p>
+                  ${p.generalRules.tempo ? `<p style="font-size: 12px; color: var(--slate); margin: 0 0 4px; line-height: 1.5;"><strong>Tempo :</strong> ${escapeHtml(p.generalRules.tempo)}</p>` : ""}
+                  ${p.generalRules.intensity ? `<p style="font-size: 12px; color: var(--slate); margin: 0 0 4px; line-height: 1.5;"><strong>Intensité :</strong> ${escapeHtml(p.generalRules.intensity)}</p>` : ""}
+                  ${p.generalRules.progression ? `<p style="font-size: 12px; color: var(--slate); margin: 0; line-height: 1.5;"><strong>Progression :</strong> ${escapeHtml(p.generalRules.progression)}</p>` : ""}
+                </div>
+
+                <!-- Calendrier de la Semaine -->
+                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid var(--line);">
+                  <h4 style="font-size: 11px; text-transform: uppercase; color: var(--ink); font-weight: 800; margin: 0 0 6px; font-family: 'IBM Plex Mono', monospace;">📅 Calendrier de la semaine</h4>
+                  <div style="display: flex; flex-direction: column; gap: 4px;">
+                    ${p.weeklySchedule.map(s => `
+                      <div style="display: flex; font-size: 12px; border-bottom: 1px solid var(--line); padding: 4px 0; justify-content: space-between;">
+                        <span style="width: 80px; font-weight: 700; color: var(--ink);">${escapeHtml(s.day)}</span>
+                        <span style="color: var(--slate); flex: 1; text-align: left; padding-left: 12px;">${escapeHtml(s.focus)}</span>
+                      </div>
+                    `).join("")}
+                  </div>
+                </div>
+
+                <!-- Exercices détaillés par séance -->
+                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid var(--line);">
+                  <h4 style="font-size: 11px; text-transform: uppercase; color: var(--ink); font-weight: 800; margin: 0 0 8px; font-family: 'IBM Plex Mono', monospace;">💪 Détail des Exercices par Séance</h4>
+                  ${p.sessions.map(sess => `
+                    <details style="margin-bottom: 8px; background: var(--chalk-soft); padding: 8px 12px; border-radius: 4px; border: 1px solid var(--line);">
+                      <summary style="font-size: 12px; font-weight: 700; color: var(--ink); display: flex; justify-content: space-between; align-items: center; user-select: none; outline: none; cursor: pointer;">
+                        <span>${escapeHtml(sess.name.replace(" — Focus technique", "").replace(" — Intensité maîtrisée", "").replace(" — Endurance active", ""))}</span>
+                        <span style="font-size: 11px; font-weight: normal; color: var(--slate);">${escapeHtml(sess.duration)} · ${sess.exercises.length} exos</span>
+                      </summary>
+                      <div style="margin-top: 8px; font-size: 12px; display: flex; flex-direction: column; gap: 8px;">
+                        ${sess.exercises.map((ex, idx) => `
+                          <div style="border-bottom: 1px dashed var(--line); padding-bottom: 6px; margin-bottom: 4px;">
+                            <div style="display: flex; justify-content: space-between; font-weight: 600; color: var(--ink);">
+                              <span>${idx + 1}. ${escapeHtml(ex.name)}</span>
+                              <span style="color: var(--ember); white-space: nowrap; margin-left: 8px;">${escapeHtml(ex.sets)} × ${escapeHtml(ex.reps)}</span>
+                            </div>
+                            <div style="color: var(--slate); font-size: 11px; margin-top: 2px;">
+                              Récupération : <strong>${escapeHtml(ex.rest)}</strong> ${ex.type ? `· <span style="text-transform: uppercase; font-size: 9px; padding: 1px 4px; background: white; border: 1px solid var(--line); border-radius: 2px;">${escapeHtml(ex.type)}</span>` : ""}
+                            </div>
+                            ${ex.desc ? `<p style="color: var(--slate); font-size: 11px; margin: 4px 0 0; line-height: 1.4;">${escapeHtml(ex.desc)}</p>` : ""}
+                          </div>
+                        `).join("")}
+                      </div>
+                    </details>
+                  `).join("")}
+                </div>
+
+              </div>
+            </details>
+          </div>
+          
+          <div style="margin-top: 24px;">
+            ${state.role === 'client' ? `
+              <button class="btn btn-moss btn-select-program w-full" data-program-id="${p.id}" style="font-weight: 700; justify-content: center; width: 100%;">
+                Activer ce programme
+              </button>
+            ` : `
+              <button class="btn btn-ember w-full" data-nav="quiz" style="font-weight: 700; justify-content: center; width: 100%;">
+                S'inscrire et démarrer ce programme
+              </button>
+            `}
+          </div>
+        </div>`;
+      }).join("")}
     </div>
 
-    <div class="card" style="margin-top:32px;padding:24px">
-      <p class="eyebrow-moss font-mono">TARIFS</p>
-      <h2 class="h2 font-display" style="font-size:24px;margin-bottom:20px">Choisis l'offre qui te correspond</h2>
-      <div class="grid-3">
-        <div class="card" style="padding:20px">
-          <h3 class="font-display" style="font-size:18px;color:var(--ink);margin-bottom:8px">Abonnement Flex</h3>
-          <p style="font-size:14px;color:var(--slate);margin-bottom:12px">Accès à tous les programmes (salle/maison/extérieur)</p>
-          <div class="stat-val font-display">8 000 FCFA / mois</div>
-          <div class="font-mono" style="font-size:12px;color:var(--moss);margin-top:8px">Mensuel</div>
+    <!-- Section Tarification -->
+    <div class="card" style="margin-top:48px; padding:32px" id="tarifs-section">
+      <p class="eyebrow-moss font-mono" id="tarifs-eyebrow">TARIFS TRANSPARENTS</p>
+      <h2 class="h2 font-display" style="font-size:24px; margin-bottom:20px" id="tarifs-title">Choisissez l'offre qui vous correspond</h2>
+      <p style="font-size:14px; color:var(--slate); margin-bottom:24px; max-width:650px;">Un accompagnement sur-mesure pour votre transformation physique. Paiement direct et sécurisé en FCFA.</p>
+      
+      <div class="grid-3" id="tarifs-grid">
+        <div class="card" style="padding:24px; background: white; border: 1px solid var(--line); display: flex; flex-direction: column;" id="tarif-flex">
+          <h3 class="font-display" style="font-size:18px; color:var(--ink); margin-bottom:8px">Abonnement Flex</h3>
+          <p style="font-size:13px; color:var(--slate); margin-bottom:16px; flex-grow: 1;">Accès illimité à tous les programmes du Coach Abdou BAKARI (Maison, Salle, Sans matériel).</p>
+          <div class="stat-val font-display" style="font-size: 20px; color: var(--ember);">8 000 FCFA <span style="font-size: 13px; font-family: var(--font-sans); font-weight: normal; color: var(--slate);">/ mois</span></div>
+          <div class="font-mono" style="font-size:11px; color:var(--moss); margin-top:12px; margin-bottom: 16px; font-weight:600;">Sans engagement</div>
+          <a href="https://wa.me/2290191720596?text=${encodeURIComponent('Bonjour Coach Abdou, je souhaite souscrire à l\'Abonnement Flex à 8000 FCFA/mois.')}" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="width: 100%; justify-content: center; text-decoration: none;">Souscrire via WhatsApp</a>
         </div>
-        <div class="card" style="padding:20px">
-          <h3 class="font-display" style="font-size:18px;color:var(--ink);margin-bottom:8px">Abonnement Premium</h3>
-          <p style="font-size:14px;color:var(--slate);margin-bottom:12px">Consultation personnalisée/mois + accès prioritaire aux nouveaux programmes</p>
-          <div class="stat-val font-display">15 000 FCFA / mois</div>
-          <div class="font-mono" style="font-size:12px;color:var(--moss);margin-top:8px">Mensuel</div>
+        
+        <div class="card" style="padding:24px; background: white; border: 2px solid var(--ember); position: relative; display: flex; flex-direction: column;" id="tarif-premium">
+          <div style="position: absolute; top: -12px; right: 16px; background: var(--ember); color: white; font-size: 9px; font-weight: 800; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace;">Recommandé</div>
+          <h3 class="font-display" style="font-size:18px; color:var(--ink); margin-bottom:8px">Abonnement Premium</h3>
+          <p style="font-size:13px; color:var(--slate); margin-bottom:16px; flex-grow: 1;">Tous les programmes + 1 consultation de suivi visio par mois et ajustements en direct par le coach.</p>
+          <div class="stat-val font-display" style="font-size: 20px; color: var(--ember);">15 000 FCFA <span style="font-size: 13px; font-family: var(--font-sans); font-weight: normal; color: var(--slate);">/ mois</span></div>
+          <div class="font-mono" style="font-size:11px; color:var(--moss); margin-top:12px; margin-bottom: 16px; font-weight:600;">Suivi prioritaire inclus</div>
+          <a href="https://wa.me/2290191720596?text=${encodeURIComponent('Bonjour Coach Abdou, je souhaite souscrire à l\'Abonnement Premium à 15000 FCFA/mois avec suivi.')}" target="_blank" rel="noopener noreferrer" class="btn btn-ember" style="width: 100%; justify-content: center; text-decoration: none;">Souscrire via WhatsApp</a>
         </div>
-        <div class="card" style="padding:20px">
-          <h3 class="font-display" style="font-size:18px;color:var(--ink);margin-bottom:8px">Programme 30 Jours Défi</h3>
-          <p style="font-size:14px;color:var(--slate);margin-bottom:12px">Défi intensif de 30 jours avec objectif précis + suivi quotidien</p>
-          <div class="stat-val font-display">15 000 FCFA</div>
-          <div class="font-mono" style="font-size:12px;color:var(--moss);margin-top:8px">30 jours</div>
+        
+        <div class="card" style="padding:24px; background: white; border: 1px solid var(--line); display: flex; flex-direction: column;" id="tarif-defi">
+          <h3 class="font-display" style="font-size:18px; color:var(--ink); margin-bottom:8px">Programme 30 Jours Défi</h3>
+          <p style="font-size:13px; color:var(--slate); margin-bottom:16px; flex-grow: 1;">Formule de choc intensive sur 30 jours pour relancer la forme avec objectif ciblé et messagerie directe.</p>
+          <div class="stat-val font-display" style="font-size: 20px; color: var(--ember);">15 000 FCFA</div>
+          <div class="font-mono" style="font-size:11px; color:var(--moss); margin-top:12px; margin-bottom: 16px; font-weight:600;">Paiement unique</div>
+          <a href="https://wa.me/2290191720596?text=${encodeURIComponent('Bonjour Coach Abdou, je souhaite participer au Programme 30 Jours Défi (15000 FCFA).')}" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="width: 100%; justify-content: center; text-decoration: none;">Souscrire via WhatsApp</a>
         </div>
       </div>
-      <div class="card" style="margin-top:20px;padding:20px;background:var(--chalk-soft)">
-        <h3 class="font-display" style="font-size:18px;color:var(--ink);margin-bottom:8px">Séance Découverte Gratuite</h3>
-        <p style="font-size:14px;color:var(--slate);margin-bottom:12px">1 semaine d'accès gratuit à 3 programmes de base + 1 consultation</p>
-        <div class="font-mono" style="font-size:12px;color:var(--moss)">Gratuit</div>
+      
+      <div class="card" style="margin-top:24px; padding:20px; background:var(--chalk-soft); border: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;" id="tarif-decouverte">
+        <div>
+          <h3 class="font-display" style="font-size:16px; color:var(--ink); margin-bottom:4px">Séance Découverte Gratuite</h3>
+          <p style="font-size:13px; color:var(--slate); margin:0">Bénéficiez de 1 semaine d'accès complet à nos séances d'essai pour évaluer votre motivation.</p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="font-mono" style="font-size:12px; color:var(--moss); font-weight: 700; background: rgba(60, 90, 70, 0.08); padding: 4px 10px; border-radius: 4px;">100% GRATUIT</div>
+          <a href="https://wa.me/2290191720596?text=${encodeURIComponent('Bonjour Coach Abdou, je suis intéressé(e) par la séance découverte gratuite.')}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark" style="text-decoration: none; font-size: 12px; padding: 8px 12px;">Demander l'accès</a>
+        </div>
       </div>
     </div>
 
-    <div class="cta-band" style="margin-top:40px;">
+    <!-- Bandeau Appel à l'action -->
+    <div class="cta-band" style="margin-top:48px;" id="programs-cta">
       <div class="wrap">
-        <h3 class="font-display">Le bon programme, le bon rythme, la bonne méthode.</h3>
-        <button class="btn btn-ember" data-nav="signup" aria-label="Démarrer">Démarrer</button>
+        <h3 class="font-display" style="font-size: 22px; line-height: 1.4;">Atteignez vos objectifs avec rigueur et méthode.</h3>
+        ${state.role === 'client' ? `
+          <button class="btn btn-ember" data-nav="client-program" aria-label="Consulter mon entraînement">Consulter mon entraînement</button>
+        ` : `
+          <button class="btn btn-ember" data-nav="quiz" aria-label="Démarrer mon programme">Commencer mon Onboarding</button>
+        `}
       </div>
     </div>
   </div>`;
-}
-
-export function renderTrialProgram(id) {
-  if (id === "gym") {
-    return `
-      <div class="trial-program">
-        <div class="font-mono" style="font-size:12px;color:var(--ink-muted3);margin-bottom:6px">Programme d'essai gratuit</div>
-        <div style="font-weight:600;color:var(--ink);margin-bottom:8px">4 séances / semaine — Poussée / Tirage / Jambes + Cardio</div>
-        <ul style="font-size:14px;color:var(--slate);margin:0 0 8px 16px">
-          <li><strong>Séance 1 — Push</strong> : développé couché, développé militaire, dips — 40–50 min</li>
-          <li><strong>Séance 2 — Pull</strong> : traction/row, tirage horizontal, curl — 40–50 min</li>
-          <li><strong>Séance 3 — Jambes</strong> : squat, fente, soulevé roumain — 45–55 min</li>
-          <li><strong>Séance 4 — Cardio</strong> : 30–40 min (fractionné ou endurance)</li>
-        </ul>
-      </div>`;
-  }
-  if (id === "home-equip") {
-    return `
-      <div class="trial-program" style="border-left: 3px solid var(--ember); padding-left: 12px; background: rgba(224, 70, 50, 0.03); border-radius: 6px;">
-        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
-          <span style="background: var(--ember); color: white; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">Officiel Coach Abdou</span>
-          <span style="font-size: 11px; font-weight: 700; color: var(--ink);">MONPROGRAMMEFIT</span>
-        </div>
-        <div style="font-weight:700;color:var(--ink);margin-bottom:6px;font-size:14px;">PROGRAMME PRISE DE MUSCLE — 5 séances / semaine</div>
-        <p style="font-size: 12px; color: var(--slate); margin: 0 0 8px; line-height: 1.4;">
-          8 semaines pour développer votre masse musculaire à domicile avec haltères, élastiques et banc.
-        </p>
-        <ul style="font-size:13px;color:var(--slate);margin:0 0 8px 16px; line-height: 1.5;">
-          <li><strong>Lundi</strong> : Pectoraux & Biceps (7 exercices · 45 min)</li>
-          <li><strong>Mardi</strong> : Dos & Triceps (7 exercices · 45 min)</li>
-          <li><strong>Mercredi</strong> : Jambes (6 exercices · 45 min)</li>
-          <li><strong>Jeudi</strong> : Haut du corps Push/Pull (6 exercices · 40 min)</li>
-          <li><strong>Vendredi</strong> : Épaules & Bras (8 exercices · 50 min)</li>
-        </ul>
-        <div style="font-size:11px; color:var(--moss); font-weight:600; font-family:'IBM Plex Mono', monospace;">
-          ⏱ Repos 90s (principaux) / 45-60s (isolation) · Tempo 2-0-2
-        </div>
-      </div>`;
-  }
-  // bodyweight
-  return `
-    <div class="trial-program">
-      <div class="font-mono" style="font-size:12px;color:var(--ink-muted3);margin-bottom:6px">Programme d'essai gratuit</div>
-      <div style="font-weight:600;color:var(--ink);margin-bottom:8px">5 séances / semaine — Poids du corps</div>
-      <ul style="font-size:14px;color:var(--slate);margin:0 0 8px 16px">
-        <li><strong>Séance 1 — Haut</strong> : pompes progressives, dips entre chaises — 30–40 min</li>
-        <li><strong>Séance 2 — Bas</strong> : squat, pistol-assisted, fentes sautées — 35–45 min</li>
-        <li><strong>Séance 3 — Full</strong> : circuit (burpees, mountain climbers, planche) — 30–35 min</li>
-        <li><strong>Séance 4 — Core + mobilité</strong> : planche, hollow, stretching — 25–30 min</li>
-        <li><strong>Séance 5 — Endurance</strong> : running ou cardio à la maison 30–40 min</li>
-      </ul>
-    </div>`;
 }
 
 export function renderBlog() {
