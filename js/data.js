@@ -12,7 +12,7 @@ export const TRACKS = [
     dist: "12 semaines",
     tagline: "Accès machines & poids libres",
     desc: "Programmes structurés autour des équipements de salle : progression en charge, split par groupes musculaires, suivi des séries.",
-    img: "https://images.unsplash.com/photo-1758223521209-f70658aa6bb6?auto=format&fit=crop&w=800&q=80",
+    img: "/images/salle-de-gym.PNG",
   },
   {
     id: "home-equip",
@@ -30,7 +30,7 @@ export const TRACKS = [
     dist: "8 semaines",
     tagline: "Zéro matériel, marche & running inclus",
     desc: "Aucun équipement requis : renforcement au poids du corps, routines de marche active et progression running débutant.",
-    img: "https://images.unsplash.com/photo-1699959381686-2bb76f9a64c7?auto=format&fit=crop&w=800&q=80",
+    img: "/images/maison-au-poids-du-corps.jpg",
   },
 ];
 
