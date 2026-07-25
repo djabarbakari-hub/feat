@@ -85,6 +85,128 @@ function validatePasswordComplexity(password) {
   return null;
 }
 
+/**
+ * Déduit l'objectif (goal) à partir de l'identifiant du programme si non fourni.
+ */
+function deduceGoalFromProgramId(programId) {
+  if (!programId) return "musculation";
+  if (programId.startsWith("perte-poids")) return "perte-poids";
+  if (programId.startsWith("sante-endurance")) return "endurance-sante";
+  if (programId.startsWith("prise-de-muscle")) return "musculation";
+  return "musculation";
+}
+
+/**
+ * Fonction centralisée pour appliquer la sélection d'un programme.
+ * Harmonise les données écrites dans l'état local et Firestore (goal, track, niveau, frequence, quizAnswers, program, updatedAt).
+ * 
+ * @param {Object} coachProgram - Le programme issu de COACH_PROGRAMS.
+ * @param {Object} options - Options supplémentaires ({ answers, skipConfirmation, goal }).
+ * @returns {Promise<boolean>} True si le programme a été appliqué, false si annulé par l'utilisateur.
+ */
+export async function applyProgramSelection(coachProgram, options = {}) {
+  if (!coachProgram) return false;
+
+  const currentProgram = state.clientProfile?.program;
+  
+  // 1. Confirmation explicite si un programme est déjà actif et différent
+  if (!options.skipConfirmation && currentProgram && currentProgram.coachProgramId && currentProgram.coachProgramId !== coachProgram.id) {
+    const oldCoachP = COACH_PROGRAMS.find(p => p.id === currentProgram.coachProgramId);
+    const oldName = oldCoachP 
+      ? `${oldCoachP.title.replace("MONPROGRAMMEFIT : ", "")} (${oldCoachP.subtitle})` 
+      : (currentProgram.trackLabel || "Programme actif");
+    const newName = `${coachProgram.title.replace("MONPROGRAMMEFIT : ", "")} (${coachProgram.subtitle})`;
+    
+    const confirmed = confirm(`Tu as déjà un programme actif (${oldName}). Le remplacer par ${newName} ? Ta progression actuelle sera réinitialisée.`);
+    if (!confirmed) {
+      return false;
+    }
+  }
+
+  // 2. Harmonisation complète des données
+  const answers = options.answers || state.quizAnswers || {};
+  const goal = answers.objectif || options.goal || deduceGoalFromProgramId(coachProgram.id);
+  const track = answers.lieu || coachProgram.trackId || state.clientProfile?.track || "home-equip";
+  const niveau = answers.niveau || state.clientProfile?.niveau || coachProgram.level || "Débutant - Intermédiaire";
+  const frequence = answers.frequence || state.clientProfile?.frequence || coachProgram.frequency || "5 séances / semaine";
+  const physique = answers.physique || state.clientProfile?.physique || {};
+
+  const quizAnswers = {
+    ...state.clientProfile?.quizAnswers,
+    ...answers,
+    objectif: goal,
+    lieu: track,
+    niveau,
+    frequence
+  };
+
+  const program = {
+    coachProgramId: coachProgram.id,
+    trackLabel: `${coachProgram.title.replace("MONPROGRAMMEFIT : ", "")} (${coachProgram.subtitle}) — Coach Abdou BAKARI`,
+    track: track,
+    week: 1,
+    totalWeeks: 8,
+    nextSession: coachProgram.sessions[0]?.name || "",
+    history: [
+      { name: "Semaine 1", done: 0, total: coachProgram.sessions.length }
+    ],
+    sessions: coachProgram.sessions.map((s, idx) => ({
+      id: `s${idx + 1}`,
+      name: s.name,
+      exos: s.exercises.length,
+      duree: s.duration,
+      done: false,
+      weekNumber: 1
+    }))
+  };
+
+  // Mise à jour de l'état local
+  state.clientProfile = {
+    ...state.clientProfile,
+    goal,
+    track,
+    niveau,
+    frequence,
+    physique,
+    quizAnswers,
+    program,
+  };
+
+  persistState();
+
+  // 3. Écriture synchronisée dans Firestore pour l'utilisateur connecté
+  const currentUser = auth.currentUser;
+  if (currentUser && !state.simulationActive) {
+    try {
+      const userRef = doc(db, "users", currentUser.uid);
+      await setDoc(userRef, {
+        goal,
+        track,
+        niveau,
+        frequence,
+        weight: physique.poids ? parseFloat(physique.poids) : (state.clientProfile.weight || null),
+        height: physique.taille ? parseFloat(physique.taille) : (state.clientProfile.height || null),
+        age: physique.age ? parseInt(physique.age, 10) : (state.clientProfile.age || null),
+        quizAnswers,
+        program,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+
+      // Enregistrement des séances dans la sous-collection users/{uid}/sessions
+      const batch = writeBatch(db);
+      program.sessions.forEach((s) => {
+        const sRef = doc(db, "users", currentUser.uid, "sessions", s.id);
+        batch.set(sRef, s);
+      });
+      await batch.commit();
+    } catch (err) {
+      console.error("Erreur d'enregistrement Firestore du programme:", err);
+    }
+  }
+
+  return true;
+}
+
 document.addEventListener("input", (e) => {
   if (e.target.matches('[data-contact-name]')) {
     state.drafts.contact.name = e.target.value;
@@ -233,71 +355,23 @@ document.addEventListener("click", async (e) => {
       coachP = COACH_PROGRAMS[0];
     }
 
-    const program = {
-      coachProgramId: coachP.id,
-      trackLabel: `${coachP.title.replace("MONPROGRAMMEFIT : ", "")} (${coachP.subtitle}) — Coach Abdou BAKARI`,
-      track: track.id,
-      week: 1,
-      totalWeeks: 8,
-      nextSession: coachP.sessions[0].name,
-      history: [
-        { name: "Semaine 1", done: 0, total: coachP.sessions.length }
-      ],
-      sessions: coachP.sessions.map((s, idx) => ({
-        id: `s${idx + 1}`,
-        name: s.name,
-        exos: s.exercises.length,
-        duree: s.duration,
-        done: false,
-        weekNumber: 1
-      }))
-    };
-
-    state.clientProfile = {
-      ...state.clientProfile,
-      goal: answers.objectif || "",
-      track: answers.lieu || "",
-      niveau: answers.niveau || "",
-      frequence: answers.frequence || "",
-      physique: answers.physique || {},
-      quizAnswers: answers,
-      program,
-    };
-    state.quizStep = QUIZ_STEPS.length;
-    persistState();
-
-    // Écriture dans Firestore pour l'utilisateur connecté
     const currentUser = auth.currentUser;
-    if (currentUser) {
-      try {
-        const userRef = doc(db, "users", currentUser.uid);
-        await setDoc(userRef, {
-          goal: answers.objectif || "",
-          track: answers.lieu || "",
-          niveau: answers.niveau || "",
-          frequence: answers.frequence || "",
-          weight: answers.physique?.poids ? parseFloat(answers.physique.poids) : null,
-          height: answers.physique?.taille ? parseFloat(answers.physique.taille) : null,
-          age: answers.physique?.age ? parseInt(answers.physique.age, 10) : null,
-          quizAnswers: answers,
-          program,
-          updatedAt: new Date().toISOString()
-        }, { merge: true });
-
-        // Enregistrement des séances dans la sous-collection users/{uid}/sessions
-        const batch = writeBatch(db);
-        program.sessions.forEach((s) => {
-          const sRef = doc(db, "users", currentUser.uid, "sessions", s.id);
-          batch.set(sRef, s);
-        });
-        await batch.commit();
-      } catch (err) {
-        console.error("Erreur d'enregistrement Firestore du quiz:", err);
-      }
+    if (!currentUser && state.role === "guest") {
+      state.pendingProgramId = coachP.id;
+      state.quizStep = QUIZ_STEPS.length;
+      persistState();
+      showToast("Veuillez vous inscrire ou vous connecter pour enregistrer votre programme.");
+      navigate("signup");
+      return;
     }
 
-    render();
-    navigate("client-dashboard");
+    const applied = await applyProgramSelection(coachP, { answers, fromQuiz: true });
+    if (applied) {
+      state.quizStep = QUIZ_STEPS.length;
+      persistState();
+      render();
+      navigate("client-dashboard");
+    }
     return;
   }
 
@@ -306,59 +380,21 @@ document.addEventListener("click", async (e) => {
     const programId = selectProgBtn.dataset.programId;
     const coachP = COACH_PROGRAMS.find(p => p.id === programId);
     if (coachP) {
-      const program = {
-        coachProgramId: coachP.id,
-        trackLabel: `${coachP.title.replace("MONPROGRAMMEFIT : ", "")} (${coachP.subtitle}) — Coach Abdou BAKARI`,
-        track: coachP.trackId,
-        week: 1,
-        totalWeeks: 8,
-        nextSession: coachP.sessions[0].name,
-        history: [
-          { name: "Semaine 1", done: 0, total: coachP.sessions.length }
-        ],
-        sessions: coachP.sessions.map((s, idx) => ({
-          id: `s${idx + 1}`,
-          name: s.name,
-          exos: s.exercises.length,
-          duree: s.duration,
-          done: false,
-          weekNumber: 1
-        }))
-      };
-
-      state.clientProfile = {
-        ...state.clientProfile,
-        track: coachP.trackId,
-        program,
-      };
-
-      persistState();
-
       const currentUser = auth.currentUser;
-      if (currentUser) {
-        try {
-          const userRef = doc(db, "users", currentUser.uid);
-          await setDoc(userRef, {
-            track: coachP.trackId,
-            program,
-            updatedAt: new Date().toISOString()
-          }, { merge: true });
-
-          // Enregistrement des séances dans la sous-collection users/{uid}/sessions
-          const batch = writeBatch(db);
-          program.sessions.forEach((s) => {
-            const sRef = doc(db, "users", currentUser.uid, "sessions", s.id);
-            batch.set(sRef, s);
-          });
-          await batch.commit();
-        } catch (err) {
-          console.error("Erreur d'enregistrement du changement de programme dans Firestore:", err);
-        }
+      if (!currentUser && state.role === "guest") {
+        state.pendingProgramId = coachP.id;
+        persistState();
+        showToast("Veuillez vous inscrire ou vous connecter pour activer ce programme.");
+        navigate("signup");
+        return;
       }
 
-      showToast("Programme activé avec succès !");
-      render();
-      navigate("client-program");
+      const applied = await applyProgramSelection(coachP);
+      if (applied) {
+        showToast("Programme activé avec succès !");
+        render();
+        navigate("client-program");
+      }
     }
     return;
   }
@@ -961,6 +997,19 @@ document.addEventListener("click", async (e) => {
       state.ui.signupPending = false;
       state.ui.signupError = "";
 
+      if (state.pendingProgramId && assignedRole !== "admin") {
+        const pendingCoachP = COACH_PROGRAMS.find(p => p.id === state.pendingProgramId);
+        state.pendingProgramId = null;
+        persistState();
+        if (pendingCoachP) {
+          await applyProgramSelection(pendingCoachP, { skipConfirmation: true });
+          showToast("Compte créé et programme activé avec succès !");
+          render();
+          navigate("client-program");
+          return;
+        }
+      }
+
       persistState();
       navigate(assignedRole === "admin" ? "admin-dashboard" : "quiz");
     } catch (error) {
@@ -1095,6 +1144,19 @@ document.addEventListener("click", async (e) => {
       state.ui.loginPending = false;
       state.ui.loginError = "";
 
+      if (state.pendingProgramId && userRole !== "admin") {
+        const pendingCoachP = COACH_PROGRAMS.find(p => p.id === state.pendingProgramId);
+        state.pendingProgramId = null;
+        persistState();
+        if (pendingCoachP) {
+          await applyProgramSelection(pendingCoachP, { skipConfirmation: true });
+          showToast("Connexion réussie et programme activé avec succès !");
+          render();
+          navigate("client-program");
+          return;
+        }
+      }
+
       persistState();
       navigate(userRole === "admin" ? "admin-dashboard" : "client-dashboard");
     } catch (error) {
@@ -1186,6 +1248,19 @@ document.addEventListener("click", async (e) => {
       state.ui.googleAuthPending = false;
       state.ui.loginError = "";
       state.ui.signupError = "";
+
+      if (state.pendingProgramId && userRole !== "admin") {
+        const pendingCoachP = COACH_PROGRAMS.find(p => p.id === state.pendingProgramId);
+        state.pendingProgramId = null;
+        persistState();
+        if (pendingCoachP) {
+          await applyProgramSelection(pendingCoachP, { skipConfirmation: true });
+          showToast("Connexion réussie et programme activé avec succès !");
+          render();
+          navigate("client-program");
+          return;
+        }
+      }
 
       persistState();
 

@@ -271,7 +271,7 @@ export function renderPrograms() {
                 Activer ce programme
               </button>
             ` : `
-              <button class="btn btn-ember w-full" data-nav="quiz" style="font-weight: 700; justify-content: center; width: 100%;">
+              <button class="btn btn-ember btn-select-program w-full" data-program-id="${p.id}" style="font-weight: 700; justify-content: center; width: 100%;">
                 S'inscrire et démarrer ce programme
               </button>
             `}

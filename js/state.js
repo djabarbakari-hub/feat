@@ -7,6 +7,7 @@ export const STORAGE_KEY = "monprogrammefit-state-v1";
 export const state = {
   page: "home",
   role: "guest", // guest | client | admin
+  pendingProgramId: null,
   quizStep: 0,
   quizAnswers: {},
   loginTab: "client",
@@ -70,6 +71,7 @@ export function persistState() {
     const snapshot = {
       page: state.page,
       role: state.role,
+      pendingProgramId: state.pendingProgramId,
       quizStep: state.quizStep,
       quizAnswers: state.quizAnswers,
       loginTab: state.loginTab,
@@ -100,6 +102,7 @@ export function restorePersistedState(validPageKeys = []) {
       const parsed = JSON.parse(saved);
       if (parsed.page) state.page = parsed.page;
       if (parsed.role) state.role = parsed.role;
+      if (parsed.pendingProgramId !== undefined) state.pendingProgramId = parsed.pendingProgramId;
       if (typeof parsed.quizStep === "number") state.quizStep = parsed.quizStep;
       if (parsed.quizAnswers) state.quizAnswers = parsed.quizAnswers;
       if (parsed.loginTab) state.loginTab = parsed.loginTab;
