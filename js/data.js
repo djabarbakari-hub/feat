@@ -1,3 +1,5 @@
+import { TRACK_GYM_IMG, TRACK_BODYWEIGHT_IMG } from "./assets.js";
+
 /* ==========================================================
    data.js — Données statiques de l'application (mock).
    Aucune logique ici : uniquement des constantes.
@@ -12,7 +14,7 @@ export const TRACKS = [
     dist: "12 semaines",
     tagline: "Accès machines & poids libres",
     desc: "Programmes structurés autour des équipements de salle : progression en charge, split par groupes musculaires, suivi des séries.",
-    img: "/images/salle-de-gym.PNG",
+    img: TRACK_GYM_IMG,
   },
   {
     id: "home-equip",
@@ -30,7 +32,7 @@ export const TRACKS = [
     dist: "8 semaines",
     tagline: "Zéro matériel, marche & running inclus",
     desc: "Aucun équipement requis : renforcement au poids du corps, routines de marche active et progression running débutant.",
-    img: "/images/maison-au-poids-du-corps.jpg",
+    img: TRACK_BODYWEIGHT_IMG,
   },
 ];
 
