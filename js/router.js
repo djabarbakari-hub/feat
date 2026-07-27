@@ -34,6 +34,17 @@ export function navigate(page, { replace = false } = {}) {
     page = "signup";
   }
 
+  // Réinitialisation des messages d'erreur et de succès de connexion s'il ne s'agit pas de la page de connexion
+  if (page !== "login") {
+    state.ui.loginError = "";
+    state.ui.loginSuccessMessage = "";
+  }
+  // Réinitialisation des messages d'erreur et de succès d'inscription s'il ne s'agit pas de la page d'inscription
+  if (page !== "signup") {
+    state.ui.signupError = "";
+    state.ui.signupSuccessMessage = "";
+  }
+
   if (!replace && state.page && state.page !== page) {
     state.history.push(state.page);
   }

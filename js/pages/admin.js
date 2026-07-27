@@ -553,6 +553,7 @@ export function showClientDetailsModal(client) {
               ${icon("phone", 14)} Appeler
             </a>
           ` : ""}
+          <!-- [COMMENTAIRE] Bouton permettant à l'administrateur de supprimer définitivement le compte d'un client et de purger ses données -->
           <button class="btn btn-delete-client-account" data-client-id="${escapeHtml(client.id || client.uid || "")}" data-client-email="${escapeHtml(client.email || "")}" data-client-name="${escapeHtml(fullName)}" style="font-size: 13px; background: #dc2626; color: white; border: none; padding: 10px 14px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; transition: background 0.2s;" onmouseover="this.style.background='#b91c1c'" onmouseout="this.style.background='#dc2626'">
             ${icon("trash-2", 14)} Supprimer le compte
           </button>

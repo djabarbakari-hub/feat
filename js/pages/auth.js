@@ -45,6 +45,9 @@ export function renderLogin() {
           <button type="button" id="btn-forgot-password-link" style="background:none;border:none;padding:0;color:var(--ember);font-size:12px;font-weight:600;cursor:pointer;text-decoration:underline;">Mot de passe oublié ?</button>
         </div>
 
+        <!-- [COMMENTAIRE] Affichage du message de succès d'activation/création de compte (avec instructions d'e-mail de vérification) -->
+        ${state.ui.loginSuccessMessage ? `<div class="form-success" role="alert" style="background:#def7ec;color:#03543f;border:1px solid #bcf0da;padding:12px;border-radius:6px;font-size:13px;margin-bottom:12px;font-weight:500;">${escapeHtml(state.ui.loginSuccessMessage)}</div>` : ""}
+
         ${state.ui.loginError ? `<div class="form-error" role="alert">${escapeHtml(state.ui.loginError)}</div>` : ""}
 
         <button class="btn btn-ember" style="justify-content:center;margin-top:8px" data-login-submit="1" ${state.ui.loginPending ? "disabled" : ""}>
@@ -103,6 +106,9 @@ export function renderSignup() {
           <button type="button" class="toggle-password" data-signup-toggle-password>${state.ui.signupShowPassword ? "Masquer" : "Afficher"}</button>
         </div>
         <p class="login-help">Au moins 8 caractères avec majuscule, minuscule, chiffre et caractère spécial (ex: @, #, !).</p>
+
+        <!-- [COMMENTAIRE] Affichage de confirmation verte si un message de succès d'inscription existe -->
+        ${state.ui.signupSuccessMessage ? `<div class="form-success" role="alert" style="background:#def7ec;color:#03543f;border:1px solid #bcf0da;padding:12px;border-radius:6px;font-size:13px;margin-bottom:12px;font-weight:500;">${escapeHtml(state.ui.signupSuccessMessage)}</div>` : ""}
 
         ${state.ui.signupError ? `<div class="form-error" role="alert">${escapeHtml(state.ui.signupError)}</div>` : ""}
 

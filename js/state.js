@@ -42,10 +42,12 @@ export const state = {
     isSending: false,
     sendSuccess: false,
     loginError: "",
+    loginSuccessMessage: "", // [COMMENTAIRE] Message de succès de connexion (ex: confirmation d'envoi d'e-mail d'activation)
     loginShowPassword: false,
     loginPending: false,
     signupError: "",
-    signupShowPassword: false,
+    signupSuccessMessage: "", // [COMMENTAIRE] Message de succès d'inscription
+    signupShowPassword: false, // [COMMENTAIRE] Détermine si le mot de passe d'inscription doit être visible
     signupPending: false,
   },
   backExitAttempted: false,
