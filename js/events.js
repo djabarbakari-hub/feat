@@ -424,21 +424,15 @@ document.addEventListener("click", async (e) => {
     const email = form.querySelector('[data-contact-email]')?.value || "";
     const message = form.querySelector('[data-contact-message]')?.value || "";
     const subject = form.querySelector('[data-contact-subject]')?.value || "";
-    const captcha = form.querySelector('[data-contact-captcha]')?.value || "";
     
     // Validation
-    if (!name || !email || !message || !subject || !captcha) {
+    if (!name || !email || !message || !subject) {
       alert("Tous les champs sont obligatoires.");
       return;
     }
     
     if (!/^[^@]+@[^@]+\.[^@]+$/.test(email)) {
       alert("Veuillez entrer un email valide.");
-      return;
-    }
-    
-    if (captcha.trim() !== "5") {
-      alert("Réponse anti-spam incorrecte (2 + 3 = 5).");
       return;
     }
     

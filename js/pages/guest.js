@@ -652,156 +652,212 @@ export function renderHome() {
 
 export function renderPrograms() {
   return `
-  <div class="section wrap">
-    <p class="eyebrow-moss font-mono" id="prog-eyebrow">PROGRAMMES OFFICIELS</p>
-    <h1 class="h2 font-display" id="prog-title">Nos Programmes d'Entraînement</h1>
-    <p class="hero-sub" style="max-width:700px; margin-top:12px;" id="prog-subtitle">Découvrez les 9 programmes complets et précis rédigés sur-mesure par le <strong>Coach Abdou BAKARI</strong>. Chaque parcours est adapté à vos objectifs et à votre environnement.</p>
+  <div style="background: var(--chalk); padding-bottom: 60px;">
     
-    <div class="grid-2" style="margin-top:40px; gap:32px;" id="programs-grid">
-      ${COACH_PROGRAMS.map((p) => {
-        const isPriseDeMuscle = p.id.includes("prise-de-muscle");
-        const isPertePoids = p.id.includes("perte-poids");
-        const goalLabel = isPriseDeMuscle ? "Hypertrophie" : (isPertePoids ? "Perte de Poids" : "Santé & Endurance");
-        return `
-        <div class="card" id="program-card-${p.id}" style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid var(--ember); background: var(--surface); box-shadow: 0 4px 20px rgba(0,0,0,0.03); border-radius: 8px;">
-          <div>
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 8px; flex-wrap: wrap;">
-              <span style="background: var(--ember); color: white; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace;">Programme Officiel</span>
-              <span style="font-size: 11px; font-weight: 700; color: var(--moss); background: rgba(60, 90, 70, 0.08); padding: 4px 8px; border-radius: 4px; font-family: 'IBM Plex Mono', monospace;">
-                🎯 ${goalLabel}
-              </span>
-            </div>
-            
-            <h3 class="font-display" style="font-size: 18px; color: var(--ink); margin: 0 0 4px; font-weight: 800; line-height: 1.3;">
-              ${escapeHtml(p.title.replace("MONPROGRAMMEFIT : ", ""))}
-            </h3>
-            <p style="font-size: 13px; font-weight: 600; color: var(--slate); margin-bottom: 16px;">
-              ${escapeHtml(p.subtitle)}
-            </p>
+    <!-- HERO CINÉMATIQUE HAUT DE PAGE -->
+    <section class="hero" style="background: radial-gradient(circle at 85% 15%, rgba(226, 98, 45, 0.12) 0%, transparent 65%), var(--ink) !important; padding: 60px 0 50px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+      <div class="wrap" style="max-width: 1120px; margin: 0 auto; position: relative; z-index: 2;">
+        
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <span class="font-mono" style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; padding: 4px 10px; background: rgba(226, 98, 45, 0.15); color: var(--ember); border-radius: 4px; font-weight: 700;">
+            [ CATALOGUE OFFICIEL & SUR-MESURE ]
+          </span>
+          <span style="font-size: 12px; color: var(--ink-muted2); font-family: var(--font-mono, monospace);">MonProgrammeFit — Edition 2026</span>
+        </div>
 
-            <!-- Grid de Statistiques -->
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: var(--chalk-soft); padding: 12px; border-radius: 6px; margin-bottom: 16px; border: 1px solid var(--line);">
-              <div style="text-align: center;">
-                <span style="display: block; font-size: 9px; color: var(--slate); text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 2px;">Durée</span>
-                <strong style="font-size: 12px; color: var(--ink);">${escapeHtml(p.duration)}</strong>
-              </div>
-              <div style="text-align: center; border-left: 1px solid var(--line); border-right: 1px solid var(--line);">
-                <span style="display: block; font-size: 9px; color: var(--slate); text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 2px;">Fréquence</span>
-                <strong style="font-size: 12px; color: var(--ink);">${escapeHtml(p.frequency)}</strong>
-              </div>
-              <div style="text-align: center;">
-                <span style="display: block; font-size: 9px; color: var(--slate); text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 2px;">Niveau</span>
-                <strong style="font-size: 11px; color: var(--ink);">${escapeHtml(p.level)}</strong>
-              </div>
-            </div>
+        <h1 class="font-display h1" id="prog-title" style="max-width: 860px; margin: 0 0 16px 0; font-size: clamp(28px, 4.5vw, 44px); line-height: 1.15; color: var(--chalk) !important;">
+          Des programmes d'entraînement complets, structurés et évolutifs.
+        </h1>
 
-            <!-- Objectif -->
-            <p style="font-size: 13px; color: var(--slate); margin-bottom: 16px; line-height: 1.5; min-height: 60px;">
-              ${escapeHtml(p.objective)}
-            </p>
+        <p class="hero-sub" id="prog-subtitle" style="max-width: 700px; font-size: 16px; line-height: 1.6; color: var(--ink-muted2) !important; margin: 0 0 28px 0;">
+          Découvrez nos programmes officiels conçus par le <strong>Coach Abdou BAKARI</strong>. Chaque parcours intègre des consignes de charge, des tempos précis et un calendrier hebdomadaire adaptable.
+        </p>
 
-            <!-- Équipement Requis -->
-            <div style="margin-bottom: 20px;">
-              <h4 style="font-size: 11px; text-transform: uppercase; color: var(--ink); font-weight: 700; margin: 0 0 8px; font-family: 'IBM Plex Mono', monospace;">🛠 Équipement requis</h4>
-              <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-                ${p.equipment.map(eq => `<span style="font-size: 11px; background: white; border: 1px solid var(--line); color: var(--slate); padding: 4px 8px; border-radius: 4px;">• ${escapeHtml(eq)}</span>`).join("")}
-              </div>
-            </div>
+        <!-- BADGES HIGHLIGHTS -->
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+          <span style="font-size: 12px; font-weight: 600; color: var(--chalk); background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px;">
+            ${icon("check-circle-2", 14, "var(--ember)")} 9 Programmes certifiés
+          </span>
+          <span style="font-size: 12px; font-weight: 600; color: var(--chalk); background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px;">
+            ${icon("sliders", 14, "var(--moss)")} Salle, Maison & Poids du corps
+          </span>
+          <span style="font-size: 12px; font-weight: 600; color: var(--chalk); background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px;">
+            ${icon("user-check", 14, "var(--ember)")} Suivi & Mises à jour
+          </span>
+        </div>
 
-            <!-- Accordéon Interactif pour Dévoiler les Détails -->
-            <details style="border-top: 1px dashed var(--line); margin-top: 16px; padding-top: 12px;">
-              <summary style="font-size: 12px; font-weight: 700; color: var(--ember); user-select: none; display: flex; align-items: center; gap: 6px; outline: none; cursor: pointer;">
-                <span>📖 Consulter le programme détaillé & séances</span>
-              </summary>
+      </div>
+    </section>
+
+    <!-- CONTENU PRINCIPAL DES PROGRAMMES -->
+    <div class="wrap" style="max-width: 1120px; margin: 40px auto 0;">
+      
+      <!-- GRID DES PROGRAMMES -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 24px;" id="programs-grid">
+        ${COACH_PROGRAMS.map((p) => {
+          const isPriseDeMuscle = p.id.includes("prise-de-muscle");
+          const isPertePoids = p.id.includes("perte-poids");
+          const goalLabel = isPriseDeMuscle ? "Hypertrophie" : (isPertePoids ? "Perte de Poids" : "Santé & Endurance");
+          const cleanTitle = p.title.replace("MONPROGRAMMEFIT : ", "");
+
+          return `
+          <div class="card" id="program-card-${p.id}" style="padding: 28px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid var(--line); border-top: 4px solid var(--ember); background: #ffffff; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border-radius: 12px; transition: transform 0.2s ease, box-shadow 0.2s ease;">
+            <div>
               
-              <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 16px; text-align: left; cursor: default;" onclick="event.stopPropagation();">
+              <!-- EN-TÊTE BADGES -->
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 8px; flex-wrap: wrap;">
+                <span class="font-mono" style="background: rgba(226, 98, 45, 0.12); color: var(--ember); font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em;">
+                  PROGRAMME OFFICIEL
+                </span>
+                <span class="font-mono" style="font-size: 11px; font-weight: 700; color: var(--moss); background: rgba(60, 150, 80, 0.1); padding: 4px 8px; border-radius: 4px;">
+                  🎯 ${goalLabel}
+                </span>
+              </div>
+              
+              <h3 class="font-display" style="font-size: 20px; color: var(--ink); margin: 0 0 6px 0; font-weight: 800; line-height: 1.3;">
+                ${escapeHtml(cleanTitle)}
+              </h3>
+
+              <p style="font-size: 13px; font-weight: 600; color: var(--slate); margin: 0 0 16px 0; line-height: 1.4;">
+                ${escapeHtml(p.subtitle)}
+              </p>
+
+              <!-- GRID DES STATISTIQUES -->
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: rgba(0,0,0,0.02); padding: 12px; border-radius: 8px; margin-bottom: 16px; border: 1px solid var(--line);">
+                <div style="text-align: center;">
+                  <span class="font-mono" style="display: block; font-size: 9px; color: var(--slate); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 2px;">Durée</span>
+                  <strong style="font-size: 13px; color: var(--ink); font-weight: 700;">${escapeHtml(p.duration)}</strong>
+                </div>
+                <div style="text-align: center; border-left: 1px solid var(--line); border-right: 1px solid var(--line);">
+                  <span class="font-mono" style="display: block; font-size: 9px; color: var(--slate); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 2px;">Fréquence</span>
+                  <strong style="font-size: 13px; color: var(--ink); font-weight: 700;">${escapeHtml(p.frequency)}</strong>
+                </div>
+                <div style="text-align: center;">
+                  <span class="font-mono" style="display: block; font-size: 9px; color: var(--slate); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 2px;">Niveau</span>
+                  <strong style="font-size: 12px; color: var(--ink); font-weight: 700;">${escapeHtml(p.level)}</strong>
+                </div>
+              </div>
+
+              <!-- OBJECTIF -->
+              <p style="font-size: 13px; color: var(--slate); margin-bottom: 16px; line-height: 1.5; min-height: 52px;">
+                ${escapeHtml(p.objective)}
+              </p>
+
+              <!-- ÉQUIPEMENT REQUIS -->
+              <div style="margin-bottom: 20px;">
+                <h4 class="font-mono" style="font-size: 11px; text-transform: uppercase; color: var(--ink); font-weight: 700; margin: 0 0 8px 0; letter-spacing: 0.05em;">🛠 Équipement requis</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                  ${p.equipment.map(eq => `<span style="font-size: 11px; background: #ffffff; border: 1px solid var(--line); color: var(--ink); padding: 4px 8px; border-radius: 4px; font-weight: 500;">• ${escapeHtml(eq)}</span>`).join("")}
+                </div>
+              </div>
+
+              <!-- ACCORDÉON DÉTAILS SÉANCES -->
+              <details style="border-top: 1px dashed var(--line); margin-top: 16px; padding-top: 14px;">
+                <summary style="font-size: 13px; font-weight: 700; color: var(--ember); user-select: none; display: flex; align-items: center; gap: 6px; outline: none; cursor: pointer;">
+                  <span>📖 Consulter le programme détaillé & séances</span>
+                </summary>
                 
-                <!-- Échauffement -->
-                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid var(--line);">
-                  <h4 style="font-size: 11px; text-transform: uppercase; color: var(--ember); font-weight: 800; margin: 0 0 6px; font-family: 'IBM Plex Mono', monospace;">🔥 Échauffement (${escapeHtml(p.warmup.duration)})</h4>
-                  <ul style="margin: 0; padding-left: 16px; font-size: 12px; color: var(--slate); line-height: 1.5;">
-                    ${p.warmup.steps.map(step => `<li>${escapeHtml(step)}</li>`).join("")}
-                  </ul>
-                </div>
+                <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 16px; text-align: left; cursor: default;" onclick="event.stopPropagation();">
+                  
+                  <!-- Échauffement -->
+                  <div style="background: rgba(0,0,0,0.02); padding: 14px; border-radius: 8px; border: 1px solid var(--line);">
+                    <h4 class="font-mono" style="font-size: 11px; text-transform: uppercase; color: var(--ember); font-weight: 800; margin: 0 0 8px 0;">🔥 Échauffement (${escapeHtml(p.warmup.duration)})</h4>
+                    <ul style="margin: 0; padding-left: 18px; font-size: 12px; color: var(--slate); line-height: 1.6;">
+                      ${p.warmup.steps.map(step => `<li>${escapeHtml(step)}</li>`).join("")}
+                    </ul>
+                  </div>
 
-                <!-- Consignes & Repos -->
-                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid var(--line);">
-                  <h4 style="font-size: 11px; text-transform: uppercase; color: var(--moss); font-weight: 800; margin: 0 0 6px; font-family: 'IBM Plex Mono', monospace;">⏱ Consignes de Repos & Tempo</h4>
-                  <p style="font-size: 12px; color: var(--ink); margin: 0 0 4px; line-height: 1.5;"><strong>Récupération :</strong> ${escapeHtml(p.generalRules.rest)}</p>
-                  ${p.generalRules.tempo ? `<p style="font-size: 12px; color: var(--slate); margin: 0 0 4px; line-height: 1.5;"><strong>Tempo :</strong> ${escapeHtml(p.generalRules.tempo)}</p>` : ""}
-                  ${p.generalRules.intensity ? `<p style="font-size: 12px; color: var(--slate); margin: 0 0 4px; line-height: 1.5;"><strong>Intensité :</strong> ${escapeHtml(p.generalRules.intensity)}</p>` : ""}
-                  ${p.generalRules.progression ? `<p style="font-size: 12px; color: var(--slate); margin: 0; line-height: 1.5;"><strong>Progression :</strong> ${escapeHtml(p.generalRules.progression)}</p>` : ""}
-                </div>
+                  <!-- Consignes & Repos -->
+                  <div style="background: rgba(0,0,0,0.02); padding: 14px; border-radius: 8px; border: 1px solid var(--line);">
+                    <h4 class="font-mono" style="font-size: 11px; text-transform: uppercase; color: var(--moss); font-weight: 800; margin: 0 0 8px 0;">⏱ Consignes de Repos & Tempo</h4>
+                    <p style="font-size: 12px; color: var(--ink); margin: 0 0 4px 0; line-height: 1.5;"><strong>Récupération :</strong> ${escapeHtml(p.generalRules.rest)}</p>
+                    ${p.generalRules.tempo ? `<p style="font-size: 12px; color: var(--slate); margin: 0 0 4px 0; line-height: 1.5;"><strong>Tempo :</strong> ${escapeHtml(p.generalRules.tempo)}</p>` : ""}
+                    ${p.generalRules.intensity ? `<p style="font-size: 12px; color: var(--slate); margin: 0 0 4px 0; line-height: 1.5;"><strong>Intensité :</strong> ${escapeHtml(p.generalRules.intensity)}</p>` : ""}
+                    ${p.generalRules.progression ? `<p style="font-size: 12px; color: var(--slate); margin: 0; line-height: 1.5;"><strong>Progression :</strong> ${escapeHtml(p.generalRules.progression)}</p>` : ""}
+                  </div>
 
-                <!-- Calendrier de la Semaine -->
-                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid var(--line);">
-                  <h4 style="font-size: 11px; text-transform: uppercase; color: var(--ink); font-weight: 800; margin: 0 0 6px; font-family: 'IBM Plex Mono', monospace;">📅 Calendrier de la semaine</h4>
-                  <div style="display: flex; flex-direction: column; gap: 4px;">
-                    ${p.weeklySchedule.map(s => `
-                      <div style="display: flex; font-size: 12px; border-bottom: 1px solid var(--line); padding: 4px 0; justify-content: space-between;">
-                        <span style="width: 80px; font-weight: 700; color: var(--ink);">${escapeHtml(s.day)}</span>
-                        <span style="color: var(--slate); flex: 1; text-align: left; padding-left: 12px;">${escapeHtml(s.focus)}</span>
-                      </div>
+                  <!-- Calendrier de la Semaine -->
+                  <div style="background: rgba(0,0,0,0.02); padding: 14px; border-radius: 8px; border: 1px solid var(--line);">
+                    <h4 class="font-mono" style="font-size: 11px; text-transform: uppercase; color: var(--ink); font-weight: 800; margin: 0 0 8px 0;">📅 Calendrier de la semaine</h4>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                      ${p.weeklySchedule.map(s => `
+                        <div style="display: flex; font-size: 12px; border-bottom: 1px solid var(--line); padding-bottom: 4px; justify-content: space-between;">
+                          <span style="width: 85px; font-weight: 700; color: var(--ink);">${escapeHtml(s.day)}</span>
+                          <span style="color: var(--slate); flex: 1; text-align: left; padding-left: 8px;">${escapeHtml(s.focus)}</span>
+                        </div>
+                      `).join("")}
+                    </div>
+                  </div>
+
+                  <!-- Exercices détaillés par séance -->
+                  <div style="background: rgba(0,0,0,0.02); padding: 14px; border-radius: 8px; border: 1px solid var(--line);">
+                    <h4 class="font-mono" style="font-size: 11px; text-transform: uppercase; color: var(--ink); font-weight: 800; margin: 0 0 10px 0;">💪 Détail des Exercices par Séance</h4>
+                    ${p.sessions.map(sess => `
+                      <details style="margin-bottom: 8px; background: #ffffff; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--line);">
+                        <summary style="font-size: 12px; font-weight: 700; color: var(--ink); display: flex; justify-content: space-between; align-items: center; user-select: none; outline: none; cursor: pointer;">
+                          <span>${escapeHtml(sess.name.replace(" — Focus technique", "").replace(" — Intensité maîtrisée", "").replace(" — Endurance active", ""))}</span>
+                          <span style="font-size: 11px; font-weight: normal; color: var(--slate);">${escapeHtml(sess.duration)} · ${sess.exercises.length} exos</span>
+                        </summary>
+                        <div style="margin-top: 10px; font-size: 12px; display: flex; flex-direction: column; gap: 8px;">
+                          ${sess.exercises.map((ex, idx) => `
+                            <div style="border-bottom: 1px dashed var(--line); padding-bottom: 6px;">
+                              <div style="display: flex; justify-content: space-between; font-weight: 600; color: var(--ink);">
+                                <span>${idx + 1}. ${escapeHtml(ex.name)}</span>
+                                <span style="color: var(--ember); white-space: nowrap; margin-left: 8px;">${escapeHtml(ex.sets)} × ${escapeHtml(ex.reps)}</span>
+                              </div>
+                              <div style="color: var(--slate); font-size: 11px; margin-top: 2px;">
+                                Récupération : <strong>${escapeHtml(ex.rest)}</strong> ${ex.type ? `· <span style="text-transform: uppercase; font-size: 9px; padding: 1px 4px; background: rgba(0,0,0,0.03); border: 1px solid var(--line); border-radius: 2px;">${escapeHtml(ex.type)}</span>` : ""}
+                              </div>
+                              ${ex.desc ? `<p style="color: var(--slate); font-size: 11px; margin: 4px 0 0 0; line-height: 1.4;">${escapeHtml(ex.desc)}</p>` : ""}
+                            </div>
+                          `).join("")}
+                        </div>
+                      </details>
                     `).join("")}
                   </div>
-                </div>
 
-                <!-- Exercices détaillés par séance -->
-                <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid var(--line);">
-                  <h4 style="font-size: 11px; text-transform: uppercase; color: var(--ink); font-weight: 800; margin: 0 0 8px; font-family: 'IBM Plex Mono', monospace;">💪 Détail des Exercices par Séance</h4>
-                  ${p.sessions.map(sess => `
-                    <details style="margin-bottom: 8px; background: var(--chalk-soft); padding: 8px 12px; border-radius: 4px; border: 1px solid var(--line);">
-                      <summary style="font-size: 12px; font-weight: 700; color: var(--ink); display: flex; justify-content: space-between; align-items: center; user-select: none; outline: none; cursor: pointer;">
-                        <span>${escapeHtml(sess.name.replace(" — Focus technique", "").replace(" — Intensité maîtrisée", "").replace(" — Endurance active", ""))}</span>
-                        <span style="font-size: 11px; font-weight: normal; color: var(--slate);">${escapeHtml(sess.duration)} · ${sess.exercises.length} exos</span>
-                      </summary>
-                      <div style="margin-top: 8px; font-size: 12px; display: flex; flex-direction: column; gap: 8px;">
-                        ${sess.exercises.map((ex, idx) => `
-                          <div style="border-bottom: 1px dashed var(--line); padding-bottom: 6px; margin-bottom: 4px;">
-                            <div style="display: flex; justify-content: space-between; font-weight: 600; color: var(--ink);">
-                              <span>${idx + 1}. ${escapeHtml(ex.name)}</span>
-                              <span style="color: var(--ember); white-space: nowrap; margin-left: 8px;">${escapeHtml(ex.sets)} × ${escapeHtml(ex.reps)}</span>
-                            </div>
-                            <div style="color: var(--slate); font-size: 11px; margin-top: 2px;">
-                              Récupération : <strong>${escapeHtml(ex.rest)}</strong> ${ex.type ? `· <span style="text-transform: uppercase; font-size: 9px; padding: 1px 4px; background: white; border: 1px solid var(--line); border-radius: 2px;">${escapeHtml(ex.type)}</span>` : ""}
-                            </div>
-                            ${ex.desc ? `<p style="color: var(--slate); font-size: 11px; margin: 4px 0 0; line-height: 1.4;">${escapeHtml(ex.desc)}</p>` : ""}
-                          </div>
-                        `).join("")}
-                      </div>
-                    </details>
-                  `).join("")}
                 </div>
+              </details>
+            </div>
+            
+            <!-- BOUTON D'ACTIVATION -->
+            <div style="margin-top: 24px;">
+              ${state.role === 'client' ? `
+                <button class="btn btn-moss btn-select-program w-full" data-program-id="${p.id}" style="font-weight: 700; justify-content: center; width: 100%; padding: 12px;">
+                  Activer ce programme
+                </button>
+              ` : `
+                <button class="btn btn-ember btn-select-program w-full" data-program-id="${p.id}" style="font-weight: 700; justify-content: center; width: 100%; padding: 12px;">
+                  S'inscrire et démarrer ce programme
+                </button>
+              `}
+            </div>
+          </div>`;
+        }).join("")}
+      </div>
 
-              </div>
-            </details>
-          </div>
-          
-          <div style="margin-top: 24px;">
+      <!-- BANDEAU CTA BAS DE PAGE -->
+      <section style="background: var(--ink); border-radius: 12px; padding: 40px; color: var(--chalk); text-align: center; margin-top: 48px; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);" id="programs-cta">
+        <div style="position: relative; z-index: 2; max-width: 680px; margin: 0 auto;">
+          <span class="font-mono" style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; padding: 3px 10px; background: rgba(226, 98, 45, 0.2); color: var(--ember); border-radius: 4px; font-weight: 700;">
+            [ TRANSFORMATION SUR-MESURE ]
+          </span>
+          <h2 class="font-display" style="font-size: 26px; margin: 12px 0 12px 0; color: var(--chalk);">
+            Besoin d'un programme ajusté à 100% à ton rythme ?
+          </h2>
+          <p style="font-size: 15px; color: var(--ink-muted2); margin: 0 0 24px 0; line-height: 1.6;">
+            Complète notre questionnaire interactif pour obtenir tes recommandations personnalisées de séances et le suivi du coach.
+          </p>
+          <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
             ${state.role === 'client' ? `
-              <button class="btn btn-moss btn-select-program w-full" data-program-id="${p.id}" style="font-weight: 700; justify-content: center; width: 100%;">
-                Activer ce programme
-              </button>
+              <button class="btn btn-ember" data-nav="client-program" style="font-weight: 700; padding: 12px 24px; font-size: 14px;">Consulter mon entraînement</button>
             ` : `
-              <button class="btn btn-ember btn-select-program w-full" data-program-id="${p.id}" style="font-weight: 700; justify-content: center; width: 100%;">
-                S'inscrire et démarrer ce programme
-              </button>
+              <button class="btn btn-ember" data-nav="quiz" style="font-weight: 700; padding: 12px 24px; font-size: 14px;">Commencer mon Questionnaire Onboarding</button>
             `}
           </div>
-        </div>`;
-      }).join("")}
-    </div>
+        </div>
+      </section>
 
-    <!-- Bandeau Appel à l'action -->
-    <div class="cta-band" style="margin-top:48px;" id="programs-cta">
-      <div class="wrap">
-        <h3 class="font-display" style="font-size: 22px; line-height: 1.4;">Atteignez vos objectifs avec rigueur et méthode.</h3>
-        ${state.role === 'client' ? `
-          <button class="btn btn-ember" data-nav="client-program" aria-label="Consulter mon entraînement">Consulter mon entraînement</button>
-        ` : `
-          <button class="btn btn-ember" data-nav="quiz" aria-label="Démarrer mon programme">Commencer mon Onboarding</button>
-        `}
-      </div>
     </div>
   </div>`;
 }
@@ -1123,40 +1179,6 @@ export function renderAbout() {
                 « Mon objectif : t'aider à atteindre le tien. »
               </p>
             </div>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- SECTION 5: SÉCURITÉ & ENGAGEMENTS TRANSPARENCE -->
-      <section style="margin-bottom: 48px;">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
-          
-          <div style="background: #ffffff; border: 1px solid var(--line); border-radius: 8px; padding: 20px;">
-            <div style="display: flex; align-items: center; gap: 8px; color: var(--moss); font-weight: 700; font-size: 14px; margin-bottom: 6px;">
-              ${icon("shield", 16)} Protection des données (RGPD)
-            </div>
-            <p style="font-size: 13px; color: var(--slate); margin: 0; line-height: 1.5;">
-              Tes données personnelles et tes réponses au questionnaire t'appartiennent. Exportation au format JSON disponible à tout moment.
-            </p>
-          </div>
-
-          <div style="background: #ffffff; border: 1px solid var(--line); border-radius: 8px; padding: 20px;">
-            <div style="display: flex; align-items: center; gap: 8px; color: var(--ember); font-weight: 700; font-size: 14px; margin-bottom: 6px;">
-              ${icon("refresh-cw", 16)} Mises à jour continues
-            </div>
-            <p style="font-size: 13px; color: var(--slate); margin: 0; line-height: 1.5;">
-              Nos séances et banques d'exercices sont régulièrement enrichies pour garantir une variété constante et éviter la lassitude.
-            </p>
-          </div>
-
-          <div style="background: #ffffff; border: 1px solid var(--line); border-radius: 8px; padding: 20px;">
-            <div style="display: flex; align-items: center; gap: 8px; color: var(--ink); font-weight: 700; font-size: 14px; margin-bottom: 6px;">
-              ${icon("message-square", 16)} Support & Écoute active
-            </div>
-            <p style="font-size: 13px; color: var(--slate); margin: 0; line-height: 1.5;">
-              Une question sur une posture ou une séance ? Le coach répond directement depuis l'espace client ou la messagerie.
-            </p>
           </div>
 
         </div>
