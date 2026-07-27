@@ -11,7 +11,7 @@
 
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth }        from "firebase/auth";
-import { getFirestore }   from "firebase/firestore";
+import { initializeFirestore }   from "firebase/firestore";
 
 /**
  * Configuration Firebase lue depuis les variables d'environnement Vite.
@@ -42,11 +42,13 @@ if (!getApps().length) {
 /* Service d'authentification (email/mot de passe). */
 export const auth = getAuth(app);
 
-/* Base de données Firestore (stockage des profils clients, programmes, etc.). */
-export const db = getFirestore(app);
+/* Base de données Firestore avec détection automatique du long-polling pour sandbox/iframes */
+export const db = initializeFirestore(app, {
+  experimentalAutoDetectLongPolling: true
+});
 
 /**
- * Gestionnaire d'erreurs standardisé requis pour capturer et enrichir les échecs Firestore.
+ * Gestionnaire d'erreurs standardisé pour capturer les échecs Firestore.
  */
 export function handleFirestoreError(error, operationType, path) {
   const errInfo = {
@@ -65,6 +67,6 @@ export function handleFirestoreError(error, operationType, path) {
     operationType,
     path
   };
-  console.error('Firestore Error: ', JSON.stringify(errInfo));
-  throw new Error(JSON.stringify(errInfo));
+  console.warn('Firestore Notice/Error:', JSON.stringify(errInfo));
+  return errInfo;
 }

@@ -9,6 +9,37 @@ import { auth, db } from "../firebase.js";
 import { doc, setDoc } from "firebase/firestore";
 
 /**
+ * Séries de messages pré-rédigés pour Coach Abdou BAKARI.
+ */
+export const COACH_BILAN_TEMPLATES = [
+  {
+    id: "encouragement",
+    title: "🏋️ 1. Félicitations & Constance hebdomadaire",
+    text: "Félicitations pour tes efforts, [Prénom] ! Ta constance sur les entraînements de cette semaine est exemplaire. Continue de maintenir ton hydratation à 2.5L et assure-toi d'appliquer les temps de repos préconisés."
+  },
+  {
+    id: "nutrition_fatloss",
+    title: "📉 2. Sèche & Déficit Calorigène",
+    text: "Super travail cette semaine, [Prénom] ! Tes mensurations évoluent très positivement. N'hésite pas à maintenir un apport protéique suffisant après chaque séance pour préserver la masse musculaire durant ta perte de gras."
+  },
+  {
+    id: "muscle_hypertrophy",
+    title: "💪 3. Prise de Muscle & Hypertrophie",
+    text: "Excellente progression sur tes charges, [Prénom] ! La courbe de poids est constante et le développement musculaire progresse bien. Pense bien à valider tes 8h de sommeil par nuit pour maximiser l'hypertrophie."
+  },
+  {
+    id: "reboost",
+    title: "⚡ 4. Relance & Motivation (Assiduité)",
+    text: "Salut [Prénom], j'ai remarqué un petit ralentissement sur la validation de tes séances. Ne lâche rien, la régularité est la clé ! Contacte-moi si tu as besoin qu'on réadapte ton planning."
+  },
+  {
+    id: "cycle_completion",
+    title: "🎯 5. Bilan & Validation de fin de cycle",
+    text: "Bravo pour la validation de ce cycle complet, [Prénom] ! Ton évolution physique est remarquable. Je prépare tes prochains ajustements pour aborder le bloc suivant."
+  }
+];
+
+/**
  * Helper pour formater l'initiale d'un client.
  */
 function getInitials(firstName, lastName, email) {
@@ -396,6 +427,19 @@ export function showClientDetailsModal(client) {
   const equipment = client.equipment || client.quizAnswers?.equipement || "Non spécifié";
   const frequence = client.frequence || client.quizAnswers?.frequence || "3 séances / semaine";
 
+  // Données de bilan du coach
+  const coachBilan = client.coachBilan || client.coachNotes || null;
+  let currentBilanText = "";
+  let currentBilanDate = "";
+  if (coachBilan) {
+    if (typeof coachBilan === "object") {
+      currentBilanText = coachBilan.text || "";
+      currentBilanDate = coachBilan.dateStr || (coachBilan.updatedAt ? new Date(coachBilan.updatedAt).toLocaleDateString('fr-FR') : "");
+    } else if (typeof coachBilan === "string") {
+      currentBilanText = coachBilan;
+    }
+  }
+
   const modal = document.createElement("div");
   modal.id = "client-details-modal";
   modal.style.cssText = `
@@ -529,6 +573,52 @@ export function showClientDetailsModal(client) {
           </div>
         </div>
 
+        <!-- SECTION 4: ANALYSE & BILAN DU COACH ABDOU -->
+        <div style="border-top: 1px solid var(--line); padding-top: 20px; margin-top: 10px;">
+          <h3 style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--moss); margin: 0 0 12px; display: flex; align-items: center; gap: 6px;">
+            ${icon("edit-3", 14)} Analyse & Bilan de Coach Abdou BAKARI
+          </h3>
+
+          <div style="background: rgba(60,90,70,0.03); border: 1.5px solid var(--moss); border-radius: 10px; padding: 18px;">
+            <p style="font-size: 12px; color: var(--slate); margin: 0 0 12px; line-height: 1.4;">
+              Publiez un conseil personnalisé pour <strong>${escapeHtml(fullName)}</strong>. Il sera directement affiché dans sa rubrique <strong>"Ma Progression"</strong>.
+            </p>
+
+            <!-- SÉLECTEUR DE MESSAGES PRÉ-RÉDIGÉS -->
+            <div style="margin-bottom: 12px;">
+              <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 4px;">
+                ⚡ Insérer un message pré-rédigé :
+              </label>
+              <select id="select-coach-bilan-template" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 6px; font-size: 13px; background: white; color: var(--ink); font-weight: 600; cursor: pointer;">
+                <option value="">-- Sélectionner un modèle de message --</option>
+                ${COACH_BILAN_TEMPLATES.map(t => `<option value="${t.id}">${t.title}</option>`).join("")}
+              </select>
+            </div>
+
+            <!-- ZONE DE TEXTE ÉDITABLE PAR LE COACH -->
+            <div style="margin-bottom: 12px;">
+              <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 4px;">
+                Texte du bilan (modifiable à tout moment) :
+              </label>
+              <textarea id="input-coach-bilan-text" rows="4" style="width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 6px; font-size: 13px; line-height: 1.5; font-family: inherit; resize: vertical;" placeholder="Sélectionnez un modèle ci-dessus ou écrivez votre message...">${escapeHtml(currentBilanText)}</textarea>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+              <span id="coach-bilan-status-text" style="font-size: 11px; color: var(--slate); font-weight: 600;">
+                ${currentBilanDate ? `Dernier bilan publié le ${currentBilanDate}` : 'Aucun bilan actuellement publié pour ce client.'}
+              </span>
+              <div style="display: flex; gap: 8px;">
+                <button type="button" id="btn-delete-coach-bilan" class="btn btn-outline-dark" style="font-size: 12px; color: var(--ember); border-color: var(--ember-soft); padding: 8px 12px; ${!currentBilanText ? 'display: none;' : ''}">
+                  Supprimer le bilan
+                </button>
+                <button type="button" id="btn-save-coach-bilan" class="btn btn-primary" style="font-size: 12px; font-weight: 700; padding: 8px 16px; background: var(--moss); border-color: var(--moss);">
+                  ${icon("check-circle", 14)} Enregistrer & Publier
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- FOOTER ACTIONS -->
@@ -571,6 +661,106 @@ export function showClientDetailsModal(client) {
   `;
 
   document.body.appendChild(modal);
+
+  // Câblage interactif du bilan de Coach Abdou
+  const templateSelect = modal.querySelector("#select-coach-bilan-template");
+  const bilanArea = modal.querySelector("#input-coach-bilan-text");
+  const saveBilanBtn = modal.querySelector("#btn-save-coach-bilan");
+  const deleteBilanBtn = modal.querySelector("#btn-delete-coach-bilan");
+  const statusSpan = modal.querySelector("#coach-bilan-status-text");
+
+  if (templateSelect && bilanArea) {
+    templateSelect.addEventListener("change", (e) => {
+      const selectedId = e.target.value;
+      if (!selectedId) return;
+      const tmpl = COACH_BILAN_TEMPLATES.find(t => t.id === selectedId);
+      if (tmpl) {
+        const clientFirstName = client.firstName || "Athlète";
+        bilanArea.value = tmpl.text.replace(/\[Prénom\]/g, clientFirstName);
+      }
+    });
+  }
+
+  if (saveBilanBtn && bilanArea) {
+    saveBilanBtn.addEventListener("click", async () => {
+      const val = bilanArea.value.trim();
+      if (!val) {
+        showToast("Veuillez saisir un texte pour le bilan.");
+        return;
+      }
+
+      saveBilanBtn.disabled = true;
+      saveBilanBtn.innerHTML = '<span class="btn-spinner"></span> Publication...';
+
+      const dateStr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+      const newBilanObj = {
+        text: val,
+        dateStr: dateStr,
+        updatedAt: new Date().toISOString()
+      };
+
+      try {
+        const cId = client.id || client.uid;
+        if (cId && db) {
+          const userRef = doc(db, "users", cId);
+          await setDoc(userRef, { coachBilan: newBilanObj }, { merge: true });
+        }
+
+        client.coachBilan = newBilanObj;
+
+        if (state.clientProfile && (state.clientProfile.id === cId || state.clientProfile.email === client.email || state.simulationActive)) {
+          state.clientProfile.coachBilan = newBilanObj;
+        }
+
+        showToast(`✅ Bilan de Coach Abdou publié pour ${client.firstName || 'l\'athlète'} !`);
+        if (statusSpan) statusSpan.textContent = `Dernier bilan publié le ${dateStr}`;
+        if (deleteBilanBtn) deleteBilanBtn.style.display = "inline-flex";
+
+        const { render } = await import("../render.js");
+        render();
+      } catch (err) {
+        console.error("Erreur sauvegarde bilan coach:", err);
+        showToast("Erreur lors de la publication du bilan.");
+      } finally {
+        saveBilanBtn.disabled = false;
+        saveBilanBtn.innerHTML = `${icon("check-circle", 14)} Enregistrer & Publier`;
+      }
+    });
+  }
+
+  if (deleteBilanBtn && bilanArea) {
+    deleteBilanBtn.addEventListener("click", async () => {
+      if (!confirm("Voulez-vous supprimer le bilan actuellement publié pour ce client ?")) return;
+
+      deleteBilanBtn.disabled = true;
+
+      try {
+        const cId = client.id || client.uid;
+        if (cId && db) {
+          const userRef = doc(db, "users", cId);
+          await setDoc(userRef, { coachBilan: null }, { merge: true });
+        }
+
+        client.coachBilan = null;
+        if (state.clientProfile && (state.clientProfile.id === cId || state.clientProfile.email === client.email || state.simulationActive)) {
+          state.clientProfile.coachBilan = null;
+        }
+
+        bilanArea.value = "";
+        deleteBilanBtn.style.display = "none";
+        if (statusSpan) statusSpan.textContent = "Aucun bilan actuellement publié pour ce client.";
+        showToast("🗑️ Bilan supprimé avec succès.");
+
+        const { render } = await import("../render.js");
+        render();
+      } catch (err) {
+        console.error("Erreur suppression bilan:", err);
+        showToast("Erreur lors de la suppression.");
+      } finally {
+        deleteBilanBtn.disabled = false;
+      }
+    });
+  }
 
   const closeModal = () => modal.remove();
   modal.querySelector("#close-client-details-modal")?.addEventListener("click", closeModal);

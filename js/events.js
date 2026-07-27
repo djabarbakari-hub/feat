@@ -1552,9 +1552,15 @@ document.addEventListener("click", async (e) => {
     return;
   }
 
-  const quickMetricsBtn = e.target.closest("#btn-quick-update-metrics");
+  const quickMetricsBtn = e.target.closest("#btn-quick-update-metrics") || e.target.closest("#btn-quick-log-weight");
   if (quickMetricsBtn) {
     showQuickMetricsModal();
+    return;
+  }
+
+  const openMeasurementsBtn = e.target.closest("#btn-open-measurements-modal");
+  if (openMeasurementsBtn) {
+    showBodyMeasurementsModal();
     return;
   }
 });
@@ -2237,4 +2243,155 @@ window.addEventListener("scroll", () => {
     }
   });
 });
+
+/**
+ * Modal d'enregistrement des mensurations corporelles (Taille, Poitrine, Bras, Hanches, Cuisses).
+ */
+export function showBodyMeasurementsModal() {
+  const profile = state.clientProfile || {};
+  const bodyM = profile.bodyMeasurements || {};
+  const waist = bodyM.waist || profile.physique?.waist || "";
+  const chest = bodyM.chest || profile.physique?.chest || "";
+  const arms = bodyM.arms || profile.physique?.arms || "";
+  const hips = bodyM.hips || profile.physique?.hips || "";
+  const thighs = bodyM.thighs || profile.physique?.thighs || "";
+
+  const modal = document.createElement("div");
+  modal.id = "body-measurements-modal";
+  modal.style.cssText = `
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.8); display: flex; align-items: center;
+    justify-content: center; z-index: 140; padding: 16px;
+  `;
+
+  modal.innerHTML = `
+    <div style="
+      background: var(--chalk); color: var(--ink);
+      border-radius: 12px; padding: 28px; max-width: 440px;
+      width: 100%; box-shadow: 0 24px 64px rgba(0,0,0,0.35); border: 1px solid var(--line);
+    ">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--line); padding-bottom: 12px;">
+        <h2 style="margin: 0; font-size: 18px; font-weight: 800; font-family: 'Archivo Black', sans-serif; color: var(--ink); display: flex; align-items: center; gap: 8px;">
+          📐 Mensurations Corporelles
+        </h2>
+        <button id="close-measurements-modal-btn" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--slate); font-weight: bold;">&times;</button>
+      </div>
+
+      <form id="body-measurements-form" style="display: grid; gap: 14px;">
+        <p style="font-size: 13px; color: var(--slate); line-height: 1.5; margin: 0;">
+          Prenez vos mesures au mètre ruban (à jeun de préférence).
+        </p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div>
+            <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 4px;">Tour de Taille (cm)</label>
+            <input type="number" step="0.5" name="waist" class="text-input" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 6px;" value="${waist}" placeholder="Ex: 82" />
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 4px;">Tour de Poitrine (cm)</label>
+            <input type="number" step="0.5" name="chest" class="text-input" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 6px;" value="${chest}" placeholder="Ex: 102" />
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div>
+            <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 4px;">Tour de Bras (cm)</label>
+            <input type="number" step="0.5" name="arms" class="text-input" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 6px;" value="${arms}" placeholder="Ex: 38" />
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 4px;">Tour de Hanches (cm)</label>
+            <input type="number" step="0.5" name="hips" class="text-input" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 6px;" value="${hips}" placeholder="Ex: 96" />
+          </div>
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 4px;">Tour de Cuisses (cm)</label>
+          <input type="number" step="0.5" name="thighs" class="text-input" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 6px;" value="${thighs}" placeholder="Ex: 58" />
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <button type="button" id="cancel-measurements-modal-btn" class="btn btn-outline-dark" style="flex: 1; justify-content: center;">Annuler</button>
+          <button type="submit" class="btn btn-primary" style="flex: 1; justify-content: center; background: var(--ember); border-color: var(--ember); font-weight: 700;">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  const close = () => modal.remove();
+  modal.querySelector("#close-measurements-modal-btn").addEventListener("click", close);
+  modal.querySelector("#cancel-measurements-modal-btn").addEventListener("click", close);
+
+  modal.querySelector("#body-measurements-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const waistVal = parseFloat(e.target.waist.value) || null;
+    const chestVal = parseFloat(e.target.chest.value) || null;
+    const armsVal = parseFloat(e.target.arms.value) || null;
+    const hipsVal = parseFloat(e.target.hips.value) || null;
+    const thighsVal = parseFloat(e.target.thighs.value) || null;
+
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="btn-spinner"></span> Enregistrement...';
+    }
+
+    const { updateUserProfile } = await import("./modules/privacy.js");
+    const { render } = await import("./render.js");
+    const { showToast } = await import("./helpers.js");
+
+    const newMeasurements = {
+      waist: waistVal,
+      chest: chestVal,
+      arms: armsVal,
+      hips: hipsVal,
+      thighs: thighsVal,
+      updatedAt: new Date().toLocaleDateString('fr-FR')
+    };
+
+    profile.bodyMeasurements = newMeasurements;
+    state.clientProfile = profile;
+
+    await updateUserProfile({
+      bodyMeasurements: newMeasurements
+    });
+
+    modal.remove();
+    render();
+    showToast("📐 Vos mensurations ont été enregistrées avec succès !");
+  });
+}
+
+/**
+  Visionneuse Lightbox plein écran pour les photos de transformation.
+ */
+window.viewFullImage = function(url, title = "Aperçu de la Photo") {
+  if (!url) return;
+  const modal = document.createElement("div");
+  modal.style.cssText = `
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.92); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; z-index: 250; padding: 20px;
+    backdrop-filter: blur(4px);
+  `;
+  modal.innerHTML = `
+    <div style="position: relative; max-width: 90vw; max-height: 90vh; text-align: center;">
+      <button id="close-lightbox-btn" style="position: absolute; top: -45px; right: 0; background: none; border: none; color: white; font-size: 32px; cursor: pointer; font-weight: bold;">&times;</button>
+      <h3 style="color: white; font-size: 15px; margin-bottom: 12px; font-weight: 700; font-family: 'IBM Plex Mono', monospace;">${title}</h3>
+      <img src="${url}" style="max-width: 100%; max-height: 80vh; border-radius: 8px; box-shadow: 0 16px 48px rgba(0,0,0,0.8); object-fit: contain; border: 1px solid rgba(255,255,255,0.2);" />
+    </div>
+  `;
+  document.body.appendChild(modal);
+  modal.querySelector("#close-lightbox-btn").addEventListener("click", () => modal.remove());
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) modal.remove();
+  });
+};
+
+
+
+
 
