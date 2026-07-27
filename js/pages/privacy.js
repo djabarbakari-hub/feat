@@ -48,7 +48,12 @@ export function renderPrivacyPage() {
   const profile = state.clientProfile || {};
   const physique = profile.physique || {};
   const hasProfile = !!profile.firstName || !!profile.lastName || !!profile.email;
-  const hasQuiz = Object.keys(state.quizAnswers || {}).length > 0;
+  const effectiveQuiz = (state.quizAnswers && Object.keys(state.quizAnswers).length > 0)
+    ? state.quizAnswers
+    : (profile.quizAnswers || {});
+  const quizCount = Object.keys(effectiveQuiz).length;
+  const hasQuiz = quizCount > 0 || !!profile.goal || !!profile.track;
+  const quizDisplayCount = quizCount > 0 ? quizCount : (profile.goal || profile.track ? 2 : 0);
   const hasDrafts =
     !!(state.drafts?.contact?.name || state.drafts?.contact?.message || state.drafts?.signup?.firstName);
   const hasHistory = (state.history || []).length > 0;
@@ -672,7 +677,7 @@ export function renderPrivacyPage() {
               </div>
               <div style="display: flex; align-items: center; gap: 10px;">
                 <span style="font-size: 13px; font-weight: 600; color: ${hasQuiz ? "var(--moss)" : "var(--slate)"};">
-                  ${hasQuiz ? `✓ ${Object.keys(state.quizAnswers).length} réponse(s)` : "Non renseigné"}
+                  ${hasQuiz ? `✓ ${quizDisplayCount} réponse(s)` : "Non renseigné"}
                 </span>
                 <button class="btn btn-outline-dark" data-nav="quiz" style="padding: 4px 10px; font-size: 12px;">Repasser</button>
               </div>

@@ -332,21 +332,6 @@ onAuthStateChanged(auth, async (user) => {
             if (adminDocSnap.exists()) {
               userRole = "admin";
               await setDoc(userDocRef, { role: "admin", email: user.email }, { merge: true });
-            } else {
-              const adminsQuery = query(collection(db, "users"), where("role", "==", "admin"));
-              const adminSnaps = await getDocs(adminsQuery);
-              let preAuthFound = false;
-              adminSnaps.forEach((aDoc) => {
-                const aData = aDoc.data();
-                if (aData.email && aData.email.toLowerCase().trim() === userEmailLower) {
-                  preAuthFound = true;
-                }
-              });
-
-              if (preAuthFound) {
-                userRole = "admin";
-                await setDoc(userDocRef, { role: "admin", email: user.email }, { merge: true });
-              }
             }
           } catch (e) {
             console.warn("Erreur de vérification admin pré-autorisé:", e);
@@ -354,6 +339,13 @@ onAuthStateChanged(auth, async (user) => {
         }
         
         state.role = userRole;
+
+        // Redirection réactive : si l'utilisateur est connecté et se trouve sur la page de connexion ou d'inscription, rediriger automatiquement
+        if (state.page === "login" || state.page === "signup") {
+          state.page = userRole === "admin" ? "admin-dashboard" : "client-dashboard";
+          state.ui.loginError = "";
+          state.ui.signupError = "";
+        }
 
         // Reconstitution robuste de l'objet physique
         const physique = {
@@ -369,10 +361,23 @@ onAuthStateChanged(auth, async (user) => {
           program.sessions = state.clientProfile.program.sessions;
         }
 
+        // Reconstitution des réponses de l'onboarding / quiz
+        const quizAns = userData.quizAnswers || state.clientProfile?.quizAnswers || {};
+        const restoredQuizAnswers = {
+          ...quizAns,
+          objectif: quizAns.objectif || userData.goal || "",
+          lieu: quizAns.lieu || userData.track || "",
+          niveau: quizAns.niveau || userData.niveau || "",
+          frequence: quizAns.frequence || userData.frequence || "",
+          physique: quizAns.physique || physique
+        };
+        state.quizAnswers = restoredQuizAnswers;
+
         state.clientProfile = {
           ...state.clientProfile,
           ...userData,
           physique,
+          quizAnswers: restoredQuizAnswers,
           email: user.email,
           uid: user.uid,
           program: {
@@ -420,6 +425,7 @@ onAuthStateChanged(auth, async (user) => {
     cleanupAdminRealTimeSync();
     state.role = "guest";
     state.clientProfile = {};
+    state.quizAnswers = {};
     state.adminData = { clients: [], messages: [], loaded: false, loading: false };
     if (state.page.startsWith("client") || state.page.startsWith("admin")) {
       state.page = "signup";

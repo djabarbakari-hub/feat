@@ -1110,38 +1110,7 @@ document.addEventListener("click", async (e) => {
     render();
 
     try {
-      // Vérification si l'utilisateur est enregistré dans la base de données Firestore
-      const emailLower = email.toLowerCase().trim();
-      let isAllowedDirectly = emailLower === "djabarbakari.032003@gmail.com" || emailLower === "test.client@monprogrammefit.com";
-      if (!isAllowedDirectly) {
-        try {
-          const adminEmailDocRef = doc(db, "admin_emails", emailLower);
-          const adminEmailDocSnap = await getDoc(adminEmailDocRef);
-          if (adminEmailDocSnap.exists()) {
-            isAllowedDirectly = true;
-          }
-        } catch (e) {
-          console.warn("Erreur vérification admin_emails:", e);
-        }
-      }
-
-      if (!isAllowedDirectly) {
-        const q1 = query(collection(db, "users"), where("email", "==", email));
-        const q2 = query(collection(db, "users"), where("email", "==", emailLower));
-        const [snap1, snap2] = await Promise.all([getDocs(q1), getDocs(q2)]);
-        if (snap1.empty && snap2.empty) {
-          state.ui.loginPending = false;
-          state.ui.signupError = "Aucun compte n'est enregistré avec cette adresse e-mail. Veuillez créer un compte.";
-          state.drafts.signup.email = email;
-          state.ui.loginError = "";
-          persistState();
-          navigate("signup");
-          render();
-          return;
-        }
-      }
-
-      // 1. Connexion via Firebase Auth
+      // 1. Connexion directe via Firebase Auth (Firebase gère la vérification des identifiants)
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 

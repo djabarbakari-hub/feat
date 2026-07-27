@@ -55,10 +55,12 @@ export function navigate(page, { replace = false } = {}) {
   renderFn();
   window.scrollTo({ top: 0, behavior: "smooth" });
 
-  // Réinitialiser le quiz si on retourne à l'accueil
+  // Réinitialiser le step du quiz si on retourne à l'accueil
   if (page === "home") {
     state.quizStep = 0;
-    state.quizAnswers = {};
+    if (!state.clientProfile?.quizAnswers || Object.keys(state.clientProfile.quizAnswers).length === 0) {
+      state.quizAnswers = {};
+    }
   }
 }
 
