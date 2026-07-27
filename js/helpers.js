@@ -4,6 +4,61 @@
 
 import { TRACKS, QUIZ_STEPS } from "./data.js";
 import { state } from "./state.js";
+import { auth } from "./firebase.js";
+
+/**
+ * Génère le HTML d'avatar dynamique pour un utilisateur.
+ * Affiche la véritable photo de profil Google / email si disponible,
+ * ou tente la photo liée à l'adresse e-mail via unavatar.io,
+ * avec un repli automatique et propre sur les initiales si l'image est indisponible.
+ */
+export function getUserAvatarHtml({
+  photoURL = "",
+  email = "",
+  firstName = "",
+  lastName = "",
+  size = 28,
+  border = "1px solid rgba(255, 255, 255, 0.2)",
+  className = "",
+  customStyle = ""
+} = {}) {
+  const cleanEmail = (email || "").trim().toLowerCase();
+  const fName = (firstName || "").trim();
+  const lName = (lastName || "").trim();
+  const initials = ((fName[0] || "") + (lName[0] || "")).toUpperCase() || (cleanEmail[0] || "U").toUpperCase();
+
+  let photo = photoURL || "";
+
+  if (!photo && auth?.currentUser) {
+    const currEmail = (auth.currentUser.email || "").trim().toLowerCase();
+    if (currEmail && cleanEmail && currEmail === cleanEmail && auth.currentUser.photoURL) {
+      photo = auth.currentUser.photoURL;
+    } else if (!cleanEmail && auth.currentUser.photoURL) {
+      photo = auth.currentUser.photoURL;
+    }
+  }
+
+  if (!photo && cleanEmail) {
+    photo = `https://unavatar.io/${encodeURIComponent(cleanEmail)}?fallback=false`;
+  }
+
+  const containerStyle = `width:${size}px; height:${size}px; border-radius:50%; flex-shrink:0; overflow:hidden; display:inline-flex; align-items:center; justify-content:center; position:relative; ${border ? `border:${border};` : ""} ${customStyle}`;
+
+  if (photo && (photo.startsWith("http") || photo.startsWith("data:"))) {
+    return `
+      <div class="user-avatar-wrap ${className}" style="${containerStyle}">
+        <img src="${escapeHtml(photo)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;" alt="${escapeHtml(initials)}" referrerpolicy="no-referrer" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';" />
+        <span style="display:none; align-items:center; justify-content:center; width:100%; height:100%; background:var(--ember); color:#ffffff; font-size:${Math.round(size * 0.42)}px; font-weight:800; font-family:'Archivo', sans-serif;">${escapeHtml(initials)}</span>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="user-avatar-wrap ${className}" style="${containerStyle} background:var(--ember); color:#ffffff; font-size:${Math.round(size * 0.42)}px; font-weight:800; font-family:'Archivo', sans-serif;">
+      ${escapeHtml(initials)}
+    </div>
+  `;
+}
 
 /**
  * Génère une icône Lucide dynamique.

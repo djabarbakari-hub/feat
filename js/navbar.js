@@ -3,7 +3,8 @@
    ========================================================== */
 
 import { state } from "./state.js";
-import { icon, escapeHtml } from "./helpers.js";
+import { icon, escapeHtml, getUserAvatarHtml } from "./helpers.js";
+import { auth } from "./firebase.js";
 import { WHATSAPP_ICON } from "./assets.js";
 
 /**
@@ -34,16 +35,33 @@ export function renderNavbar() {
   
   // Badge de profil dynamique de l'utilisateur connecté
   const isDocAdmin = state.role === "admin";
+  const email = state.clientProfile?.email || auth?.currentUser?.email || "";
   const firstName = state.clientProfile?.firstName || (isDocAdmin ? "Abdou" : "Athlète");
   const lastName = state.clientProfile?.lastName || "";
-  const initial = firstName.charAt(0).toUpperCase() || "U";
+  const photoURL = state.clientProfile?.photoURL || state.clientProfile?.photoUrl || auth?.currentUser?.photoURL || "";
+
+  const avatarHeaderHtml = getUserAvatarHtml({
+    photoURL,
+    email,
+    firstName,
+    lastName,
+    size: 24,
+    border: "1px solid rgba(255, 255, 255, 0.25)"
+  });
+
+  const avatarMobileHtml = getUserAvatarHtml({
+    photoURL,
+    email,
+    firstName,
+    lastName,
+    size: 28,
+    border: "1px solid rgba(255, 255, 255, 0.25)"
+  });
 
   const rightUser = `
     <div class="navbar-right-user" style="display: flex; align-items: center; gap: 14px;">
-      <div class="user-badge-header" style="display: flex; align-items: center; gap: 8px; padding: 6px 14px; background: rgba(255, 255, 255, 0.06); border-radius: 9999px; border: 1px solid rgba(255, 255, 255, 0.12); cursor: default;">
-        <span style="width: 22px; height: 22px; border-radius: 50%; background: var(--accent-primary); color: var(--ink); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; font-family: 'Archivo', sans-serif;">
-          ${escapeHtml(initial)}
-        </span>
+      <div class="user-badge-header" style="display: flex; align-items: center; gap: 8px; padding: 4px 12px; background: rgba(255, 255, 255, 0.06); border-radius: 9999px; border: 1px solid rgba(255, 255, 255, 0.12); cursor: default;">
+        ${avatarHeaderHtml}
         <span style="font-size: 13px; color: var(--chalk); font-weight: 600; white-space: nowrap; max-width: 120px; overflow: hidden; text-overflow: ellipsis; display: inline-block;">
           ${escapeHtml(isDocAdmin ? "Coach Abdou" : firstName)}
         </span>
@@ -57,9 +75,7 @@ export function renderNavbar() {
   const rightUserMobile = `
     <div style="display: flex; flex-direction: column; gap: 12px; border-top: 1px dashed rgba(255, 255, 255, 0.12); padding-top: 12px; margin-top: 12px;">
       <div style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: rgba(255, 255, 255, 0.06); border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.08);">
-        <span style="width: 26px; height: 26px; border-radius: 50%; background: var(--accent-primary); color: var(--ink); display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800;">
-          ${escapeHtml(initial)}
-        </span>
+        ${avatarMobileHtml}
         <span style="font-size: 13px; color: var(--chalk); font-weight: 600;">
           Session active : ${escapeHtml(isDocAdmin ? `Coach Abdou` : `${firstName} ${lastName}`.trim())}
         </span>

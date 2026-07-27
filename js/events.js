@@ -1152,7 +1152,7 @@ document.addEventListener("click", async (e) => {
 
       // 2. Lecture du rôle réel et des données depuis la collection "users" dans Firestore
       let userRole = "client";
-      let userProfile = { email: user.email, uid: user.uid };
+      let userProfile = { email: user.email, uid: user.uid, photoURL: user.photoURL || null };
 
       const userDocRef = doc(db, "users", user.uid);
       const userDocSnap = await getDoc(userDocRef);

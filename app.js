@@ -380,6 +380,7 @@ onAuthStateChanged(auth, async (user) => {
           quizAnswers: restoredQuizAnswers,
           email: user.email,
           uid: user.uid,
+          photoURL: user.photoURL || userData.photoURL || userData.photoUrl || state.clientProfile?.photoURL || null,
           program: {
             ...(state.clientProfile?.program || {}),
             ...program

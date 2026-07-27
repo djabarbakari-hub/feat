@@ -3,58 +3,165 @@
    ========================================================== */
 
 import { state } from "../state.js";
-import { escapeHtml } from "../helpers.js";
+import { escapeHtml, icon } from "../helpers.js";
 
 export function renderLogin() {
   const login = state.drafts.login;
   return `
-  <div class="section wrap">
-    <div class="login-wrap">
-      <h1 class="font-display" style="font-size:24px;text-align:center;color:var(--ink);margin-bottom:4px">Connexion</h1>
-      <p style="font-size:14px;text-align:center;color:var(--slate);margin-bottom:24px">Accède à ton espace et reprends ton suivi où tu l’as laissé.</p>
-      <div class="login-form card">
-        <div style="margin-bottom:16px;">
-          <button type="button" class="btn" data-google-auth="login" style="width:100%;justify-content:center;gap:10px;background:#ffffff;color:#1f2937;border:1px solid var(--line, #e5e7eb);padding:12px;font-weight:600;border-radius:8px;cursor:pointer;display:flex;align-items:center;transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.05);" ${state.ui.googleAuthPending ? "disabled" : ""}>
+  <div class="auth-page-container" style="background: var(--chalk);">
+    <div class="auth-wrap">
+      
+      <div class="auth-grid">
+        
+        <!-- COLONNE GAUCHE: BRANDING & FIABILITÉ (Masquée sur Mobile) -->
+        <div class="auth-branding-col">
+          
+          <div style="position: relative; z-index: 2;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+              <span class="font-mono" style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; background: rgba(226, 98, 45, 0.2); color: var(--ember); border-radius: 4px; font-weight: 800;">
+                [ ESPACE MEMBRE ]
+              </span>
+            </div>
+
+            <h1 class="font-display auth-title" style="color: #ffffff;">
+              Ravi de vous revoir sur MonProgrammeFit.
+            </h1>
+
+            <p class="auth-desc">
+              Connectez-vous pour reprendre votre suivi, enregistrer vos séances et consulter vos consignes.
+            </p>
+
+            <!-- AVANTAGES MEMBRE -->
+            <div class="auth-features-list">
+              <div class="auth-feature-item">
+                <div class="auth-feature-icon" style="background: rgba(226, 98, 45, 0.15); color: var(--ember);">
+                  ${icon("activity", 16)}
+                </div>
+                <div>
+                  <h4 class="auth-feature-title">Programmes & Exercices</h4>
+                  <p class="auth-feature-text">Accédez immédiatement aux séances et conseils ciblés.</p>
+                </div>
+              </div>
+
+              <div class="auth-feature-item">
+                <div class="auth-feature-icon" style="background: rgba(60, 150, 80, 0.15); color: var(--moss);">
+                  ${icon("trending-up", 16)}
+                </div>
+                <div>
+                  <h4 class="auth-feature-title">Suivi de Progression</h4>
+                  <p class="auth-feature-text">Consignez votre évolution physique et vos mensurations.</p>
+                </div>
+              </div>
+
+              <div class="auth-feature-item">
+                <div class="auth-feature-icon" style="background: rgba(255, 255, 255, 0.1); color: #ffffff;">
+                  ${icon("shield-check", 16)}
+                </div>
+                <div>
+                  <h4 class="auth-feature-title">Espace 100% Sécurisé</h4>
+                  <p class="auth-feature-text">Données personnelles protégées et synchronisées.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CITATION / BADGE EN BAS -->
+          <div style="margin-top: 16px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px;">
+            <div style="width: 30px; height: 30px; border-radius: 50%; background: var(--ember); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; flex-shrink: 0;">
+              AB
+            </div>
+            <div>
+              <div style="font-size: 12px; font-weight: 700; color: #ffffff;">Coach Abdou BAKARI</div>
+              <div style="font-size: 10.5px; color: var(--ink-muted2);">Fondateur & Préparateur Physique</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- COLONNE DROITE: FORMULAIRE DE CONNEXION -->
+        <div class="auth-form-card">
+          
+          <div style="margin-bottom: 12px;">
+            <h2 class="font-display auth-title" style="color: var(--ink);">Connexion</h2>
+            <p class="auth-desc" style="margin: 0;">Saisissez vos identifiants pour vous connecter.</p>
+          </div>
+
+          <!-- BOUTON AUTH GOOGLE -->
+          <button type="button" class="auth-google-btn" data-google-auth="login" ${state.ui.googleAuthPending ? "disabled" : ""}>
             <svg width="18" height="18" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
               <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
             </svg>
-            ${state.ui.googleAuthPending ? "Connexion Google en cours…" : "Continuer avec Google"}
+            ${state.ui.googleAuthPending ? "Connexion Google…" : "Continuer avec Google"}
           </button>
+
+          <!-- SEPARATEUR -->
+          <div class="auth-divider">
+            <div style="flex: 1; height: 1px; background: var(--line);"></div>
+            <span style="padding: 0 10px;" class="font-mono">ou avec email</span>
+            <div style="flex: 1; height: 1px; background: var(--line);"></div>
+          </div>
+
+          <!-- FORMULAIRE EMAIL/MDP -->
+          <div class="auth-input-group">
+            <div>
+              <label class="font-mono auth-input-label">
+                Adresse e-mail
+              </label>
+              <input class="auth-input text-input" type="email" data-login-email value="${escapeHtml(login.email)}" placeholder="nom@exemple.com" autocomplete="username" />
+            </div>
+
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+                <label class="font-mono auth-input-label" style="margin-bottom: 0;">
+                  Mot de passe
+                </label>
+                <button type="button" id="btn-forgot-password-link" style="background: none; border: none; padding: 0; color: var(--ember); font-size: 11px; font-weight: 600; cursor: pointer;">
+                  Mot de passe oublié ?
+                </button>
+              </div>
+
+              <div class="password-field" style="position: relative;">
+                <input class="auth-input text-input" type="${state.ui.loginShowPassword ? "text" : "password"}" data-login-password value="${escapeHtml(login.password)}" placeholder="•••••••••" autocomplete="current-password" />
+                <button type="button" class="toggle-password" data-login-toggle-password style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--slate); font-size: 11px; font-weight: 600; cursor: pointer;">
+                  ${state.ui.loginShowPassword ? "Masquer" : "Afficher"}
+                </button>
+              </div>
+            </div>
+
+            <!-- BANNÈRES DE NOTIFICATION -->
+            ${state.ui.loginSuccessMessage ? `
+              <div class="form-success" role="alert" style="background: rgba(60, 150, 80, 0.1); color: var(--moss); border: 1px solid rgba(60, 150, 80, 0.2); padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">
+                ${escapeHtml(state.ui.loginSuccessMessage)}
+              </div>
+            ` : ""}
+
+            ${state.ui.loginError ? `
+              <div class="form-error" role="alert" style="background: rgba(226, 98, 45, 0.1); color: var(--ember); border: 1px solid rgba(226, 98, 45, 0.2); padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">
+                ${escapeHtml(state.ui.loginError)}
+              </div>
+            ` : ""}
+
+            <!-- BOUTON VALIDER -->
+            <button class="btn btn-ember auth-submit-btn" data-login-submit="1" ${state.ui.loginPending ? "disabled" : ""}>
+              ${state.ui.loginPending ? `<span class="btn-spinner"></span> Connexion…` : "Se connecter"}
+            </button>
+          </div>
+
+          <!-- ACCÈS INSCRIPTION -->
+          <div style="margin-top: 12px; text-align: center; border-top: 1px solid var(--line); padding-top: 10px;">
+            <p style="font-size: 12px; color: var(--slate); margin: 0 0 4px 0;">Nouveau sur MonProgrammeFit ?</p>
+            <button class="btn btn-outline" style="font-size: 12px; font-weight: 700; padding: 6px 14px; border: 1px solid var(--line); border-radius: 6px; color: var(--ink); background: var(--chalk-soft); cursor: pointer;" data-nav="signup">
+              Créer mon compte
+            </button>
+          </div>
+
         </div>
 
-        <div style="display:flex;align-items:center;margin:16px 0;color:var(--slate, #6b7280);font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;">
-          <div style="flex:1;height:1px;background:var(--line, #e5e7eb);"></div>
-          <span style="padding:0 10px;">ou avec email</span>
-          <div style="flex:1;height:1px;background:var(--line, #e5e7eb);"></div>
-        </div>
-
-        <label class="font-mono" style="font-size:12px">Adresse e-mail</label>
-        <input class="text-input" type="email" data-login-email value="${escapeHtml(login.email)}" placeholder="ton@exemple.com" autocomplete="username" />
-        <p class="login-help">Utilise l’adresse liée à ton compte MonProgrammeFit.</p>
-
-        <label class="font-mono" style="font-size:12px">Mot de passe</label>
-        <div class="password-field">
-          <input class="text-input" type="${state.ui.loginShowPassword ? "text" : "password"}" data-login-password value="${escapeHtml(login.password)}" placeholder="•••••••••" autocomplete="current-password" />
-          <button type="button" class="toggle-password" data-login-toggle-password>${state.ui.loginShowPassword ? "Masquer" : "Afficher"}</button>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;margin-bottom:12px;">
-          <p class="login-help" style="margin:0;">Ton mot de passe reste confidentiel.</p>
-          <button type="button" id="btn-forgot-password-link" style="background:none;border:none;padding:0;color:var(--ember);font-size:12px;font-weight:600;cursor:pointer;text-decoration:underline;">Mot de passe oublié ?</button>
-        </div>
-
-        <!-- [COMMENTAIRE] Affichage du message de succès d'activation/création de compte (avec instructions d'e-mail de vérification) -->
-        ${state.ui.loginSuccessMessage ? `<div class="form-success" role="alert" style="background:#def7ec;color:#03543f;border:1px solid #bcf0da;padding:12px;border-radius:6px;font-size:13px;margin-bottom:12px;font-weight:500;">${escapeHtml(state.ui.loginSuccessMessage)}</div>` : ""}
-
-        ${state.ui.loginError ? `<div class="form-error" role="alert">${escapeHtml(state.ui.loginError)}</div>` : ""}
-
-        <button class="btn btn-ember" style="justify-content:center;margin-top:8px" data-login-submit="1" ${state.ui.loginPending ? "disabled" : ""}>
-          ${state.ui.loginPending ? `<span class="btn-spinner"></span>Connexion en cours…` : "Se connecter"}
-        </button>
       </div>
-      <p class="hint">Pas encore de compte ? <button class="btn btn-ember" style="font-size:14px;padding:10px 14px;color:var(--ink);" data-nav="signup">S'inscrire</button></p>
+
     </div>
   </div>`;
 }
@@ -62,61 +169,166 @@ export function renderLogin() {
 export function renderSignup() {
   const d = state.drafts.signup;
   return `
-  <div class="section wrap">
-    <div class="card" style="max-width:560px;margin:0 auto;padding:24px">
-      <h1 class="font-display" style="font-size:22px;margin-bottom:8px">Créer mon compte</h1>
-      <p style="font-size:14px;color:var(--slate);margin-bottom:16px">Commence avec ton profil et choisis ton programme après inscription.</p>
+  <div class="auth-page-container" style="background: var(--chalk);">
+    <div class="auth-wrap">
+      
+      <div class="auth-grid">
+        
+        <!-- COLONNE GAUCHE: BRANDING INSCRIPTION (Masquée sur Mobile) -->
+        <div class="auth-branding-col">
+          
+          <div style="position: relative; z-index: 2;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+              <span class="font-mono" style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; background: rgba(226, 98, 45, 0.2); color: var(--ember); border-radius: 4px; font-weight: 800;">
+                [ INSCRIPTION MEMBRE ]
+              </span>
+            </div>
 
-      <div style="margin-bottom:16px;">
-        <button type="button" class="btn" data-google-auth="signup" style="width:100%;justify-content:center;gap:10px;background:#ffffff;color:#1f2937;border:1px solid var(--line, #e5e7eb);padding:12px;font-weight:600;border-radius:8px;cursor:pointer;display:flex;align-items:center;transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.05);" ${state.ui.googleAuthPending ? "disabled" : ""}>
-          <svg width="18" height="18" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-          </svg>
-          ${state.ui.googleAuthPending ? "Création en cours avec Google…" : "S'inscrire avec Google"}
-        </button>
-      </div>
+            <h1 class="font-display auth-title" style="color: #ffffff;">
+              Commencez votre transformation dès aujourd'hui.
+            </h1>
 
-      <div style="display:flex;align-items:center;margin:16px 0;color:var(--slate, #6b7280);font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;">
-        <div style="flex:1;height:1px;background:var(--line, #e5e7eb);"></div>
-        <span style="padding:0 10px;">ou par e-mail</span>
-        <div style="flex:1;height:1px;background:var(--line, #e5e7eb);"></div>
-      </div>
+            <p class="auth-desc">
+              Créez votre profil en quelques secondes pour accéder à vos programmes personnalisés.
+            </p>
 
-      <div class="form-grid">
-        <label class="font-mono" style="font-size:12px">Prénom</label>
-        <input class="text-input" type="text" data-signup-firstname value="${escapeHtml(d.firstName)}" placeholder="Ex: Julie" />
+            <!-- POINTS FORTS INSCRIPTION -->
+            <div class="auth-features-list">
+              <div class="auth-feature-item">
+                <div class="auth-feature-icon" style="background: rgba(226, 98, 45, 0.15); color: var(--ember);">
+                  ${icon("check-circle-2", 16)}
+                </div>
+                <div>
+                  <h4 class="auth-feature-title">Diagnostic personnalisé</h4>
+                  <p class="auth-feature-text">Questionnaire guidé pour définir vos cibles sportives.</p>
+                </div>
+              </div>
 
-        <label class="font-mono" style="font-size:12px">Nom</label>
-        <input class="text-input" type="text" data-signup-lastname value="${escapeHtml(d.lastName)}" placeholder="Ex: Dubois" />
+              <div class="auth-feature-item">
+                <div class="auth-feature-icon" style="background: rgba(60, 150, 80, 0.15); color: var(--moss);">
+                  ${icon("dumbbell", 16)}
+                </div>
+                <div>
+                  <h4 class="auth-feature-title">Programmes au choix</h4>
+                  <p class="auth-feature-text">Accès aux parcours en Salle, Maison & Poids du corps.</p>
+                </div>
+              </div>
 
-        <label class="font-mono" style="font-size:12px">Adresse e-mail</label>
-        <input class="text-input" type="email" data-signup-email value="${escapeHtml(d.email)}" placeholder="ton@exemple.com" autocomplete="username" />
-        <p class="login-help">Ton adresse email permettra de te reconnecter plus tard.</p>
+              <div class="auth-feature-item">
+                <div class="auth-feature-icon" style="background: rgba(255, 255, 255, 0.1); color: #ffffff;">
+                  ${icon("user-check", 16)}
+                </div>
+                <div>
+                  <h4 class="auth-feature-title">Accompagnement Coach</h4>
+                  <p class="auth-feature-text">Méthode conçue par le Coach Abdou BAKARI.</p>
+                </div>
+              </div>
+            </div>
+          </div>
 
-        <label class="font-mono" style="font-size:12px">Téléphone <span style="color:var(--slate);font-weight:normal;">(optionnel)</span></label>
-        <input class="text-input" type="tel" data-signup-phone value="${escapeHtml(d.phone || '')}" placeholder="Ex: +229 90000000" />
-        <p class="login-help">Optionnel — Utile si tu souhaites être contacté par SMS ou WhatsApp par le coach.</p>
+          <!-- FOOTER GAUCHE -->
+          <div style="margin-top: 16px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: space-between;">
+            <span class="font-mono" style="font-size: 11px; color: var(--ink-muted2);">MonProgrammeFit © 2026</span>
+            <span style="font-size: 11px; color: var(--moss); font-weight: 700;">Inscription gratuite</span>
+          </div>
 
-        <label class="font-mono" style="font-size:12px">Mot de passe</label>
-        <div class="password-field">
-          <input class="text-input" type="${state.ui.signupShowPassword ? "text" : "password"}" data-signup-password value="${escapeHtml(d.password)}" placeholder="•••••••••" autocomplete="new-password" />
-          <button type="button" class="toggle-password" data-signup-toggle-password>${state.ui.signupShowPassword ? "Masquer" : "Afficher"}</button>
         </div>
-        <p class="login-help">Au moins 8 caractères avec majuscule, minuscule, chiffre et caractère spécial (ex: @, #, !).</p>
 
-        <!-- [COMMENTAIRE] Affichage de confirmation verte si un message de succès d'inscription existe -->
-        ${state.ui.signupSuccessMessage ? `<div class="form-success" role="alert" style="background:#def7ec;color:#03543f;border:1px solid #bcf0da;padding:12px;border-radius:6px;font-size:13px;margin-bottom:12px;font-weight:500;">${escapeHtml(state.ui.signupSuccessMessage)}</div>` : ""}
+        <!-- COLONNE DROITE: FORMULAIRE D'INSCRIPTION -->
+        <div class="auth-form-card">
+          
+          <div style="margin-bottom: 12px;">
+            <h2 class="font-display auth-title" style="color: var(--ink);">Créer mon compte</h2>
+            <p class="auth-desc" style="margin: 0;">Rejoignez-nous et commencez votre entraînement.</p>
+          </div>
 
-        ${state.ui.signupError ? `<div class="form-error" role="alert">${escapeHtml(state.ui.signupError)}</div>` : ""}
+          <!-- BOUTON GOOGLE -->
+          <button type="button" class="auth-google-btn" data-google-auth="signup" ${state.ui.googleAuthPending ? "disabled" : ""}>
+            <svg width="18" height="18" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            ${state.ui.googleAuthPending ? "Création en cours avec Google…" : "S'inscrire avec Google"}
+          </button>
 
-        <button class="btn btn-ember" style="justify-content:center;margin-top:8px" data-signup-submit="1" ${state.ui.signupPending ? "disabled" : ""}>
-          ${state.ui.signupPending ? `<span class="btn-spinner"></span>Création en cours…` : "Créer mon compte"}
-        </button>
+          <!-- SEPARATEUR -->
+          <div class="auth-divider">
+            <div style="flex: 1; height: 1px; background: var(--line);"></div>
+            <span style="padding: 0 10px;" class="font-mono">ou par e-mail</span>
+            <div style="flex: 1; height: 1px; background: var(--line);"></div>
+          </div>
+
+          <!-- CHAMPS FORMULAIRE -->
+          <div class="auth-input-group">
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: clamp(8px, 1.2vw, 12px);">
+              <div>
+                <label class="font-mono auth-input-label">Prénom</label>
+                <input class="auth-input text-input" type="text" data-signup-firstname value="${escapeHtml(d.firstName)}" placeholder="Ex: Thomas" />
+              </div>
+
+              <div>
+                <label class="font-mono auth-input-label">Nom</label>
+                <input class="auth-input text-input" type="text" data-signup-lastname value="${escapeHtml(d.lastName)}" placeholder="Ex: Martin" />
+              </div>
+            </div>
+
+            <div>
+              <label class="font-mono auth-input-label">Adresse e-mail</label>
+              <input class="auth-input text-input" type="email" data-signup-email value="${escapeHtml(d.email)}" placeholder="nom@exemple.com" autocomplete="username" />
+            </div>
+
+            <div>
+              <label class="font-mono auth-input-label">
+                Téléphone <span style="color: var(--slate); font-weight: normal; text-transform: none;">(optionnel)</span>
+              </label>
+              <input class="auth-input text-input" type="tel" data-signup-phone value="${escapeHtml(d.phone || '')}" placeholder="Ex: +229 90000000" />
+            </div>
+
+            <div>
+              <label class="font-mono auth-input-label">Mot de passe</label>
+              <div class="password-field" style="position: relative;">
+                <input class="auth-input text-input" type="${state.ui.signupShowPassword ? "text" : "password"}" data-signup-password value="${escapeHtml(d.password)}" placeholder="•••••••••" autocomplete="new-password" />
+                <button type="button" class="toggle-password" data-signup-toggle-password style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--slate); font-size: 11px; font-weight: 600; cursor: pointer;">
+                  ${state.ui.signupShowPassword ? "Masquer" : "Afficher"}
+                </button>
+              </div>
+              <p style="font-size: 10px; color: var(--slate); margin: 2px 0 0 0;">Au moins 8 caractères avec majuscule, chiffre et symbole.</p>
+            </div>
+
+            <!-- BANNÈRES CONFIRMATION & ERREUR -->
+            ${state.ui.signupSuccessMessage ? `
+              <div class="form-success" role="alert" style="background: rgba(60, 150, 80, 0.1); color: var(--moss); border: 1px solid rgba(60, 150, 80, 0.2); padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">
+                ${escapeHtml(state.ui.signupSuccessMessage)}
+              </div>
+            ` : ""}
+
+            ${state.ui.signupError ? `
+              <div class="form-error" role="alert" style="background: rgba(226, 98, 45, 0.1); color: var(--ember); border: 1px solid rgba(226, 98, 45, 0.2); padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">
+                ${escapeHtml(state.ui.signupError)}
+              </div>
+            ` : ""}
+
+            <!-- BOUTON VALIDER INSCRIPTION -->
+            <button class="btn btn-ember auth-submit-btn" data-signup-submit="1" ${state.ui.signupPending ? "disabled" : ""}>
+              ${state.ui.signupPending ? `<span class="btn-spinner"></span> Création en cours…` : "Créer mon compte"}
+            </button>
+          </div>
+
+          <!-- ACCÈS CONNEXION -->
+          <div style="margin-top: 12px; text-align: center; border-top: 1px solid var(--line); padding-top: 10px;">
+            <p style="font-size: 12px; color: var(--slate); margin: 0 0 4px 0;">Vous avez déjà un compte ?</p>
+            <button class="btn btn-outline" style="font-size: 12px; font-weight: 700; padding: 6px 14px; border: 1px solid var(--line); border-radius: 6px; color: var(--ink); background: var(--chalk-soft); cursor: pointer;" data-nav="login">
+              Se connecter
+            </button>
+          </div>
+
+        </div>
+
       </div>
-      <p class="hint">Déjà un compte ? <button class="btn btn-ember" style="font-size:14px;padding:10px 14px;color:var(--ink);" data-nav="login">Se connecter</button></p>
+
     </div>
   </div>`;
 }

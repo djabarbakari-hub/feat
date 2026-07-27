@@ -36,6 +36,11 @@ function renderAvatarHtml(photoURL, firstName, lastName, email, avatarClass = "a
     }
   }
 
+  const cleanEmail = (email || "").toLowerCase().trim();
+  if (!photo && cleanEmail) {
+    photo = `https://unavatar.io/${encodeURIComponent(cleanEmail)}?fallback=false`;
+  }
+
   if (photo && typeof photo === "string" && photo.startsWith("http")) {
     return `
       <div class="${avatarClass}" style="padding: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; ${customStyle}">

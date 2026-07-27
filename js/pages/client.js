@@ -4,7 +4,7 @@
    ========================================================== */
 
 import { state } from "../state.js";
-import { icon, escapeHtml } from "../helpers.js";
+import { icon, escapeHtml, getUserAvatarHtml } from "../helpers.js";
 import { COACH_PROGRAMS } from "../data.js";
 
 /**
@@ -28,10 +28,20 @@ export function renderClientDashboard() {
   if (!program || !program.sessions?.length) {
     return `
     <div class="wrap client-page">
-      <div class="client-header">
-        <p class="client-eyebrow">Bienvenue</p>
-        <h1 class="client-title">Bonjour ${escapeHtml(firstName)}, prêt à commencer ?</h1>
-        <p class="client-subtitle">Nous avons besoin de quelques informations pour construire un programme 100% adapté à votre profil et vos objectifs.</p>
+      <div class="client-header" style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+        <div>
+          <p class="client-eyebrow">Bienvenue</p>
+          <h1 class="client-title">Bonjour ${escapeHtml(firstName)}, prêt à commencer ?</h1>
+          <p class="client-subtitle">Nous avons besoin de quelques informations pour construire un programme 100% adapté à votre profil et vos objectifs.</p>
+        </div>
+        ${getUserAvatarHtml({
+          photoURL: profile.photoURL || profile.photoUrl,
+          email: profile.email,
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          size: 52,
+          border: "2px solid var(--ember)"
+        })}
       </div>
 
       <div class="client-empty-state">
@@ -267,10 +277,20 @@ export function renderClientDashboard() {
 
   return `
   <div class="wrap client-page">
-    <div class="client-header">
-      <p class="client-eyebrow">Tableau de bord Athlète</p>
-      <h1 class="client-title">Bonjour, ${escapeHtml(firstName)}.</h1>
-      <p class="client-subtitle">Chaque entraînement est une brique de votre succès. Suivez vos objectifs et maintenez le cap.</p>
+    <div class="client-header" style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+      <div>
+        <p class="client-eyebrow">Tableau de bord Athlète</p>
+        <h1 class="client-title">Bonjour, ${escapeHtml(firstName)}.</h1>
+        <p class="client-subtitle">Chaque entraînement est une brique de votre succès. Suivez vos objectifs et maintenez le cap.</p>
+      </div>
+      ${getUserAvatarHtml({
+        photoURL: profile.photoURL || profile.photoUrl,
+        email: profile.email,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        size: 52,
+        border: "2px solid var(--ember)"
+      })}
     </div>
 
     <!-- PROCHAINE SÉANCE (Hero Card) -->
