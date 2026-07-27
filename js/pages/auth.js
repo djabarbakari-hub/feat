@@ -98,7 +98,10 @@ export function renderSignup() {
         <p class="login-help">Optionnel — Utile si tu souhaites être contacté par SMS ou WhatsApp par le coach.</p>
 
         <label class="font-mono" style="font-size:12px">Mot de passe</label>
-        <input class="text-input" type="password" data-signup-password value="${escapeHtml(d.password)}" placeholder="•••••••••" autocomplete="new-password" />
+        <div class="password-field">
+          <input class="text-input" type="${state.ui.signupShowPassword ? "text" : "password"}" data-signup-password value="${escapeHtml(d.password)}" placeholder="•••••••••" autocomplete="new-password" />
+          <button type="button" class="toggle-password" data-signup-toggle-password>${state.ui.signupShowPassword ? "Masquer" : "Afficher"}</button>
+        </div>
         <p class="login-help">Au moins 8 caractères avec majuscule, minuscule, chiffre et caractère spécial (ex: @, #, !).</p>
 
         ${state.ui.signupError ? `<div class="form-error" role="alert">${escapeHtml(state.ui.signupError)}</div>` : ""}

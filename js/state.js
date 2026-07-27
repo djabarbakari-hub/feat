@@ -45,6 +45,7 @@ export const state = {
     loginShowPassword: false,
     loginPending: false,
     signupError: "",
+    signupShowPassword: false,
     signupPending: false,
   },
   backExitAttempted: false,

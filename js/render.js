@@ -8,11 +8,13 @@ import { PAGES } from "./pages/index.js";
 import { renderNotFound } from "./pages/guest.js";
 import { createIcons, icons } from "lucide";
 import { updateTimerUI } from "./modules/workoutTimer.js";
+import { WHATSAPP_ICON } from "./assets.js";
 
 export function render() {
   const navContainer = document.getElementById("app");
   const main = document.getElementById("main-content");
   const footerContainer = document.getElementById("appFooter");
+  const whatsappContainer = document.getElementById("whatsapp-float-root");
   const pageFn = PAGES[state.page] || renderNotFound;
   
   if (navContainer) navContainer.innerHTML = renderNavbar();
@@ -35,6 +37,15 @@ export function render() {
   
   if (main) main.innerHTML = pageHtml;
   if (footerContainer) footerContainer.innerHTML = renderFooter();
+  
+  // Rendre l'icône WhatsApp toujours visible au niveau de la racine
+  if (whatsappContainer && !whatsappContainer.innerHTML) {
+    whatsappContainer.innerHTML = `
+      <a href="https://wa.me/2290191720596" class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Contacter sur WhatsApp" style="z-index: 999999;">
+        <img src="${WHATSAPP_ICON}" alt="WhatsApp" style="width:100%;height:100%;object-fit:cover;border-radius:50%;transform:scale(1.4);" onerror="this.onerror=null;this.src='/images/icone-whatsapp.png';" />
+      </a>
+    `;
+  }
   
   // Synchroniser le chronomètre d'entraînement si présent dans le DOM
   if (document.getElementById("workout-timer")) {

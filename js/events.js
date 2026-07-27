@@ -232,6 +232,10 @@ document.addEventListener("input", (e) => {
     state.drafts.signup.email = e.target.value;
     persistState();
   }
+  if (e.target.matches('[data-signup-phone]')) {
+    state.drafts.signup.phone = e.target.value;
+    persistState();
+  }
   if (e.target.matches('[data-signup-password]')) {
     state.drafts.signup.password = e.target.value;
     persistState();
@@ -663,6 +667,52 @@ document.addEventListener("click", async (e) => {
     return;
   }
 
+  const deleteClientAccountBtn = e.target.closest(".btn-delete-client-account");
+  if (deleteClientAccountBtn) {
+    if (state.role !== "admin") {
+      alert("Action interdite : Seul un administrateur peut supprimer un compte.");
+      return;
+    }
+
+    const clientId = deleteClientAccountBtn.dataset.clientId;
+    const clientEmail = deleteClientAccountBtn.dataset.clientEmail || "";
+    const clientName = deleteClientAccountBtn.dataset.clientName || "cet utilisateur";
+
+    if (!clientId) {
+      alert("ID client manquant.");
+      return;
+    }
+
+    const confirmed = confirm(`⚠️ Êtes-vous sûr de vouloir supprimer définitivement le compte de ${clientName} ?\n\nCette action est irréversible et supprimera l'intégralité de ses données (profil, messages, historique de séances, réponses du quiz) de la base de données Firestore.`);
+    if (!confirmed) return;
+
+    const originalText = deleteClientAccountBtn.innerHTML;
+    deleteClientAccountBtn.disabled = true;
+    deleteClientAccountBtn.innerHTML = "Suppression en cours...";
+
+    try {
+      const { purgeAllFirestoreUserData } = await import("./modules/privacy.js");
+      await purgeAllFirestoreUserData(clientId, clientEmail);
+
+      // Fermer le modal de détails s'il est ouvert
+      const existing = document.getElementById("client-details-modal");
+      if (existing) existing.remove();
+
+      // Mettre à jour les données admin globales
+      await refreshAdminData();
+      
+      const { showToast } = await import("./helpers.js");
+      showToast(`Le compte de ${clientName} a été supprimé avec succès.`);
+      render();
+    } catch (err) {
+      console.error("Erreur lors de la suppression de l'utilisateur:", err);
+      alert(`Erreur lors de la suppression du compte : ${err.message}`);
+      deleteClientAccountBtn.disabled = false;
+      deleteClientAccountBtn.innerHTML = originalText;
+    }
+    return;
+  }
+
   const cancelWorkoutBtn = e.target.closest("#btn-cancel-workout") || e.target.closest("#btn-cancel-workout-btn");
   if (cancelWorkoutBtn) {
     const { pauseWorkoutTimer } = await import("./modules/workoutTimer.js");
@@ -910,6 +960,13 @@ document.addEventListener("click", async (e) => {
   const loginPasswordToggle = e.target.closest("[data-login-toggle-password]");
   if (loginPasswordToggle) {
     state.ui.loginShowPassword = !state.ui.loginShowPassword;
+    render();
+    return;
+  }
+
+  const signupPasswordToggle = e.target.closest("[data-signup-toggle-password]");
+  if (signupPasswordToggle) {
+    state.ui.signupShowPassword = !state.ui.signupShowPassword;
     render();
     return;
   }
@@ -2122,3 +2179,57 @@ export function showQuickMetricsModal() {
     render();
   });
 }
+
+/* ==========================================================
+   MonProgrammeFit Rebranding — Interactions Ultra-Dynamiques
+   ========================================================== */
+
+// 1. Effet 3D Tilt sur les cartes éligibles (.tilt-card)
+document.addEventListener("mousemove", (e) => {
+  if (!e.target || typeof e.target.closest !== "function") return;
+  const card = e.target.closest(".tilt-card");
+  if (!card) return;
+  
+  const rect = card.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  
+  const centerX = rect.width / 2;
+  const centerY = rect.height / 2;
+  
+  // Facteur d'inclinaison personnalisable
+  const factor = parseFloat(card.getAttribute("data-tilt-factor")) || 0.08;
+  
+  const rotateX = -(y - centerY) * factor;
+  const rotateY = (x - centerX) * factor;
+  
+  // Appliquer une inclinaison 3D fluide
+  card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02) translateY(-4px)`;
+  card.style.boxShadow = "0 20px 40px rgba(226, 98, 45, 0.2)";
+});
+
+document.addEventListener("mouseleave", (e) => {
+  if (!e.target || typeof e.target.closest !== "function") return;
+  const card = e.target.closest(".tilt-card");
+  if (card) {
+    card.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1) translateY(0)";
+    card.style.boxShadow = "";
+  }
+}, true);
+
+// 2. Parallaxe de défilement pour les éléments parallax (.parallax-img)
+window.addEventListener("scroll", () => {
+  const scrollY = window.scrollY;
+  const parallaxImages = document.querySelectorAll(".parallax-img");
+  parallaxImages.forEach((img) => {
+    const parent = img.parentElement;
+    const rect = parent.getBoundingClientRect();
+    const inView = rect.top < window.innerHeight && rect.bottom > 0;
+    if (inView) {
+      const speed = 0.05;
+      const offset = (window.innerHeight / 2 - rect.top) * speed;
+      img.style.transform = `translateY(${offset}px) scale(1.15)`;
+    }
+  });
+});
+
