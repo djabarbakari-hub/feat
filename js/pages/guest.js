@@ -820,8 +820,12 @@ export function renderPrograms() {
               </details>
             </div>
             
-            <!-- BOUTON D'ACTIVATION -->
-            <div style="margin-top: 24px;">
+            <!-- BOUTONS D'ACTION (TELECHARGEMENT PDF & ACTIVATION) -->
+            <div style="margin-top: 24px; display: flex; flex-direction: column; gap: 10px;">
+              <button class="btn btn-outline btn-download-program" data-program-id="${p.id}" style="font-weight: 700; justify-content: center; width: 100%; padding: 10px; border: 1px solid var(--line); color: var(--ink); background: var(--chalk-soft); display: flex; align-items: center; gap: 8px;">
+                ${icon("download", 16, "var(--ember)")} Télécharger le programme (PDF)
+              </button>
+
               ${state.role === 'client' ? `
                 <button class="btn btn-moss btn-select-program w-full" data-program-id="${p.id}" style="font-weight: 700; justify-content: center; width: 100%; padding: 12px;">
                   Activer ce programme

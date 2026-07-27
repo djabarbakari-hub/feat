@@ -575,8 +575,13 @@ export function renderClientProgram() {
           <h2 style="font-size: 20px; font-weight: 800; color: var(--ink); margin: 6px 0 2px;">${escapeHtml(coachProg.title)}</h2>
           <p style="font-size: 13px; color: var(--slate); margin: 0;">${escapeHtml(coachProg.subtitle)} · ${escapeHtml(coachProg.duration)} · ${escapeHtml(coachProg.frequency)}</p>
         </div>
-        <div style="font-size: 12px; font-weight: 700; color: var(--moss); background: rgba(60, 90, 70, 0.08); padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(60, 90, 70, 0.15);">
-          🎯 ${escapeHtml(coachProg.id.includes("prise-de-muscle") ? "Progression & Hypertrophie" : (coachProg.id.includes("perte-poids") ? "Perte de Poids" : "Santé & Endurance"))}
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+          <div style="font-size: 12px; font-weight: 700; color: var(--moss); background: rgba(60, 90, 70, 0.08); padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(60, 90, 70, 0.15);">
+            🎯 ${escapeHtml(coachProg.id.includes("prise-de-muscle") ? "Progression & Hypertrophie" : (coachProg.id.includes("perte-poids") ? "Perte de Poids" : "Santé & Endurance"))}
+          </div>
+          <button class="btn btn-outline btn-download-program" data-program-id="${coachProg.id}" style="font-size: 12px; font-weight: 700; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 6px; background: #ffffff; cursor: pointer; color: var(--ink);">
+            ${icon("download", 14, "var(--ember)")} Télécharger ma fiche (PDF)
+          </button>
         </div>
       </div>
 
