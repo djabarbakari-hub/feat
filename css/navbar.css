@@ -2,12 +2,15 @@
 .header {
   width: 100%;
   background: var(--ink);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .navbar {
   position: sticky;
   top: 0;
-  z-index: 40;
+  z-index: 1000;
   background: linear-gradient(135deg, var(--ink) 0%, #22333d 100%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 6px 18px rgba(22, 35, 44, 0.14);
@@ -282,9 +285,31 @@
   }
 
   .footer .wrap {
-    padding: 12px 18px;
+    padding: 18px 16px;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    text-align: center;
+    gap: 14px;
+  }
+
+  .footer-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .footer-brand .logo {
+    justify-content: center;
+  }
+
+  .footer-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 10px 16px;
   }
 }
 
