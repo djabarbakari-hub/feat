@@ -911,117 +911,284 @@ export function renderLegal() {
 }
 
 /**
- * Rend la page À propos de MonProgrammeFit.
- * Structure : Hero + Histoire + Mission + Valeurs + Équipe + CTA.
- * Utilise des templates littéraux pour générer le HTML.
+ * Rend la page À propos de MonProgrammeFit (Rebranded).
+ * Structure : Hero Cinématique + KPIs + Histoire + Mission + Piliers + Coach + Engagements + CTA.
  * @returns {string} HTML de la page À propos.
  */
 export function renderAbout() {
   return `
-  <div class="section wrap">
-    <!-- Hero section -->
-    <section class="about-hero">
-      <p class="eyebrow-moss font-mono">À PROPOS DE NOUS</p>
-      <h1 class="font-display" style="max-width:780px;margin-bottom:16px;">Notre mission : rendre le sport accessible à tous, sans excuse.</h1>
-      <p class="hero-sub" style="max-width:640px;font-size:16px;line-height:1.6;color:var(--slate);">
-        Chez <span class="brand-name">MonProgrammeFit</span>, nous croyons que chacun mérite un programme adapté à son niveau, son environnement et ses objectifs. Découvre notre histoire et nos valeurs.
-      </p>
-    </section>
+  <div style="background: var(--chalk); padding-bottom: 60px;">
+    
+    <!-- HERO CINÉMATIQUE HAUT DE PAGE -->
+    <section class="hero" style="background: radial-gradient(circle at 85% 15%, rgba(226, 98, 45, 0.12) 0%, transparent 65%), var(--ink) !important; padding: 60px 0 50px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+      <div class="wrap" style="max-width: 1120px; margin: 0 auto; position: relative; z-index: 2;">
+        
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <span class="font-mono" style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; padding: 4px 10px; background: rgba(226, 98, 45, 0.15); color: var(--ember); border-radius: 4px; font-weight: 700;">
+            [ NOTRE HISTOIRE & ENGAGEMENT ]
+          </span>
+          <span style="font-size: 12px; color: var(--ink-muted2); font-family: var(--font-mono, monospace);">MonProgrammeFit — Edition 2026</span>
+        </div>
 
-    <!-- Histoire de la marque -->
-    <section class="about-story" style="margin-top:36px;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
-        ${icon("history", 22, "var(--ember)")}
-        <h2 class="h3 font-display" style="margin:0;">Notre histoire</h2>
-      </div>
-      <div class="story-grid">
-        <div class="story-card card">
-          <div class="story-step-badge">01</div>
-          <h3 class="font-display">Avant</h3>
-          <p>Tout a commencé en 2018 lorsque Abdou BAKARI, passionné de sport et coach depuis 2 ans, a constaté que beaucoup de personnes abandonnaient le sport par manque de temps, de matériel ou de motivation.</p>
-        </div>
-        <div class="story-card card">
-          <div class="story-step-badge">02</div>
-          <h3 class="font-display">Le déclencheur</h3>
-          <p>Un jour, un ami lui a demandé : <em>« Comment puis-je m'entraîner chez moi sans matériel ? »</em>. Cette question a été le déclic pour créer <span class="brand-name">MonProgrammeFit</span>.</p>
-        </div>
-        <div class="story-card card">
-          <div class="story-step-badge">03</div>
-          <h3 class="font-display">Maintenant</h3>
-          <p>Aujourd'hui, <span class="brand-name">MonProgrammeFit</span> accompagne des personnes dans leur transformation physique, avec des programmes 100% personnalisés et accessibles à tous.</p>
-        </div>
-      </div>
-    </section>
+        <h1 class="font-display h1" style="max-width: 860px; margin: 0 0 16px 0; font-size: clamp(28px, 4.5vw, 44px); line-height: 1.15; color: var(--chalk) !important;">
+          Rendre le coaching sportif sur-mesure accessible à tous, sans concession.
+        </h1>
 
-    <!-- Mission -->
-    <section class="about-mission card" style="margin-top:40px;padding:28px 24px;border-left:4px solid var(--ember, #E2622D);background:var(--surface);">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-        ${icon("target", 22, "var(--ember)")}
-        <h2 class="h3 font-display" style="margin:0;">Notre mission</h2>
-      </div>
-      <p style="font-size:15px;line-height:1.7;color:var(--text-primary);margin:0;">
-        Notre mission est simple : <strong>rendre le sport accessible à tous</strong> en proposant des programmes <strong>adaptés à chacun</strong>, quel que soit son niveau, son matériel ou son emploi du temps.
-      </p>
-    </section>
+        <p class="hero-sub" style="max-width: 680px; font-size: 16px; line-height: 1.6; color: var(--ink-muted2) !important; margin: 0 0 32px 0;">
+          Chez <strong style="color: var(--chalk);">MonProgrammeFit</strong>, nous rejetons les programmes génériques en papier coller. Chaque parcours est conçu sur-mesure selon ton niveau, ton équipement et tes contraintes réelles.
+        </p>
 
-    <!-- Valeurs -->
-    <section class="about-values" style="margin-top:44px;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
-        ${icon("heart", 22, "var(--ember)")}
-        <h2 class="h3 font-display" style="margin:0;">Nos valeurs</h2>
-      </div>
-      <div class="values-grid">
-        <div class="value-card card">
-          <div class="value-icon">${icon("check-circle-2", 22, "var(--ember)")}</div>
-          <h3 class="font-display">Accessibilité</h3>
-          <p>Des programmes adaptés à ta salle, ta maison, avec ou sans matériel.</p>
+        <!-- KPI STATS HIGHLIGHTS GRID -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 24px;">
+          <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 16px 20px;">
+            <div class="font-mono" style="font-size: 28px; font-weight: 800; color: var(--ember);">100%</div>
+            <div style="font-size: 13px; font-weight: 600; color: var(--chalk); margin-top: 2px;">Sur-mesure & Adaptatif</div>
+            <div style="font-size: 11px; color: var(--ink-muted2); margin-top: 2px;">Programme ajusté à ton profil</div>
+          </div>
+
+          <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 16px 20px;">
+            <div class="font-mono" style="font-size: 28px; font-weight: 800; color: var(--chalk);">+3 ans</div>
+            <div style="font-size: 13px; font-weight: 600; color: var(--chalk); margin-top: 2px;">Expertise Terrain</div>
+            <div style="font-size: 11px; color: var(--ink-muted2); margin-top: 2px;">Coaching certifié & éprouvé</div>
+          </div>
+
+          <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 16px 20px;">
+            <div class="font-mono" style="font-size: 28px; font-weight: 800; color: var(--chalk);">0 FCFA</div>
+            <div style="font-size: 13px; font-weight: 600; color: var(--chalk); margin-top: 2px;">Engagement Masqué</div>
+            <div style="font-size: 11px; color: var(--ink-muted2); margin-top: 2px;">Transparence & liberté totale</div>
+          </div>
         </div>
-        <div class="value-card card">
-          <div class="value-icon">${icon("sliders", 22, "var(--ember)")}</div>
-          <h3 class="font-display">Personnalisation</h3>
-          <p>Un questionnaire court pour générer ton programme sur mesure.</p>
-        </div>
-        <div class="value-card card">
-          <div class="value-icon">${icon("award", 22, "var(--ember)")}</div>
-          <h3 class="font-display">Expertise</h3>
-          <p>Des coachs reconnus avec plus de 3 ans d'expérience pour te guider.</p>
-        </div>
-        <div class="value-card card">
-          <div class="value-icon">${icon("users", 22, "var(--ember)")}</div>
-          <h3 class="font-display">Communauté</h3>
-          <p>Un groupe privé pour échanger avec d'autres utilisateurs et poser tes questions.</p>
-        </div>
+
       </div>
     </section>
 
-    <!-- Équipe -->
-    <section class="about-team" style="margin-top:44px;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
-        ${icon("user-check", 22, "var(--ember)")}
-        <h2 class="h3 font-display" style="margin:0;">Notre équipe</h2>
-      </div>
-      <div class="team-card card" style="display:flex;gap:28px;align-items:center;flex-wrap:wrap;padding:28px;">
-        <div style="flex:0 0 330px;width:330px;height:360px;border-radius:12px;overflow:hidden;background:var(--line, #e5e7eb);box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
-          <img src="${COACH_AVATAR}" alt="Photo de Abdou BAKARI" loading="lazy" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null;this.src='/images/team/abdou_bakari.jpg';" />
-          <div style="display:none;width:100%;height:100%;background:var(--ink, #1f2937);color:#ffffff;align-items:center;justify-content:center;font-weight:700;font-size:48px;">AB</div>
+    <!-- MAIN CONTENT SECTION -->
+    <div class="wrap" style="max-width: 1120px; margin: 40px auto 0;">
+
+      <!-- SECTION 1: NOTRE HISTOIRE (GENESIS) -->
+      <section style="margin-bottom: 48px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; border-bottom: 1px solid var(--line); padding-bottom: 12px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 4px; background: rgba(226, 98, 45, 0.1); display: flex; align-items: center; justify-content: center; color: var(--ember);">
+              ${icon("history", 18)}
+            </div>
+            <h2 class="h3 font-display" style="margin: 0; font-size: 22px; color: var(--ink);">Notre Genèse</h2>
+          </div>
+          <span class="font-mono" style="font-size: 11px; color: var(--slate); text-transform: uppercase;">Du constat au programme</span>
         </div>
-        <div style="flex:1;min-width:240px;">
-          <h3 class="font-display" style="font-size:22px;margin:0 0 6px;">Abdou BAKARI</h3>
-          <p class="role font-mono" style="color:var(--moss);font-size:14px;margin:0 0 12px;font-weight:600;">Fondateur & Coach principal</p>
-          <p style="font-size:16px;color:var(--slate);line-height:1.6;font-style:italic;margin:0;">
-            « Mon objectif : t'aider à atteindre le tien. »
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+          
+          <div class="card" style="padding: 24px; border: 1px solid var(--line); border-radius: 8px; background: #ffffff; position: relative;">
+            <div class="font-mono" style="font-size: 12px; font-weight: 800; color: var(--ember); background: rgba(226,98,45,0.1); padding: 2px 8px; border-radius: 4px; width: fit-content; margin-bottom: 12px;">
+              ÉTAPE 01 — 2018
+            </div>
+            <h3 class="font-display" style="font-size: 18px; margin: 0 0 10px 0; color: var(--ink);">Le Constat du Terrain</h3>
+            <p style="font-size: 14px; color: var(--slate); line-height: 1.6; margin: 0;">
+              En démarrant le coaching en 2018, <strong>Abdou BAKARI</strong> constate que beaucoup de débutants abandonnent dans les 6 premières semaines par manque de structure claire ou de programmes adaptés à leur quotidien.
+            </p>
+          </div>
+
+          <div class="card" style="padding: 24px; border: 1px solid var(--line); border-radius: 8px; background: #ffffff; position: relative;">
+            <div class="font-mono" style="font-size: 12px; font-weight: 800; color: var(--moss); background: rgba(60,150,80,0.1); padding: 2px 8px; border-radius: 4px; width: fit-content; margin-bottom: 12px;">
+              ÉTAPE 02 — LE DÉCLIC
+            </div>
+            <h3 class="font-display" style="font-size: 18px; margin: 0 0 10px 0; color: var(--ink);">L'Entraînement Sans Barrières</h3>
+            <p style="font-size: 14px; color: var(--slate); line-height: 1.6; margin: 0;">
+              Face aux demandes répétées d'entraînements à la maison sans matériel coûteux, l'idée de créer une solution digitale dynamique et personnalisée naît pour éliminer tout obstacle.
+            </p>
+          </div>
+
+          <div class="card" style="padding: 24px; border: 1px solid var(--line); border-radius: 8px; background: #ffffff; position: relative;">
+            <div class="font-mono" style="font-size: 12px; font-weight: 800; color: var(--ink); background: rgba(0,0,0,0.05); padding: 2px 8px; border-radius: 4px; width: fit-content; margin-bottom: 12px;">
+              ÉTAPE 03 — AUJOURD'HUI
+            </div>
+            <h3 class="font-display" style="font-size: 18px; margin: 0 0 10px 0; color: var(--ink);">MonProgrammeFit</h3>
+            <p style="font-size: 14px; color: var(--slate); line-height: 1.6; margin: 0;">
+              Aujourd'hui, MonProgrammeFit combine questionnaire intelligent, suivi direct du coach et liberté de choix entre salle de sport, maison équipée ou poids du corps.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SECTION 2: NOTRE MISSION (MISSION BANNER) -->
+      <section style="margin-bottom: 48px;">
+        <div style="background: #ffffff; border: 1px solid var(--line); border-left: 4px solid var(--ember); border-radius: 8px; padding: 28px 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+            ${icon("target", 22, "var(--ember)")}
+            <h2 class="h3 font-display" style="margin: 0; font-size: 20px; color: var(--ink);">Notre mission</h2>
+          </div>
+          <p style="font-size: 15px; line-height: 1.7; color: var(--text-primary); margin: 0;">
+            Notre mission est simple : <strong>rendre le sport accessible à tous</strong> en proposant des programmes <strong>adaptés à chacun</strong>, quel que soit son niveau, son matériel ou son emploi du temps.
           </p>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- CTA final -->
-    <section class="about-cta card" style="margin-top:48px;">
-      <h2 class="h3 font-display" style="margin-bottom:16px;">Prêt à commencer ta transformation ?</h2>
-      <button class="btn btn-ember" data-nav="signup" aria-label="Démarrer mon programme">Démarrer mon programme</button>
-    </section>
+      <!-- SECTION 3: NOS PILIERS ET VALEURS -->
+      <section style="margin-bottom: 48px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; border-bottom: 1px solid var(--line); padding-bottom: 12px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 4px; background: rgba(60, 150, 80, 0.1); display: flex; align-items: center; justify-content: center; color: var(--moss);">
+              ${icon("shield", 18)}
+            </div>
+            <h2 class="h3 font-display" style="margin: 0; font-size: 22px; color: var(--ink);">Nos 4 Piliers d'Excellence</h2>
+          </div>
+          <span class="font-mono" style="font-size: 11px; color: var(--slate); text-transform: uppercase;">Principes directeurs</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+          
+          <div class="card" style="padding: 20px; border: 1px solid var(--line); border-radius: 8px; background: #ffffff;">
+            <div style="width: 36px; height: 36px; border-radius: 6px; background: rgba(226, 98, 45, 0.1); display: flex; align-items: center; justify-content: center; color: var(--ember); margin-bottom: 12px;">
+              ${icon("check-circle-2", 20)}
+            </div>
+            <h3 class="font-display" style="font-size: 16px; margin: 0 0 8px 0; color: var(--ink);">Accessibilité Totale</h3>
+            <p style="font-size: 13px; color: var(--slate); line-height: 1.5; margin: 0;">
+              Programmes configurables pour la salle de gym complète, la maison avec matériel léger ou 100% au poids du corps.
+            </p>
+          </div>
+
+          <div class="card" style="padding: 20px; border: 1px solid var(--line); border-radius: 8px; background: #ffffff;">
+            <div style="width: 36px; height: 36px; border-radius: 6px; background: rgba(60, 150, 80, 0.1); display: flex; align-items: center; justify-content: center; color: var(--moss); margin-bottom: 12px;">
+              ${icon("sliders", 20)}
+            </div>
+            <h3 class="font-display" style="font-size: 16px; margin: 0 0 8px 0; color: var(--ink);">Hyper-Personnalisation</h3>
+            <p style="font-size: 13px; color: var(--slate); line-height: 1.5; margin: 0;">
+              Un questionnaire de départ rapide (objectif, fréquence, contraintes) qui adapte automatiquement les séances.
+            </p>
+          </div>
+
+          <div class="card" style="padding: 20px; border: 1px solid var(--line); border-radius: 8px; background: #ffffff;">
+            <div style="width: 36px; height: 36px; border-radius: 6px; background: rgba(0, 0, 0, 0.05); display: flex; align-items: center; justify-content: center; color: var(--ink); margin-bottom: 12px;">
+              ${icon("award", 20)}
+            </div>
+            <h3 class="font-display" style="font-size: 16px; margin: 0 0 8px 0; color: var(--ink);">Rigueur & Pédagogie</h3>
+            <p style="font-size: 13px; color: var(--slate); line-height: 1.5; margin: 0;">
+              Consignes d'exécution claires, temps de repos préconisés et conseils nutritionnels validés sur le terrain.
+            </p>
+          </div>
+
+          <div class="card" style="padding: 20px; border: 1px solid var(--line); border-radius: 8px; background: #ffffff;">
+            <div style="width: 36px; height: 36px; border-radius: 6px; background: rgba(226, 98, 45, 0.1); display: flex; align-items: center; justify-content: center; color: var(--ember); margin-bottom: 12px;">
+              ${icon("users", 20)}
+            </div>
+            <h3 class="font-display" style="font-size: 16px; margin: 0 0 8px 0; color: var(--ink);">Accompagnement Direct</h3>
+            <p style="font-size: 13px; color: var(--slate); line-height: 1.5; margin: 0;">
+              Contact permanent avec le coach via l'espace client sécurisé et messagerie intégrée.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SECTION 4: LE COACH & FONDATEUR -->
+      <section style="margin-bottom: 48px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; border-bottom: 1px solid var(--line); padding-bottom: 12px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 4px; background: rgba(226, 98, 45, 0.1); display: flex; align-items: center; justify-content: center; color: var(--ember);">
+              ${icon("user-check", 18)}
+            </div>
+            <h2 class="h3 font-display" style="margin: 0; font-size: 22px; color: var(--ink);">Le Fondateur & Head Coach</h2>
+          </div>
+          <span class="font-mono" style="font-size: 11px; color: var(--slate); text-transform: uppercase;">Profil certifié</span>
+        </div>
+
+        <div class="card" style="padding: 32px; border: 1px solid var(--line); border-radius: 12px; background: #ffffff; display: flex; gap: 32px; align-items: center; flex-wrap: wrap; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+          
+          <div style="flex: 0 0 280px; width: 280px; height: 320px; border-radius: 10px; overflow: hidden; background: var(--ink); border: 2px solid var(--line); box-shadow: 0 8px 24px rgba(0,0,0,0.1); position: relative;">
+            <img src="${COACH_AVATAR}" alt="Photo de Abdou BAKARI" loading="lazy" style="width:100%; height:100%; object-fit:cover;" onerror="this.onerror=null;this.src='/images/team/abdou_bakari.jpg';" />
+            <div style="position: absolute; bottom: 12px; left: 12px; right: 12px; background: rgba(22, 35, 44, 0.85); backdrop-filter: blur(8px); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);">
+              <span class="font-mono" style="font-size: 10px; color: var(--ember); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700;">[ CERTIFIÉ & DIPLÔMÉ ]</span>
+              <div style="font-size: 12px; color: var(--chalk); font-weight: 600; margin-top: 2px;">Abdou BAKARI</div>
+            </div>
+          </div>
+
+          <div style="flex: 1; min-width: 280px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span class="font-mono" style="font-size: 11px; background: rgba(60,150,80,0.12); color: var(--moss); padding: 3px 10px; border-radius: 4px; font-weight: 700;">
+                FONDATEUR & HEAD COACH
+              </span>
+              <span style="font-size: 12px; color: var(--slate); font-weight: 600;">• MonProgrammeFit</span>
+            </div>
+
+            <h3 class="font-display" style="font-size: 26px; margin: 0 0 10px 0; color: var(--ink);">Abdou BAKARI</h3>
+
+            <p style="font-size: 15px; color: var(--slate); line-height: 1.6; margin: 0 0 16px 0;">
+              Passionné de musculation et de préparation physique depuis plus de 6 ans, Abdou a accompagné des dizaines de profils différents dans leur transformation. Sa philosophie repose sur la régularité, l'adaptation et la simplicité d'exécution.
+            </p>
+
+            <div style="background: rgba(226, 98, 45, 0.05); border-left: 3px solid var(--ember); padding: 12px 16px; border-radius: 4px; margin-bottom: 0;">
+              <p style="font-size: 14px; color: var(--ink); font-style: italic; margin: 0; font-weight: 500;">
+                « Mon objectif : t'aider à atteindre le tien. »
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SECTION 5: SÉCURITÉ & ENGAGEMENTS TRANSPARENCE -->
+      <section style="margin-bottom: 48px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+          
+          <div style="background: #ffffff; border: 1px solid var(--line); border-radius: 8px; padding: 20px;">
+            <div style="display: flex; align-items: center; gap: 8px; color: var(--moss); font-weight: 700; font-size: 14px; margin-bottom: 6px;">
+              ${icon("shield", 16)} Protection des données (RGPD)
+            </div>
+            <p style="font-size: 13px; color: var(--slate); margin: 0; line-height: 1.5;">
+              Tes données personnelles et tes réponses au questionnaire t'appartiennent. Exportation au format JSON disponible à tout moment.
+            </p>
+          </div>
+
+          <div style="background: #ffffff; border: 1px solid var(--line); border-radius: 8px; padding: 20px;">
+            <div style="display: flex; align-items: center; gap: 8px; color: var(--ember); font-weight: 700; font-size: 14px; margin-bottom: 6px;">
+              ${icon("refresh-cw", 16)} Mises à jour continues
+            </div>
+            <p style="font-size: 13px; color: var(--slate); margin: 0; line-height: 1.5;">
+              Nos séances et banques d'exercices sont régulièrement enrichies pour garantir une variété constante et éviter la lassitude.
+            </p>
+          </div>
+
+          <div style="background: #ffffff; border: 1px solid var(--line); border-radius: 8px; padding: 20px;">
+            <div style="display: flex; align-items: center; gap: 8px; color: var(--ink); font-weight: 700; font-size: 14px; margin-bottom: 6px;">
+              ${icon("message-square", 16)} Support & Écoute active
+            </div>
+            <p style="font-size: 13px; color: var(--slate); margin: 0; line-height: 1.5;">
+              Une question sur une posture ou une séance ? Le coach répond directement depuis l'espace client ou la messagerie.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SECTION 6: CTA FINAL -->
+      <section style="background: var(--ink); border-radius: 12px; padding: 40px; color: var(--chalk); text-align: center; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
+        <div style="position: relative; z-index: 2; max-width: 680px; margin: 0 auto;">
+          <span class="font-mono" style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; padding: 3px 10px; background: rgba(226, 98, 45, 0.2); color: var(--ember); border-radius: 4px; font-weight: 700;">
+            [ REJOINS L'AVENTURE ]
+          </span>
+          <h2 class="font-display" style="font-size: 28px; margin: 12px 0 12px 0; color: var(--chalk);">
+            Prêt à obtenir ton programme personnalisé ?
+          </h2>
+          <p style="font-size: 15px; color: var(--ink-muted2); margin: 0 0 24px 0; line-height: 1.6;">
+            Réponds à notre questionnaire rapide de 2 minutes pour découvrir les séances parfaitement ajustées à tes objectifs.
+          </p>
+          <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+            <button class="btn btn-ember" data-nav="quiz" style="font-weight: 700; padding: 12px 24px; font-size: 14px;">
+              Passer le questionnaire gratuit
+            </button>
+            <button class="btn btn-outline-light" data-nav="programs" style="padding: 12px 20px; font-size: 14px; color: var(--chalk); border-color: rgba(255,255,255,0.2);">
+              Voir tous les programmes
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </div>
   </div>`;
 }
+
 
 export function renderNotFound() {
   return `
