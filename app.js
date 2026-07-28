@@ -20,6 +20,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, collection, getDocs, query, where, onSnapshot, setDoc } from "firebase/firestore";
 import { state } from "./js/state.js";
 import { TRACKS, COACH_PROGRAMS } from "./js/data.js";
+import { extractNameFromEmailOrDisplayName } from "./js/helpers.js";
 
 setRenderer(render);
 
@@ -308,8 +309,11 @@ onAuthStateChanged(auth, async (user) => {
         if (!userDocSnap.exists()) {
           // Si le document n'existe pas encore (onboarding/signup en cours), initialiser le profil de base
           state.role = "client";
+          const extractedInit = extractNameFromEmailOrDisplayName(user.displayName, user.email);
           state.clientProfile = {
             ...state.clientProfile,
+            firstName: extractedInit.firstName || "Athlète",
+            lastName: extractedInit.lastName || "",
             email: user.email,
             uid: user.uid,
             physique: state.clientProfile.physique || { poids: null, taille: null, age: null, remarques: "" }
@@ -319,6 +323,9 @@ onAuthStateChanged(auth, async (user) => {
         }
 
         const userData = userDocSnap.data();
+        const extracted = extractNameFromEmailOrDisplayName(user.displayName, user.email);
+        const firstName = userData.firstName || extracted.firstName || "Athlète";
+        const lastName = userData.lastName || extracted.lastName || "";
         let userRole = userData.role || "client";
         const userEmailLower = (user.email || "").toLowerCase().trim();
 
@@ -376,6 +383,8 @@ onAuthStateChanged(auth, async (user) => {
         state.clientProfile = {
           ...state.clientProfile,
           ...userData,
+          firstName,
+          lastName,
           physique,
           quizAnswers: restoredQuizAnswers,
           email: user.email,
@@ -386,6 +395,10 @@ onAuthStateChanged(auth, async (user) => {
             ...program
           }
         };
+
+        if (!userData.firstName) {
+          setDoc(userDocRef, { firstName, lastName, email: user.email }, { merge: true }).catch(err => console.warn("Auto-save extracted name error:", err));
+        }
 
         if (state.role === "admin") {
           await refreshAdminData();

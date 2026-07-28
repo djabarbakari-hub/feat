@@ -20,7 +20,7 @@ import { state, persistState } from "./state.js";
 import { navigate, goBack } from "./router.js";
 import { render } from "./render.js";
 import { QUIZ_STEPS, COACH_PROGRAMS, TRACKS } from "./data.js";
-import { trackById, closeMobileMenu, showToast } from "./helpers.js";
+import { trackById, closeMobileMenu, showToast, getMatchingCoachProgram, setButtonLoading, extractNameFromEmailOrDisplayName } from "./helpers.js";
 import { auth, db } from "./firebase.js";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup, sendEmailVerification } from "firebase/auth";
 import { doc, setDoc, getDoc, addDoc, collection, writeBatch, query, where, getDocs, updateDoc, deleteDoc } from "firebase/firestore";
@@ -222,14 +222,36 @@ document.addEventListener("input", (e) => {
   }
   if (e.target.matches('[data-signup-firstname]')) {
     state.drafts.signup.firstName = e.target.value;
+    e.target.dataset.autofilled = "false";
     persistState();
   }
   if (e.target.matches('[data-signup-lastname]')) {
     state.drafts.signup.lastName = e.target.value;
+    e.target.dataset.autofilled = "false";
     persistState();
   }
   if (e.target.matches('[data-signup-email]')) {
-    state.drafts.signup.email = e.target.value;
+    const emailVal = e.target.value;
+    state.drafts.signup.email = emailVal;
+    if (emailVal.includes("@")) {
+      const extracted = extractNameFromEmailOrDisplayName("", emailVal);
+      const fnInput = document.querySelector('[data-signup-firstname]');
+      const lnInput = document.querySelector('[data-signup-lastname]');
+      if (extracted.firstName && (!state.drafts.signup.firstName || fnInput?.dataset.autofilled === "true")) {
+        state.drafts.signup.firstName = extracted.firstName;
+        if (fnInput && document.activeElement !== fnInput) {
+          fnInput.value = extracted.firstName;
+          fnInput.dataset.autofilled = "true";
+        }
+      }
+      if (extracted.lastName && (!state.drafts.signup.lastName || lnInput?.dataset.autofilled === "true")) {
+        state.drafts.signup.lastName = extracted.lastName;
+        if (lnInput && document.activeElement !== lnInput) {
+          lnInput.value = extracted.lastName;
+          lnInput.dataset.autofilled = "true";
+        }
+      }
+    }
     persistState();
   }
   if (e.target.matches('[data-signup-phone]')) {
@@ -328,36 +350,7 @@ document.addEventListener("click", async (e) => {
     const goal = answers.objectif || "";
 
     // Trouver le programme officiel du Coach Abdou BAKARI correspondant
-    let coachP = null;
-    if (goal === "endurance-sante") {
-      coachP = COACH_PROGRAMS.find(p => p.id === `sante-endurance-${track.id}`);
-    } else if (goal === "musculation") {
-      if (track.id === "home-equip") {
-        coachP = COACH_PROGRAMS.find(p => p.id === "prise-de-muscle-home");
-      } else if (track.id === "bodyweight") {
-        coachP = COACH_PROGRAMS.find(p => p.id === "prise-de-muscle-bodyweight");
-      } else if (track.id === "gym") {
-        coachP = COACH_PROGRAMS.find(p => p.id === "prise-de-muscle-gym");
-      }
-    } else if (goal === "perte-poids") {
-      if (track.id === "home-equip") {
-        coachP = COACH_PROGRAMS.find(p => p.id === "perte-poids-home");
-      } else if (track.id === "bodyweight") {
-        coachP = COACH_PROGRAMS.find(p => p.id === "perte-poids-bodyweight");
-      } else if (track.id === "gym") {
-        coachP = COACH_PROGRAMS.find(p => p.id === "perte-poids-gym");
-      }
-    }
-
-    // Fallback : si pas de correspondance exacte par objectif, on cherche n'importe quel programme de la même piste
-    if (!coachP) {
-      coachP = COACH_PROGRAMS.find(p => p.trackId === track.id);
-    }
-
-    // Fallback ultime de sécurité
-    if (!coachP) {
-      coachP = COACH_PROGRAMS[0];
-    }
+    const coachP = getMatchingCoachProgram(goal, track.id || answers.lieu);
 
     const currentUser = auth.currentUser;
     if (!currentUser && state.role === "guest") {
@@ -369,12 +362,17 @@ document.addEventListener("click", async (e) => {
       return;
     }
 
-    const applied = await applyProgramSelection(coachP, { answers, fromQuiz: true });
-    if (applied) {
-      state.quizStep = QUIZ_STEPS.length;
-      persistState();
-      render();
-      navigate("client-dashboard");
+    setButtonLoading(quizConfirmBtn, true, "Génération...");
+    try {
+      const applied = await applyProgramSelection(coachP, { answers, fromQuiz: true });
+      if (applied) {
+        state.quizStep = QUIZ_STEPS.length;
+        persistState();
+        render();
+        navigate("client-dashboard");
+      }
+    } finally {
+      setButtonLoading(quizConfirmBtn, false);
     }
     return;
   }
@@ -393,11 +391,16 @@ document.addEventListener("click", async (e) => {
         return;
       }
 
-      const applied = await applyProgramSelection(coachP);
-      if (applied) {
-        showToast("Programme activé avec succès !");
-        render();
-        navigate("client-program");
+      setButtonLoading(selectProgBtn, true, "Activation...");
+      try {
+        const applied = await applyProgramSelection(coachP);
+        if (applied) {
+          showToast("Programme activé avec succès !");
+          render();
+          navigate("client-program");
+        }
+      } finally {
+        setButtonLoading(selectProgBtn, false);
       }
     }
     return;
@@ -969,25 +972,24 @@ document.addEventListener("click", async (e) => {
 
   const signupSubmitBtn = e.target.closest("[data-signup-submit]");
   if (signupSubmitBtn) {
-    const card = signupSubmitBtn.closest('.card') || document;
-    const firstName = (card.querySelector('[data-signup-firstname]') || {}).value.trim();
-    const lastName = (card.querySelector('[data-signup-lastname]') || {}).value.trim();
+    const card = signupSubmitBtn.closest('.card') || signupSubmitBtn.closest('.auth-card') || document;
+    let firstName = (card.querySelector('[data-signup-firstname]') || {}).value.trim();
+    let lastName = (card.querySelector('[data-signup-lastname]') || {}).value.trim();
     const email = (card.querySelector('[data-signup-email]') || {}).value.trim();
     const phone = (card.querySelector('[data-signup-phone]') || {}).value.trim();
     const password = (card.querySelector('[data-signup-password]') || {}).value || "";
     const emailValid = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
+
+    // Extraction automatique si prénom/nom non saisis
+    const extractedSignupName = extractNameFromEmailOrDisplayName("", email);
+    if (!firstName) firstName = extractedSignupName.firstName || "Athlète";
+    if (!lastName) lastName = extractedSignupName.lastName || "";
 
     state.drafts.signup.firstName = firstName;
     state.drafts.signup.lastName = lastName;
     state.drafts.signup.email = email;
     state.drafts.signup.phone = phone;
     state.drafts.signup.password = password;
-
-    if (!firstName) {
-      state.ui.signupError = "Veuillez saisir votre prénom.";
-      render();
-      return;
-    }
 
     if (!email) {
       state.ui.signupError = "Veuillez saisir votre adresse e-mail.";
@@ -1158,6 +1160,30 @@ document.addEventListener("click", async (e) => {
         userProfile = { ...userProfile, ...data, physique };
       }
 
+      // Extraire automatiquement le prénom / nom depuis user.displayName ou l'adresse e-mail si manquant
+      const extractedLoginName = extractNameFromEmailOrDisplayName(user.displayName, user.email);
+      let finalFirstName = userProfile.firstName;
+      let finalLastName = userProfile.lastName;
+
+      if (!finalFirstName || finalFirstName === "Utilisateur" || finalFirstName === "Athlète") {
+        if (extractedLoginName.firstName) finalFirstName = extractedLoginName.firstName;
+      }
+      if (!finalLastName) {
+        if (extractedLoginName.lastName) finalLastName = extractedLoginName.lastName;
+      }
+
+      userProfile.firstName = finalFirstName || "Athlète";
+      userProfile.lastName = finalLastName || "";
+
+      // Sauvegarder dans Firestore si les noms manquaient
+      if (!userDocSnap.exists() || !userDocSnap.data()?.firstName || userDocSnap.data()?.firstName === "Utilisateur") {
+        await setDoc(userDocRef, {
+          firstName: userProfile.firstName,
+          lastName: userProfile.lastName,
+          email: user.email
+        }, { merge: true });
+      }
+
       const loginEmailLower = (user.email || "").toLowerCase().trim();
       if (loginEmailLower === "djabarbakari.032003@gmail.com") {
         userRole = "admin";
@@ -1218,9 +1244,9 @@ document.addEventListener("click", async (e) => {
       const userCredential = await signInWithPopup(auth, googleProvider);
       const user = userCredential.user;
 
-      const nameParts = (user.displayName || "").trim().split(" ");
-      const firstName = nameParts[0] || "Utilisateur";
-      const lastName = nameParts.slice(1).join(" ") || "";
+      const extractedGoogleName = extractNameFromEmailOrDisplayName(user.displayName, user.email);
+      let firstName = extractedGoogleName.firstName || "Athlète";
+      let lastName = extractedGoogleName.lastName || "";
 
       const userDocRef = doc(db, "users", user.uid);
       const userDocSnap = await getDoc(userDocRef);
@@ -1231,13 +1257,15 @@ document.addEventListener("click", async (e) => {
       if (userDocSnap.exists()) {
         const data = userDocSnap.data();
         userRole = data.role || "client";
+        if (data.firstName && data.firstName !== "Utilisateur") firstName = data.firstName;
+        if (data.lastName) lastName = data.lastName;
         const physique = {
           poids: data.weight !== undefined ? data.weight : (data.physique?.poids || null),
           taille: data.height !== undefined ? data.height : (data.physique?.taille || null),
           age: data.age !== undefined ? data.age : (data.physique?.age || null),
           remarques: data.medicalNotes !== undefined ? data.medicalNotes : (data.physique?.remarques || ""),
         };
-        userProfile = { ...userProfile, ...data, physique };
+        userProfile = { ...userProfile, ...data, firstName, lastName, physique };
       }
 
       if (user.photoURL) {
@@ -1737,31 +1765,44 @@ async function showPrivacyConfirmModal(type) {
 
   const confirmBtn = modal.querySelector(".privacy-confirm-yes");
   confirmBtn.addEventListener("click", async () => {
-    modal.remove();
-    const {
-      clearDrafts,
-      clearHistory,
-      deleteClientProfile,
-      deleteEntireAccount,
-    } = await import("./modules/privacy.js");
+    setButtonLoading(confirmBtn, true, "Traitement...");
+    try {
+      const {
+        clearDrafts,
+        clearHistory,
+        deleteClientProfile,
+        deleteEntireAccount,
+      } = await import("./modules/privacy.js");
 
-    switch (config.action) {
-      case "delete-drafts":
-        clearDrafts();
-        break;
-      case "delete-history":
-        clearHistory();
-        break;
-      case "delete-profile":
-        deleteClientProfile();
-        persistState();
-        render();
-        break;
-      case "delete-account":
-        if (confirm("DERNIÈRE CONFIRMATION: Êtes-vous vraiment sûr? Cette action est irréversible.")) {
-          deleteEntireAccount();
-        }
-        break;
+      switch (config.action) {
+        case "delete-drafts":
+          clearDrafts();
+          modal.remove();
+          render();
+          break;
+        case "delete-history":
+          clearHistory();
+          modal.remove();
+          render();
+          break;
+        case "delete-profile":
+          deleteClientProfile();
+          persistState();
+          modal.remove();
+          render();
+          break;
+        case "delete-account":
+          if (confirm("DERNIÈRE CONFIRMATION: Êtes-vous vraiment sûr? Cette action est irréversible.")) {
+            modal.remove();
+            await deleteEntireAccount();
+          } else {
+            setButtonLoading(confirmBtn, false);
+          }
+          break;
+      }
+    } catch (err) {
+      console.error(err);
+      setButtonLoading(confirmBtn, false);
     }
   });
 }
@@ -1833,6 +1874,7 @@ function showChangePasswordModal() {
     const currentPassword = e.target.currentPassword.value;
     const newPassword = e.target.newPassword.value;
     const errorDiv = modal.querySelector("#change-pw-error");
+    const submitBtn = e.target.querySelector('button[type="submit"]');
 
     const validationError = validatePasswordComplexity(newPassword);
     if (validationError) {
@@ -1841,15 +1883,23 @@ function showChangePasswordModal() {
       return;
     }
 
-    const { updateUserPassword } = await import("./modules/privacy.js");
-    const result = await updateUserPassword(currentPassword, newPassword);
+    setButtonLoading(submitBtn, true, "Mise à jour...");
 
-    if (result.success) {
-      modal.remove();
-      render();
-    } else {
-      errorDiv.textContent = result.error || "Erreur lors de la modification du mot de passe.";
-      errorDiv.style.display = "block";
+    try {
+      const { updateUserPassword } = await import("./modules/privacy.js");
+      const result = await updateUserPassword(currentPassword, newPassword);
+
+      if (result.success) {
+        modal.remove();
+        render();
+      } else {
+        errorDiv.textContent = result.error || "Erreur lors de la modification du mot de passe.";
+        errorDiv.style.display = "block";
+        setButtonLoading(submitBtn, false);
+      }
+    } catch (err) {
+      console.error(err);
+      setButtonLoading(submitBtn, false);
     }
   });
 }
@@ -1923,18 +1973,32 @@ function showAccountDeletionOptionsModal() {
 
   modal.querySelector("#close-del-opt-modal").addEventListener("click", () => modal.remove());
 
-  modal.querySelector("#btn-schedule-del-7d").addEventListener("click", async () => {
-    modal.remove();
-    const { scheduleAccountDeletion } = await import("./modules/privacy.js");
-    await scheduleAccountDeletion(7);
-    render();
+  const btnSchedule7d = modal.querySelector("#btn-schedule-del-7d");
+  btnSchedule7d?.addEventListener("click", async () => {
+    setButtonLoading(btnSchedule7d, true, "Programmation...");
+    try {
+      const { scheduleAccountDeletion } = await import("./modules/privacy.js");
+      await scheduleAccountDeletion(7);
+      modal.remove();
+      render();
+    } catch (err) {
+      console.error(err);
+      setButtonLoading(btnSchedule7d, false);
+    }
   });
 
-  modal.querySelector("#btn-delete-immediate").addEventListener("click", async () => {
+  const btnDeleteImm = modal.querySelector("#btn-delete-immediate");
+  btnDeleteImm?.addEventListener("click", async () => {
     if (confirm("DERNIÈRE CONFIRMATION : Êtes-vous certain de vouloir supprimer votre compte immédiatement ? Cette action est irréversible et sans délai.")) {
-      modal.remove();
-      const { deleteAccountImmediately } = await import("./modules/privacy.js");
-      await deleteAccountImmediately();
+      setButtonLoading(btnDeleteImm, true, "Suppression...");
+      try {
+        const { deleteAccountImmediately } = await import("./modules/privacy.js");
+        await deleteAccountImmediately();
+        modal.remove();
+      } catch (err) {
+        console.error(err);
+        setButtonLoading(btnDeleteImm, false);
+      }
     }
   });
 }
@@ -2049,8 +2113,7 @@ export function showForgotPasswordModal() {
     if (!email) return;
 
     const submitBtn = document.getElementById("btn-submit-forgot-pw");
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Envoi...";
+    setButtonLoading(submitBtn, true, "Envoi du lien...");
 
     const { sendPasswordResetEmail } = await import("firebase/auth");
     const { auth } = await import("./firebase.js");
@@ -2064,8 +2127,7 @@ export function showForgotPasswordModal() {
       const errorDiv = document.getElementById("forgot-pw-error");
       errorDiv.style.display = "block";
       errorDiv.textContent = "Erreur: Adresse introuvable ou invalide.";
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Envoyer le lien";
+      setButtonLoading(submitBtn, false);
     }
   });
 }
@@ -2140,31 +2202,33 @@ export function showQuickMetricsModal() {
     const a = parseInt(e.target.age.value);
 
     const submitBtn = e.target.querySelector('button[type="submit"]');
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<span class="btn-spinner"></span> Enregistrement...';
+    setButtonLoading(submitBtn, true, "Enregistrement...");
+
+    try {
+      const { updateUserProfile } = await import("./modules/privacy.js");
+      const { render } = await import("./render.js");
+      
+      // Log weight to weightHistory if changed
+      const currentWeight = parseFloat(profile.physique?.poids || profile.weight || 0);
+      if (w !== currentWeight) {
+        const history = profile.weightHistory || [];
+        const dateStr = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+        history.push({ date: dateStr, weight: w });
+        profile.weightHistory = history;
+      }
+
+      await updateUserProfile({
+        poids: w,
+        taille: h,
+        age: a
+      });
+
+      modal.remove();
+      render();
+    } catch (err) {
+      console.error(err);
+      setButtonLoading(submitBtn, false);
     }
-
-    const { updateUserProfile } = await import("./modules/privacy.js");
-    const { render } = await import("./render.js");
-    
-    // Log weight to weightHistory if changed
-    const currentWeight = parseFloat(profile.physique?.poids || profile.weight || 0);
-    if (w !== currentWeight) {
-      const history = profile.weightHistory || [];
-      const dateStr = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
-      history.push({ date: dateStr, weight: w });
-      profile.weightHistory = history;
-    }
-
-    await updateUserProfile({
-      poids: w,
-      taille: h,
-      age: a
-    });
-
-    modal.remove();
-    render();
   });
 }
 
@@ -2311,34 +2375,36 @@ export function showBodyMeasurementsModal() {
     const thighsVal = parseFloat(e.target.thighs.value) || null;
 
     const submitBtn = e.target.querySelector('button[type="submit"]');
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<span class="btn-spinner"></span> Enregistrement...';
+    setButtonLoading(submitBtn, true, "Enregistrement...");
+
+    try {
+      const { updateUserProfile } = await import("./modules/privacy.js");
+      const { render } = await import("./render.js");
+      const { showToast } = await import("./helpers.js");
+
+      const newMeasurements = {
+        waist: waistVal,
+        chest: chestVal,
+        arms: armsVal,
+        hips: hipsVal,
+        thighs: thighsVal,
+        updatedAt: new Date().toLocaleDateString('fr-FR')
+      };
+
+      profile.bodyMeasurements = newMeasurements;
+      state.clientProfile = profile;
+
+      await updateUserProfile({
+        bodyMeasurements: newMeasurements
+      });
+
+      modal.remove();
+      render();
+      showToast("📐 Vos mensurations ont été enregistrées avec succès !");
+    } catch (err) {
+      console.error(err);
+      setButtonLoading(submitBtn, false);
     }
-
-    const { updateUserProfile } = await import("./modules/privacy.js");
-    const { render } = await import("./render.js");
-    const { showToast } = await import("./helpers.js");
-
-    const newMeasurements = {
-      waist: waistVal,
-      chest: chestVal,
-      arms: armsVal,
-      hips: hipsVal,
-      thighs: thighsVal,
-      updatedAt: new Date().toLocaleDateString('fr-FR')
-    };
-
-    profile.bodyMeasurements = newMeasurements;
-    state.clientProfile = profile;
-
-    await updateUserProfile({
-      bodyMeasurements: newMeasurements
-    });
-
-    modal.remove();
-    render();
-    showToast("📐 Vos mensurations ont été enregistrées avec succès !");
   });
 }
 

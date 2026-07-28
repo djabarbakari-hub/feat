@@ -4,7 +4,7 @@
    ========================================================== */
 
 import { state, persistState, STORAGE_KEY } from "../state.js";
-import { showToast } from "../helpers.js";
+import { showToast, getMatchingCoachProgram, setButtonLoading } from "../helpers.js";
 import { auth, db, handleFirestoreError } from "../firebase.js";
 import { doc, setDoc, deleteDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { sendPasswordResetEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider, deleteUser, GoogleAuthProvider, reauthenticateWithPopup } from "firebase/auth";
@@ -85,20 +85,47 @@ export function clearHistory() {
 export async function updateUserProfile(newData) {
   const previousProfile = { ...state.clientProfile };
   
+  const newGoal = newData.goal !== undefined ? newData.goal : state.clientProfile.goal || "";
+  const newTrack = newData.track !== undefined ? newData.track : state.clientProfile.track || "";
+
+  let updatedProgram = newData.program !== undefined ? newData.program : state.clientProfile.program || null;
+
+  // Si l'objectif ou la piste change et qu'aucun programme spécifique n'est transmis, on met à jour le programme actif
+  if ((newData.goal !== undefined || newData.track !== undefined) && !newData.program) {
+    const matchedP = getMatchingCoachProgram(newGoal, newTrack);
+    if (matchedP) {
+      const currentProg = state.clientProfile?.program || {};
+      updatedProgram = {
+        ...currentProg,
+        coachProgramId: matchedP.id,
+        trackLabel: `${matchedP.title.replace("MONPROGRAMMEFIT : ", "")} (${matchedP.subtitle}) — Coach Abdou BAKARI`,
+        track: newTrack,
+        sessions: matchedP.sessions.map((s, idx) => ({
+          id: `s${idx + 1}`,
+          name: s.name,
+          exos: s.exercises.length,
+          duree: s.duration,
+          done: false,
+          weekNumber: 1
+        }))
+      };
+    }
+  }
+
   state.clientProfile = {
     ...state.clientProfile,
     firstName: newData.firstName !== undefined ? newData.firstName : state.clientProfile.firstName || "",
     lastName: newData.lastName !== undefined ? newData.lastName : state.clientProfile.lastName || "",
     email: newData.email !== undefined ? newData.email : state.clientProfile.email || "",
     phone: newData.phone !== undefined ? newData.phone : state.clientProfile.phone || "",
-    goal: newData.goal !== undefined ? newData.goal : state.clientProfile.goal || "",
-    track: newData.track !== undefined ? newData.track : state.clientProfile.track || "",
+    goal: newGoal,
+    track: newTrack,
     niveau: newData.niveau !== undefined ? newData.niveau : state.clientProfile.niveau || "",
     frequence: newData.frequence !== undefined ? newData.frequence : state.clientProfile.frequence || "",
     medicalNotes: newData.medicalNotes !== undefined ? newData.medicalNotes : state.clientProfile.medicalNotes || "",
     dailyWaterLog: newData.dailyWaterLog !== undefined ? newData.dailyWaterLog : state.clientProfile.dailyWaterLog || null,
     weightHistory: newData.weightHistory !== undefined ? newData.weightHistory : state.clientProfile.weightHistory || null,
-    program: newData.program !== undefined ? newData.program : state.clientProfile.program || null,
+    program: updatedProgram,
     quizAnswers: newData.quizAnswers !== undefined ? newData.quizAnswers : state.clientProfile.quizAnswers || null,
     physique: {
       ...(state.clientProfile.physique || {}),
@@ -746,7 +773,9 @@ function showReauthModal(currentUser, callback) {
   });
 
   if (isGoogleUser) {
-    modal.querySelector("#btn-reauth-google").addEventListener("click", async () => {
+    const btnGoogle = modal.querySelector("#btn-reauth-google");
+    btnGoogle?.addEventListener("click", async () => {
+      setButtonLoading(btnGoogle, true, "Connexion Google...");
       try {
         const provider = new GoogleAuthProvider();
         await reauthenticateWithPopup(currentUser, provider);
@@ -755,12 +784,14 @@ function showReauthModal(currentUser, callback) {
       } catch (err) {
         console.error("Reauth Google Error:", err);
         showToast("Échec de réauthentification Google.");
+        setButtonLoading(btnGoogle, false);
         cleanup();
         callback(false);
       }
     });
   } else {
-    modal.querySelector("#btn-reauth-confirm").addEventListener("click", async () => {
+    const btnConfirm = modal.querySelector("#btn-reauth-confirm");
+    btnConfirm?.addEventListener("click", async () => {
       const pwdInput = modal.querySelector("#reauth-password");
       const errDiv = modal.querySelector("#reauth-error");
       const password = pwdInput.value;
@@ -772,6 +803,7 @@ function showReauthModal(currentUser, callback) {
       }
 
       errDiv.style.display = "none";
+      setButtonLoading(btnConfirm, true, "Vérification...");
 
       try {
         const credential = EmailAuthProvider.credential(currentUser.email, password);
@@ -782,6 +814,7 @@ function showReauthModal(currentUser, callback) {
         console.error("Reauth Credential Error:", err);
         errDiv.textContent = "Mot de passe incorrect.";
         errDiv.style.display = "block";
+        setButtonLoading(btnConfirm, false);
       }
     });
   }

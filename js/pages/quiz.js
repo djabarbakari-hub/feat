@@ -31,8 +31,14 @@ export function renderQuiz() {
   if (state.quizStep >= QUIZ_STEPS.length) {
     const result = trackById(state.quizAnswers.lieu);
     const actionButton = state.role === 'client'
-      ? `<button class="btn btn-ember" style="margin-top:1.5rem" data-nav="client-dashboard" aria-label="Voir mon tableau de bord">Voir mon tableau de bord ${icon("arrow-right", 1)}</button>`
-      : `<button class="btn btn-ember" style="margin-top:1.5rem" data-nav="signup" aria-label="Créer mon compte et démarrer">Créer mon compte et démarrer ${icon("arrow-right", 1)}</button>`;
+      ? `<div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 1.5rem;">
+           <button class="btn btn-ember" data-nav="client-dashboard" aria-label="Voir mon tableau de bord">Voir mon tableau de bord ${icon("arrow-right", 14)}</button>
+           <button type="button" class="btn btn-outline-dark" data-quiz-restart>${icon("rotate-ccw", 14)} Refaire le questionnaire</button>
+         </div>`
+      : `<div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 1.5rem;">
+           <button class="btn btn-ember" data-nav="signup" aria-label="Créer mon compte et démarrer">Créer mon compte et démarrer ${icon("arrow-right", 14)}</button>
+           <button type="button" class="btn btn-outline-dark" data-quiz-restart>${icon("rotate-ccw", 14)} Recommencer le test</button>
+         </div>`;
 
     return `
     ${quizAnimation}

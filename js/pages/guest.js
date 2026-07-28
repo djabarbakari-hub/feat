@@ -751,7 +751,9 @@ export function renderPrograms() {
                 </div>
               </div>
 
-              <!-- ACCORDÉON DÉTAILS SÉANCES -->
+              <!-- DÉTAILS DU PROGRAMME OU VERROU POUR VISITURES -->
+              ${(state.role === 'client' || state.role === 'admin') ? `
+              <!-- ACCORDÉON DÉTAILS SÉANCES (MEMBRES CONNECTÉS) -->
               <details style="border-top: 1px dashed var(--line); margin-top: 16px; padding-top: 14px;">
                 <summary style="font-size: 13px; font-weight: 700; color: var(--ember); user-select: none; display: flex; align-items: center; gap: 6px; outline: none; cursor: pointer;">
                   <span>📖 Consulter le programme détaillé & séances</span>
@@ -818,6 +820,22 @@ export function renderPrograms() {
 
                 </div>
               </details>
+              ` : `
+              <!-- MESSAGE VERROUIN SANS COMPTE -->
+              <div style="border-top: 1px dashed var(--line); margin-top: 16px; padding-top: 14px;">
+                <div style="background: rgba(226, 98, 45, 0.04); border: 1px solid rgba(226, 98, 45, 0.18); border-radius: 8px; padding: 14px; text-align: center;">
+                  <div style="font-size: 12px; font-weight: 800; color: var(--ink); display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 4px;">
+                    🔒 <span>Détails du programme réservés aux membres</span>
+                  </div>
+                  <p style="font-size: 11px; color: var(--slate); margin: 0 0 10px 0; line-height: 1.4;">
+                    Créez un compte ou connectez-vous pour accéder à la structure détaillée du programme, aux séances et aux consignes du coach.
+                  </p>
+                  <button class="btn btn-ember btn-sm" data-nav="signup" style="font-size: 11px; font-weight: 700; padding: 6px 12px; width: 100%; justify-content: center;">
+                    S'inscrire / Se connecter pour débloquer
+                  </button>
+                </div>
+              </div>
+              `}
             </div>
             
             <!-- BOUTONS D'ACTION (ACTIVATION DU PROGRAMME) -->

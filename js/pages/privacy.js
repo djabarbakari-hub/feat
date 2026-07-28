@@ -4,7 +4,7 @@
    ========================================================== */
 
 import { state } from "../state.js";
-import { escapeHtml, icon } from "../helpers.js";
+import { escapeHtml, icon, setButtonLoading } from "../helpers.js";
 import { auth } from "../firebase.js";
 import {
   exportUserData,
@@ -15,12 +15,12 @@ import {
 } from "../modules/privacy.js";
 
 const goalLabels = {
-  remise: "Remise en forme",
+  remise: "Perte de poids",
   "perte-poids": "Perte de poids",
   musculation: "Musculation / Prise de masse",
-  endurance: "Endurance",
-  sante: "Santé générale",
-  "endurance-sante": "Endurance & Santé",
+  endurance: "Santé & Endurance",
+  sante: "Santé & Endurance",
+  "endurance-sante": "Santé & Endurance",
 };
 
 const trackLabels = {
@@ -461,8 +461,8 @@ export function renderPrivacyPage() {
               ${escapeHtml(trackLabels[profile.track] || profile.track || "Format non défini")}
             </div>
           </div>
-          <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--line); font-size: 11px; font-weight: 700; color: var(--ink);">
-            ${profile.frequence ? profile.frequence + " séances / semaine" : "Fréquence libre"}
+          <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--line); font-size: 11px; font-weight: 700; color: var(--moss);">
+            5 séances / semaine — Tous niveaux
           </div>
         </div>
 
@@ -602,7 +602,7 @@ export function renderPrivacyPage() {
               </div>
               <div>
                 <strong style="font-size: 15px; font-weight: 800; color: var(--ink);">2. Profil Sportif & Paramètres Physiques</strong>
-                <div style="font-size: 12px; color: var(--slate);">Objectif, lieu, niveau, mensurations et remarques médicales</div>
+                <div style="font-size: 12px; color: var(--slate);">Objectif, lieu/équipement, mensurations et remarques médicales</div>
               </div>
             </div>
             <div style="display: flex; align-items: center; gap: 12px;">
@@ -621,14 +621,6 @@ export function renderPrivacyPage() {
               <div>
                 <div style="font-size: 11px; color: var(--slate); font-weight: 700;">Lieu / Équipement</div>
                 <div style="font-size: 14px; font-weight: 800; margin-top: 2px; color: var(--ink);">${escapeHtml(trackLabels[profile.track] || profile.track || "Non défini")}</div>
-              </div>
-              <div>
-                <div style="font-size: 11px; color: var(--slate); font-weight: 700;">Niveau d'expérience</div>
-                <div style="font-size: 14px; font-weight: 800; margin-top: 2px; color: var(--ink);">${escapeHtml(levelLabels[profile.niveau] || profile.niveau || "Non défini")}</div>
-              </div>
-              <div>
-                <div style="font-size: 11px; color: var(--slate); font-weight: 700;">Fréquence hebdo</div>
-                <div style="font-size: 14px; font-weight: 800; margin-top: 2px; color: var(--ink);">${profile.frequence ? escapeHtml(profile.frequence) + " séances / semaine" : "Non définie"}</div>
               </div>
               <div>
                 <div style="font-size: 11px; color: var(--slate); font-weight: 700;">Poids & Taille</div>
@@ -935,12 +927,9 @@ export function showEditProfileModal() {
           <div>
             <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: var(--ink);">Objectif principal</label>
             <select name="goal" class="form-input" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 4px; background: var(--surface);">
-              <option value="remise" ${profile.goal === "remise" ? "selected" : ""}>Remise en forme</option>
-              <option value="perte-poids" ${profile.goal === "perte-poids" ? "selected" : ""}>Perte de poids</option>
+              <option value="perte-poids" ${profile.goal === "perte-poids" || profile.goal === "remise" ? "selected" : ""}>Perte de poids</option>
               <option value="musculation" ${profile.goal === "musculation" ? "selected" : ""}>Musculation / Prise de masse</option>
-              <option value="endurance" ${profile.goal === "endurance" ? "selected" : ""}>Endurance</option>
-              <option value="sante" ${profile.goal === "sante" ? "selected" : ""}>Santé générale</option>
-              <option value="endurance-sante" ${profile.goal === "endurance-sante" ? "selected" : ""}>Endurance & Santé</option>
+              <option value="endurance-sante" ${profile.goal === "endurance-sante" || profile.goal === "endurance" || profile.goal === "sante" ? "selected" : ""}>Santé & Endurance</option>
             </select>
           </div>
           <div>
@@ -949,26 +938,6 @@ export function showEditProfileModal() {
               <option value="gym" ${profile.track === "gym" || profile.track === "salle" ? "selected" : ""}>Salle de gym</option>
               <option value="home-equip" ${profile.track === "home-equip" || profile.track === "maison-mat" ? "selected" : ""}>Maison avec matériel</option>
               <option value="bodyweight" ${profile.track === "bodyweight" || profile.track === "poids-corps" ? "selected" : ""}>Maison poids du corps</option>
-            </select>
-          </div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-          <div>
-            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: var(--ink);">Niveau</label>
-            <select name="niveau" class="form-input" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 4px; background: var(--surface);">
-              <option value="debutant" ${profile.niveau === "debutant" ? "selected" : ""}>Débutant</option>
-              <option value="intermediaire" ${profile.niveau === "intermediaire" ? "selected" : ""}>Intermédiaire</option>
-              <option value="avance" ${profile.niveau === "avance" ? "selected" : ""}>Avancé</option>
-            </select>
-          </div>
-          <div>
-            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: var(--ink);">Fréquence hebdo</label>
-            <select name="frequence" class="form-input" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 4px; background: var(--surface);">
-              <option value="2" ${profile.frequence == "2" ? "selected" : ""}>2 séances / semaine</option>
-              <option value="3" ${profile.frequence == "3" ? "selected" : ""}>3 séances / semaine</option>
-              <option value="4" ${profile.frequence == "4" ? "selected" : ""}>4 séances / semaine</option>
-              <option value="5" ${profile.frequence == "5" ? "selected" : ""}>5 séances / semaine</option>
             </select>
           </div>
         </div>
@@ -1010,25 +979,31 @@ export function showEditProfileModal() {
   modal.querySelector("#edit-profile-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     const form = e.target;
-    const { updateUserProfile } = await import("../modules/privacy.js");
-    
-    await updateUserProfile({
-      firstName: form.firstName.value.trim(),
-      lastName: form.lastName.value.trim(),
-      email: form.email.value.trim(),
-      phone: form.phone.value.trim(),
-      goal: form.goal.value,
-      track: form.track.value,
-      niveau: form.niveau.value,
-      frequence: form.frequence.value,
-      poids: form.poids.value ? parseFloat(form.poids.value) : null,
-      taille: form.taille.value ? parseFloat(form.taille.value) : null,
-      age: form.age.value ? parseInt(form.age.value, 10) : null,
-      medicalNotes: form.medicalNotes.value.trim(),
-    });
+    const submitBtn = form.querySelector('button[type="submit"]');
+    setButtonLoading(submitBtn, true, "Enregistrement...");
 
-    modal.remove();
-    const { render } = await import("../../app.js");
-    render();
+    try {
+      const { updateUserProfile } = await import("../modules/privacy.js");
+      
+      await updateUserProfile({
+        firstName: form.firstName.value.trim(),
+        lastName: form.lastName.value.trim(),
+        email: form.email.value.trim(),
+        phone: form.phone.value.trim(),
+        goal: form.goal.value,
+        track: form.track.value,
+        poids: form.poids.value ? parseFloat(form.poids.value) : null,
+        taille: form.taille.value ? parseFloat(form.taille.value) : null,
+        age: form.age.value ? parseInt(form.age.value, 10) : null,
+        medicalNotes: form.medicalNotes.value.trim(),
+      });
+
+      modal.remove();
+      const { render } = await import("../../app.js");
+      render();
+    } catch (err) {
+      console.error(err);
+      setButtonLoading(submitBtn, false);
+    }
   });
 }

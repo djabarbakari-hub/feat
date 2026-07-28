@@ -4,7 +4,7 @@
    ========================================================== */
 
 import { state } from "../state.js";
-import { icon, escapeHtml, getUserAvatarHtml } from "../helpers.js";
+import { icon, escapeHtml, getUserAvatarHtml, getMatchingCoachProgram } from "../helpers.js";
 import { COACH_PROGRAMS } from "../data.js";
 
 /**
@@ -712,7 +712,7 @@ export function renderClientProgram() {
 
   // --- RENDU NORMAL : OVERVIEW DU PROGRAMME ET AGENDA DE SÉANCES ---
   const coachProg = COACH_PROGRAMS.find(p => p.id === program.coachProgramId) || 
-                    COACH_PROGRAMS.find(p => p.trackId === program.track) || 
+                    getMatchingCoachProgram(profile.goal || profile.quizAnswers?.objectif, program.track || profile.track) || 
                     COACH_PROGRAMS[0];
   
   const isCoachProgram = program.track === "home-equip" || program.track === "prise-de-muscle-home" || program.track === "bodyweight" || program.track === "gym" || (program.trackLabel && program.trackLabel.includes("Abdou"));
@@ -803,7 +803,7 @@ export function renderClientProgram() {
 
       <div style="display: flex; gap: 10px; flex-wrap: wrap;">
         <button class="btn btn-outline-dark" data-nav="quiz" style="color: white; border-color: rgba(255,255,255,0.3); font-size: 12px; font-weight: 700; padding: 8px 14px; background: rgba(255,255,255,0.05);">
-          🔄 Ajuster mon niveau / quiz
+          🔄 Repasser le questionnaire d'onboarding
         </button>
       </div>
     </div>

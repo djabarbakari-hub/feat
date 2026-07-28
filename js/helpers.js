@@ -2,7 +2,7 @@
    helpers.js — Fonctions utilitaires partagées.
    ========================================================== */
 
-import { TRACKS, QUIZ_STEPS } from "./data.js";
+import { TRACKS, QUIZ_STEPS, COACH_PROGRAMS } from "./data.js";
 import { state } from "./state.js";
 import { auth } from "./firebase.js";
 
@@ -69,6 +69,43 @@ export function getUserAvatarHtml({
  */
 export const icon = (name, size = 16, color) =>
   `<i data-lucide="${name}" style="width:${size}px;height:${size}px${color ? `;color:${color}` : ""}"></i>`;
+
+/**
+ * Trouve le programme officiel du Coach Abdou BAKARI correspondant exactement
+ * au couple (objectif, lieu/piste) renseigné par l'utilisateur.
+ * @param {string} goal - Objectif (ex: "perte-poids", "musculation", "endurance-sante", "sante", "remise")
+ * @param {string} trackId - Lieu / Equipement (ex: "home-equip", "bodyweight", "gym", "salle", "maison-mat")
+ * @returns {Object} Le programme officiel correspondant
+ */
+export function getMatchingCoachProgram(goal, trackId) {
+  const normGoal = (goal || "").toLowerCase().trim();
+  const normTrack = (trackId || "").toLowerCase().trim();
+
+  let targetGoalPrefix = "perte-poids";
+  if (normGoal.includes("muscle") || normGoal.includes("musculation") || normGoal.includes("masse")) {
+    targetGoalPrefix = "prise-de-muscle";
+  } else if (normGoal.includes("sante") || normGoal.includes("endurance") || normGoal.includes("remise")) {
+    targetGoalPrefix = "sante-endurance";
+  } else if (normGoal.includes("poids") || normGoal.includes("perte") || normGoal.includes("seche")) {
+    targetGoalPrefix = "perte-poids";
+  }
+
+  let targetTrackSuffix = "home";
+  if (normTrack.includes("bodyweight") || normTrack.includes("poids-corps") || normTrack === "bodyweight") {
+    targetTrackSuffix = "bodyweight";
+  } else if (normTrack.includes("gym") || normTrack.includes("salle") || normTrack === "gym") {
+    targetTrackSuffix = "gym";
+  } else if (normTrack.includes("home") || normTrack.includes("mat") || normTrack === "home-equip") {
+    targetTrackSuffix = "home";
+  }
+
+  const expectedId = `${targetGoalPrefix}-${targetTrackSuffix}`;
+  const found = COACH_PROGRAMS.find(p => p.id === expectedId);
+  if (found) return found;
+
+  // Repères secondaires de sécurité
+  return COACH_PROGRAMS.find(p => p.trackId === trackId) || COACH_PROGRAMS[0];
+}
 
 /**
  * Récupère un programme par son ID.
@@ -150,3 +187,79 @@ export function closeMobileMenu() {
     toggleBtn.setAttribute("aria-expanded", "false");
   }
 }
+
+/**
+ * Active ou désactive l'état de chargement d'un bouton avec un spinner d'attente.
+ * @param {HTMLElement} btn - Le bouton HTML à modifier
+ * @param {boolean} isLoading - Indique si le traitement/action en arrière-plan est en cours
+ * @param {string} [loadingText] - Texte optionnel pendant le chargement
+ */
+export function setButtonLoading(btn, isLoading, loadingText) {
+  if (!btn) return;
+  if (isLoading) {
+    if (!btn.dataset.originalHtml) {
+      btn.dataset.originalHtml = btn.innerHTML;
+    }
+    btn.disabled = true;
+    btn.style.pointerEvents = "none";
+    btn.style.opacity = "0.8";
+    const text = loadingText || btn.textContent.trim() || "Traitement...";
+    btn.innerHTML = `<span class="btn-spinner" style="border-color: currentColor; border-top-color: transparent; display: inline-block; vertical-align: middle;"></span> <span>${escapeHtml(text)}</span>`;
+  } else {
+    btn.disabled = false;
+    btn.style.pointerEvents = "";
+    btn.style.opacity = "";
+    if (btn.dataset.originalHtml) {
+      btn.innerHTML = btn.dataset.originalHtml;
+      delete btn.dataset.originalHtml;
+    }
+  }
+}
+
+/**
+ * Extrait automatiquement le prénom et le nom depuis un nom d'affichage (Google Auth / Firebase)
+ * ou depuis la partie locale d'une adresse e-mail.
+ * Ex: "jean.dupont@gmail.com" -> { firstName: "Jean", lastName: "Dupont" }
+ */
+export function extractNameFromEmailOrDisplayName(displayName = "", email = "") {
+  let firstName = "";
+  let lastName = "";
+
+  if (displayName && displayName.trim().length > 0) {
+    const parts = displayName.trim().split(/\s+/);
+    if (parts.length === 1) {
+      firstName = capitalizeWord(parts[0]);
+    } else if (parts.length > 1) {
+      firstName = capitalizeWord(parts[0]);
+      lastName = parts.slice(1).map(p => p.length > 2 ? capitalizeWord(p) : p.toUpperCase()).join(" ");
+    }
+  }
+
+  // Si le prénom est vide, extraire depuis la partie locale de l'e-mail
+  if (!firstName && email && email.includes("@")) {
+    const localPart = email.split("@")[0];
+    // Enlever les chiffres à la fin s'il y en a (ex: abdou.bakari03 -> abdou.bakari)
+    const cleanLocal = localPart.replace(/\d+$/g, "");
+    // Remplacer les chiffres internes et séparateurs par des espaces
+    const normalized = cleanLocal.replace(/[0-9]/g, " ").replace(/[\._\+\-]+/g, " ");
+    const parts = normalized.trim().split(/\s+/).filter(Boolean);
+
+    if (parts.length === 1) {
+      firstName = capitalizeWord(parts[0]);
+    } else if (parts.length >= 2) {
+      firstName = capitalizeWord(parts[0]);
+      lastName = parts.slice(1).map(p => capitalizeWord(p)).join(" ");
+    }
+  }
+
+  return {
+    firstName: firstName || "",
+    lastName: lastName || ""
+  };
+}
+
+function capitalizeWord(str) {
+  if (!str) return "";
+  return str.split('-').map(sub => sub ? (sub.charAt(0).toUpperCase() + sub.slice(1).toLowerCase()) : "").join('-');
+}
+

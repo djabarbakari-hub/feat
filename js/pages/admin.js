@@ -4,7 +4,7 @@
 
 import { TRACKS, COACH_PROGRAMS } from "../data.js";
 import { state } from "../state.js";
-import { icon, escapeHtml, showToast } from "../helpers.js";
+import { icon, escapeHtml, showToast, setButtonLoading } from "../helpers.js";
 import { auth, db } from "../firebase.js";
 import { doc, setDoc } from "firebase/firestore";
 
@@ -1050,9 +1050,7 @@ export function showProgramEditModal(track) {
       return;
     }
 
-    const originalText = saveBtn.innerHTML;
-    saveBtn.disabled = true;
-    saveBtn.innerHTML = `${icon("loader-2", 14)} Enregistrement...`;
+    setButtonLoading(saveBtn, true, "Enregistrement...");
 
     const updatedTrack = {
       id: track.id,
@@ -1090,8 +1088,7 @@ export function showProgramEditModal(track) {
         errorDiv.textContent = `Erreur lors de la sauvegarde: ${err.message || err}`;
         errorDiv.style.display = "block";
       }
-      saveBtn.disabled = false;
-      saveBtn.innerHTML = originalText;
+      setButtonLoading(saveBtn, false);
     }
   });
 }
@@ -1555,8 +1552,7 @@ export function showCoachProgramEditModal(program) {
     }
 
     // Sauvegarde Firestore
-    saveBtn.disabled = true;
-    saveBtn.innerHTML = `${icon("loader-2", 14)} Sauvegarde...`;
+    setButtonLoading(saveBtn, true, "Sauvegarde...");
 
     try {
       await setDoc(doc(db, "coach_programs", program.id), progClone);
@@ -1570,8 +1566,7 @@ export function showCoachProgramEditModal(program) {
       const errDiv = modal.querySelector("#coach-edit-prog-error");
       errDiv.textContent = `Erreur lors de la sauvegarde: ${err.message || err}`;
       errDiv.style.display = "block";
-      saveBtn.disabled = false;
-      saveBtn.innerHTML = `${icon("save", 14)} Enregistrer pour tous`;
+      setButtonLoading(saveBtn, false);
     }
   });
 }
