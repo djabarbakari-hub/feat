@@ -820,12 +820,8 @@ export function renderPrograms() {
               </details>
             </div>
             
-            <!-- BOUTONS D'ACTION (TELECHARGEMENT PDF & ACTIVATION) -->
+            <!-- BOUTONS D'ACTION (ACTIVATION DU PROGRAMME) -->
             <div style="margin-top: 24px; display: flex; flex-direction: column; gap: 10px;">
-              <button class="btn btn-outline btn-download-program" data-program-id="${p.id}" style="font-weight: 700; justify-content: center; width: 100%; padding: 10px; border: 1px solid var(--line); color: var(--ink); background: var(--chalk-soft); display: flex; align-items: center; gap: 8px;">
-                ${icon("download", 16, "var(--ember)")} Télécharger le programme (PDF)
-              </button>
-
               ${state.role === 'client' ? `
                 <button class="btn btn-moss btn-select-program w-full" data-program-id="${p.id}" style="font-weight: 700; justify-content: center; width: 100%; padding: 12px;">
                   Activer ce programme
@@ -1007,7 +1003,7 @@ export function renderAbout() {
           </div>
 
           <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 16px 20px;">
-            <div class="font-mono" style="font-size: 28px; font-weight: 800; color: var(--chalk);">+3 ans</div>
+            <div class="font-mono" style="font-size: 28px; font-weight: 800; color: var(--chalk);">3 ans</div>
             <div style="font-size: 13px; font-weight: 600; color: var(--chalk); margin-top: 2px;">Expertise Terrain</div>
             <div style="font-size: 11px; color: var(--ink-muted2); margin-top: 2px;">Coaching certifié & éprouvé</div>
           </div>
@@ -1041,11 +1037,11 @@ export function renderAbout() {
           
           <div class="card" style="padding: 24px; border: 1px solid var(--line); border-radius: 8px; background: #ffffff; position: relative;">
             <div class="font-mono" style="font-size: 12px; font-weight: 800; color: var(--ember); background: rgba(226,98,45,0.1); padding: 2px 8px; border-radius: 4px; width: fit-content; margin-bottom: 12px;">
-              ÉTAPE 01 — 2018
+              ÉTAPE 01 — 2023
             </div>
             <h3 class="font-display" style="font-size: 18px; margin: 0 0 10px 0; color: var(--ink);">Le Constat du Terrain</h3>
             <p style="font-size: 14px; color: var(--slate); line-height: 1.6; margin: 0;">
-              En démarrant le coaching en 2018, <strong>Abdou BAKARI</strong> constate que beaucoup de débutants abandonnent dans les 6 premières semaines par manque de structure claire ou de programmes adaptés à leur quotidien.
+              En démarrant le coaching en 2023, <strong>Abdou BAKARI</strong> constate que beaucoup de débutants abandonnent dans les 6 premières semaines par manque de structure claire ou de programmes adaptés à leur quotidien.
             </p>
           </div>
 
@@ -1175,7 +1171,7 @@ export function renderAbout() {
             <h3 class="font-display" style="font-size: 26px; margin: 0 0 10px 0; color: var(--ink);">Abdou BAKARI</h3>
 
             <p style="font-size: 15px; color: var(--slate); line-height: 1.6; margin: 0 0 16px 0;">
-              Passionné de musculation et de préparation physique depuis plus de 6 ans, Abdou a accompagné des dizaines de profils différents dans leur transformation. Sa philosophie repose sur la régularité, l'adaptation et la simplicité d'exécution.
+              Passionné de musculation et de préparation physique depuis près de 4 ans, Abdou a accompagné plus d'une dizaines de profils différents dans leur transformation. Sa philosophie repose sur la régularité, l'adaptation et la simplicité d'exécution.
             </p>
 
             <div style="background: rgba(226, 98, 45, 0.05); border-left: 3px solid var(--ember); padding: 12px 16px; border-radius: 4px; margin-bottom: 0;">

@@ -731,10 +731,6 @@ export function renderClientProgram() {
           <h2 style="font-size: 20px; font-family: 'Archivo Black', sans-serif; color: var(--ink); margin: 0 0 4px;">${escapeHtml(coachProg.title)}</h2>
           <p style="font-size: 12px; color: var(--slate); margin: 0; line-height: 1.4;">${escapeHtml(coachProg.subtitle)} · Durée : <strong>${escapeHtml(coachProg.duration)}</strong> · Rythme : <strong>${escapeHtml(coachProg.frequency)}</strong></p>
         </div>
-
-        <button class="btn btn-outline btn-download-program" data-program-id="${coachProg.id}" style="font-size: 12px; font-weight: 700; padding: 8px 14px; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 8px; background: #ffffff; cursor: pointer; color: var(--ink);">
-          ${icon("download", 14, "var(--ember)")} Télécharger ma Fiche PDF
-        </button>
       </div>
 
       <!-- BENTO CONSIGNES TECHNIQUE -->

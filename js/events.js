@@ -21,7 +21,6 @@ import { navigate, goBack } from "./router.js";
 import { render } from "./render.js";
 import { QUIZ_STEPS, COACH_PROGRAMS, TRACKS } from "./data.js";
 import { trackById, closeMobileMenu, showToast } from "./helpers.js";
-import { downloadProgramPDF } from "./utils/pdfExport.js";
 import { auth, db } from "./firebase.js";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup, sendEmailVerification } from "firebase/auth";
 import { doc, setDoc, getDoc, addDoc, collection, writeBatch, query, where, getDocs, updateDoc, deleteDoc } from "firebase/firestore";
@@ -376,28 +375,6 @@ document.addEventListener("click", async (e) => {
       persistState();
       render();
       navigate("client-dashboard");
-    }
-    return;
-  }
-
-  const downloadProgBtn = e.target.closest(".btn-download-program");
-  if (downloadProgBtn) {
-    const programId = downloadProgBtn.dataset.programId;
-    const coachP = (COACH_PROGRAMS || []).find(p => p.id === programId);
-    if (coachP) {
-      downloadProgBtn.disabled = true;
-      const originalText = downloadProgBtn.innerHTML;
-      downloadProgBtn.innerHTML = `⏳ Génération de la fiche PDF...`;
-      try {
-        await downloadProgramPDF(coachP);
-        showToast("Téléchargement de votre programme PDF lancé !");
-      } catch (err) {
-        console.error("Erreur téléchargement PDF :", err);
-        showToast("Impossible de générer le PDF. Ouverture du mode impression...");
-      } finally {
-        downloadProgBtn.disabled = false;
-        downloadProgBtn.innerHTML = originalText;
-      }
     }
     return;
   }
