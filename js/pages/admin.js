@@ -119,6 +119,14 @@ function getGoalLabel(goalId) {
   return map[goalId] || goalId || "Non défini";
 }
 
+function getAssignedProgramLabel(client) {
+  const programId = client?.assignedProgramId || client?.program?.coachProgramId || client?.programId || "";
+  if (!programId) return "Aucun";
+  const match = COACH_PROGRAMS.find(p => p.id === programId);
+  if (!match) return programId;
+  return match.title.replace("MONPROGRAMMEFIT : ", "");
+}
+
 const renderNotice = () => state.adminNotice ? `<div class="adm-notice">${icon("info", 16)} ${escapeHtml(state.adminNotice)}</div>` : "";
 
 /**
@@ -374,22 +382,37 @@ export function renderAdminClients() {
         const goalLbl = getGoalLabel(c.goal);
         const week = c.week || 1;
         const maxWeek = c.totalWeeks || 8;
-
-        const clientId = escapeHtml(c.id || c.uid || c.email || "");
+        const clientId = c.id || c.uid || c.email || "";
+        const clientIdAttr = escapeHtml(clientId);
         const avatarHtml = renderAvatarHtml(c.photoURL || c.photoUrl, c.firstName, c.lastName, c.email, "adm-avatar av-1");
+        const selectedProgramId = c.assignedProgramId || c.program?.coachProgramId || c.programId || "";
 
         return `
-        <div class="adm-client-row" style="cursor: pointer;" data-view-client="${clientId}">
+        <div class="adm-client-row" style="cursor: pointer;" data-view-client="${clientIdAttr}">
           ${avatarHtml}
           <div>
             <div style="font-size: 14px; font-weight: 600; color: var(--ink);">${escapeHtml(name)}</div>
             <div style="font-size: 12px; color: var(--slate); margin-top: 2px;">Objectif: ${escapeHtml(goalLbl)}</div>
           </div>
-          <div class="adm-col-prog" style="font-size: 13px; color: var(--slate);">${escapeHtml(trackLbl)}</div>
+          <div class="adm-col-prog" style="min-width: 220px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: var(--slate);">
+            <div style="font-size: 11px; color: var(--slate); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700;">Assigné</div>
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <select data-admin-client-program data-client-id="${clientIdAttr}" style="min-width: 150px; max-width: 180px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: white; color: var(--ink); font-size: 12px;">
+                <option value="">Aucun</option>
+                ${COACH_PROGRAMS.map((p) => `
+                  <option value="${p.id}" ${selectedProgramId === p.id ? "selected" : ""}>${escapeHtml(p.title.replace("MONPROGRAMMEFIT : ", ""))}</option>
+                `).join("")}
+              </select>
+              <button class="btn btn-outline-dark" data-admin-action="assign-program" data-client-id="${clientIdAttr}" style="padding: 6px 10px; font-size: 11px; white-space: nowrap;">
+                Enregistrer
+              </button>
+            </div>
+            <div style="font-size: 11px; color: var(--slate);">Actuel : ${escapeHtml(getAssignedProgramLabel(c))}</div>
+          </div>
           <div class="adm-col-week" style="font-size: 13px; font-weight: 600;">S${week} / ${maxWeek}</div>
           <div style="font-size: 13px; color: var(--slate);">${escapeHtml(c.email || "")}</div>
           <div class="adm-col-status">
-            <button class="btn btn-ember" style="padding: 6px 12px; font-size: 12px;" data-view-client="${clientId}">
+            <button class="btn btn-ember" style="padding: 6px 12px; font-size: 12px;" data-view-client="${clientIdAttr}">
               ${icon("user", 12)} Voir profil
             </button>
           </div>

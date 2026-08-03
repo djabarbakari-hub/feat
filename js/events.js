@@ -783,6 +783,47 @@ document.addEventListener("click", async (e) => {
   const adminActionBtn = e.target.closest("[data-admin-action]");
   if (adminActionBtn) {
     const action = adminActionBtn.dataset.adminAction;
+    if (action === "assign-program") {
+      const clientId = adminActionBtn.dataset.clientId;
+      const select = document.querySelectorAll("[data-admin-client-program]");
+      let selectedProgramId = "";
+
+      for (const el of select) {
+        if (el.dataset.clientId === clientId) {
+          selectedProgramId = el.value;
+          break;
+        }
+      }
+
+      if (!clientId) {
+        state.adminNotice = "Client introuvable pour l'attribution du programme.";
+        render();
+        return;
+      }
+
+      try {
+        const targetDoc = doc(db, "users", clientId);
+        await setDoc(targetDoc, { assignedProgramId: selectedProgramId || null }, { merge: true });
+
+        const client = (state.adminData.allUsers || state.adminData.clients || []).find(u =>
+          (u.id && u.id === clientId) || (u.uid && u.uid === clientId)
+        );
+
+        if (client) {
+          client.assignedProgramId = selectedProgramId || null;
+        }
+
+        state.adminNotice = selectedProgramId
+          ? `Programme enregistré pour le client.`
+          : `Programme retiré pour le client.`;
+        render();
+      } catch (error) {
+        console.error("Erreur d'assignation du programme client:", error);
+        state.adminNotice = "Impossible d'enregistrer le programme pour ce client.";
+        render();
+      }
+      return;
+    }
     if (action === "notifications") {
       state.adminNotice = "Centre de notifications — 3 messages non lus à traiter.";
       navigate("admin-messages");
