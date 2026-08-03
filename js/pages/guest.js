@@ -815,11 +815,7 @@ export function renderPrograms() {
                 <button class="btn btn-moss btn-select-program w-full" data-program-id="${p.id}" style="font-weight: 700; justify-content: center; width: 100%; padding: 12px;">
                   Activer ce programme
                 </button>
-              ` : `
-                <button class="btn btn-ember btn-select-program w-full" data-nav="signup" style="font-weight: 700; justify-content: center; width: 100%; padding: 12px;">
-                  S'inscrire / Se connecter pour débloquer
-                </button>
-              `}
+              ` : ``}
             </div>
           </div>`;
         }).join("")}
