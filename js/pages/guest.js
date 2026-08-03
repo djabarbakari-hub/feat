@@ -312,24 +312,7 @@ export function renderHome() {
         </div>
 
         <!-- Section 1 : Cluster de cartes photos 3D réactives -->
-        <div class="hero-card-cluster-container">
-          <!-- Card 1: Salle de Gym -->
-          <div class="cinematic-photo-card tilt-card" style="transform: rotateY(-15deg) rotateX(10deg) translate(-40px, -20px) translateZ(-50px); z-index: 1;" data-tilt-factor="0.06">
-            <img src="${t0.img}" alt="${t0.label}" />
-            <div class="card-caption">
-              <span class="badge font-mono">SALLE DE SPORT</span>
-              <h4>${t0.label}</h4>
-            </div>
-          </div>
-          <!-- Card 2: Maison poids du corps -->
-          <div class="cinematic-photo-card tilt-card" style="transform: rotateY(15deg) rotateX(10deg) translate(40px, 20px) translateZ(-30px); z-index: 2;" data-tilt-factor="0.06">
-            <img src="${t2.img}" alt="${t2.label}" />
-            <div class="card-caption">
-              <span class="badge font-mono">POIDS DU CORPS</span>
-              <h4>${t2.label}</h4>
-            </div>
-          </div>
-        </div>
+        <div class="hero-card-cluster-container" aria-hidden="true"></div>
       </div>
 
       <!-- Section 3 : Archipel des Catégories (Floating Archipelago 3D) -->
