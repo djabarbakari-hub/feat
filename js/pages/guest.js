@@ -321,17 +321,7 @@ export function renderHome() {
               <h4>${t0.label}</h4>
             </div>
           </div>
-          <!-- Card 2: Coach Abdou BAKARI -->
-          <div class="cinematic-photo-card tilt-card active-card glowing-halo" style="transform: translateZ(50px) scale(1.08); z-index: 3;" data-tilt-factor="0.08">
-            <img src="${COACH_AVATAR}" alt="Coach Abdou BAKARI" />
-            <div class="card-caption" style="background: linear-gradient(180deg, rgba(22, 35, 44, 0) 0%, rgba(22, 35, 44, 0.95) 100%);">
-              <span class="badge font-mono" style="background: var(--ember); color: white;">★ COACH PRINCIPAL</span>
-              <h4 style="color: var(--chalk); font-size: 1.1rem;">Abdou BAKARI</h4>
-            </div>
-            <!-- Orbite de certification -->
-            <div class="orbital-badge font-mono">★ COACHING CERTIFIÉ ★</div>
-          </div>
-          <!-- Card 3: Maison poids du corps -->
+          <!-- Card 2: Maison poids du corps -->
           <div class="cinematic-photo-card tilt-card" style="transform: rotateY(15deg) rotateX(10deg) translate(40px, 20px) translateZ(-30px); z-index: 2;" data-tilt-factor="0.06">
             <img src="${t2.img}" alt="${t2.label}" />
             <div class="card-caption">
