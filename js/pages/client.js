@@ -558,8 +558,47 @@ export function getExercisesForSession(sessionName) {
   }
 }
 
+const SMARTWORKOUT_EXERCISE_URLS = {
+  "goblet squat haltere": "https://smartworkout.app/fr/bibliotheque-d-exercices/jambes/squat-goblet-avec-haltere",
+  "goblet squat": "https://smartworkout.app/fr/bibliotheque-d-exercices/jambes/squat-goblet-avec-haltere",
+  "fente avec halteres": "https://smartworkout.app/fr/bibliotheque-d-exercices/jambes/fente-avec-halteres",
+  "fentes avec halteres": "https://smartworkout.app/fr/bibliotheque-d-exercices/jambes/fentes-avec-halteres",
+  "squat avec halteres": "https://smartworkout.app/fr/bibliotheque-d-exercices/jambes/squat-avec-halteres",
+  "squat bulgare avec halteres": "https://smartworkout.app/fr/bibliotheque-d-exercices/jambes/squat-bulgare-avec-halteres",
+  "bulgarian split squat": "https://smartworkout.app/fr/bibliotheque-d-exercices/jambes/squat-bulgare-avec-halteres",
+  "souleve de terre roumain halteres": "https://smartworkout.app/fr/bibliotheque-d-exercices/jambes/souleve-de-terre-roumain-avec-halteres",
+};
+
+function normalizeExerciseName(exerciseName) {
+  return String(exerciseName || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[()]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function getExerciseIllustrationUrl(exerciseName) {
-  return `https://www.google.com/search?q=${encodeURIComponent(`site:smartwork.app ${exerciseName}`)}`;
+  const normalizedName = normalizeExerciseName(exerciseName);
+  const directUrl = SMARTWORKOUT_EXERCISE_URLS[normalizedName];
+  if (directUrl) return directUrl;
+
+  const category = /jamb|squat|fente|mollet|leg |hip |pont fessier|burpee|box jump/i.test(normalizedName)
+    ? "jambes"
+    : /curl biceps|curl marteau|curl barre/i.test(normalizedName)
+      ? "biceps"
+      : /triceps|dips/i.test(normalizedName)
+        ? "triceps"
+        : /abdo|gainage|planche|crunch/i.test(normalizedName)
+          ? "abdominaux"
+          : /epaules|épaules|pike|élévation|oiseau|shrug/i.test(normalizedName)
+            ? "epaules"
+            : /pompe|développé|ecarté|pector|push/i.test(normalizedName)
+              ? "poitrine"
+              : "dos";
+
+  return `https://smartworkout.app/fr/bibliotheque-d-exercices/${category}`;
 }
 
 /**
