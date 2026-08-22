@@ -22,7 +22,7 @@ import { render } from "./render.js";
 import { QUIZ_STEPS, COACH_PROGRAMS, TRACKS } from "./data.js";
 import { trackById, closeMobileMenu, showToast, getMatchingCoachProgram, setButtonLoading, extractNameFromEmailOrDisplayName } from "./helpers.js";
 import { auth, db } from "./firebase.js";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup, sendEmailVerification } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { doc, setDoc, getDoc, addDoc, collection, writeBatch, query, where, getDocs, updateDoc, deleteDoc } from "firebase/firestore";
 import { refreshAdminData } from "../app.js";
 
@@ -1077,34 +1077,50 @@ document.addEventListener("click", async (e) => {
         }
       }
 
+      const signupQuizAnswers = Object.keys(state.quizAnswers || {}).length > 0
+        ? state.quizAnswers
+        : null;
+
       await setDoc(doc(db, "users", user.uid), {
         firstName,
         lastName,
         email,
         phone,
         role: assignedRole,
+        quizAnswers: signupQuizAnswers,
+        goal: signupQuizAnswers?.objectif || null,
+        track: signupQuizAnswers?.lieu || null,
+        physique: signupQuizAnswers?.physique || null,
         createdAt: new Date().toISOString(),
       });
 
-      // 3. [COMMENTAIRE] Envoi de l'e-mail de vérification Firebase pour s'assurer que l'adresse Gmail/e-mail existe réellement.
-      // Le compte est créé, mais immédiatement déconnecté tant que l'e-mail n'est pas validé.
-      try {
-        await sendEmailVerification(user);
-      } catch (err) {
-        console.warn("Erreur lors de l'envoi de l'e-mail de vérification:", err);
+      state.role = assignedRole;
+      state.clientProfile = {
+        ...state.clientProfile,
+        firstName,
+        lastName,
+        email,
+        phone,
+        uid: user.uid,
+        role: assignedRole,
+        quizAnswers: signupQuizAnswers || {},
+      };
+
+      const pendingCoachP = COACH_PROGRAMS.find(p => p.id === state.pendingProgramId);
+      state.pendingProgramId = null;
+      if (pendingCoachP && assignedRole !== "admin") {
+        await applyProgramSelection(pendingCoachP, {
+          answers: signupQuizAnswers || {},
+          skipConfirmation: true,
+        });
       }
-      await signOut(auth);
 
       state.drafts.signup.password = "";
       state.ui.signupPending = false;
       state.ui.signupError = "";
-      
-      // On redirige vers l'écran de connexion avec un message de succès vert très explicite incitant l'utilisateur à cliquer sur le lien d'activation.
-      state.ui.loginSuccessMessage = `Votre compte a bien été créé ! 📧 Un e-mail de vérification a été envoyé à ${email}. Veuillez cliquer sur le lien dans cet e-mail pour activer votre compte avant de pouvoir vous connecter.`;
-      state.ui.loginError = "";
-      
+
       persistState();
-      navigate("login");
+      navigate(assignedRole === "admin" ? "admin-dashboard" : pendingCoachP ? "client-program" : "client-dashboard");
       render();
     } catch (error) {
       state.ui.signupPending = false;
@@ -1150,25 +1166,6 @@ document.addEventListener("click", async (e) => {
       // 1. Connexion directe via Firebase Auth (Firebase gère la vérification des identifiants)
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-
-      // [COMMENTAIRE] Vérification stricte de l'existence de l'e-mail.
-      // Si l'e-mail n'a pas été validé par l'utilisateur (sauf pour le super administrateur), on refuse la connexion,
-      // on tente de renvoyer un lien d'activation, et on le déconnecte immédiatement.
-      const isSuperAdmin = (user.email || "").toLowerCase().trim() === "djabarbakari.032003@gmail.com";
-      if (!user.emailVerified && !isSuperAdmin) {
-        try {
-          await sendEmailVerification(user);
-        } catch (err) {
-          console.warn("Impossible de renvoyer l'e-mail de vérification automatiquement:", err);
-        }
-        await signOut(auth);
-        state.ui.loginPending = false;
-        state.ui.loginSuccessMessage = "";
-        state.ui.loginError = "Votre adresse e-mail n'a pas encore été validée. 📧 Un nouvel e-mail de vérification vous a été envoyé. Veuillez cliquer sur le lien d'activation présent dans cet e-mail pour vous connecter.";
-        persistState();
-        render();
-        return;
-      }
 
       // 2. Lecture du rôle réel et des données depuis la collection "users" dans Firestore
       let userRole = "client";

@@ -42,7 +42,7 @@ export const state = {
     isSending: false,
     sendSuccess: false,
     loginError: "",
-    loginSuccessMessage: "", // [COMMENTAIRE] Message de succès de connexion (ex: confirmation d'envoi d'e-mail d'activation)
+    loginSuccessMessage: "",
     loginShowPassword: false,
     loginPending: false,
     signupError: "",

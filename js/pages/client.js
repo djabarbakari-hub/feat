@@ -662,9 +662,6 @@ export function renderClientProgram() {
                     <span style="font-size: 10px; font-weight: 800; color: var(--ember); font-family: 'IBM Plex Mono', monospace; text-transform: uppercase;">EXERCICE #${idx + 1}</span>
                     <h4 style="font-size: 16px; font-weight: 800; margin: 2px 0 4px; color: var(--ink);">${escapeHtml(exo.name)}</h4>
                     <p style="font-size: 12px; color: var(--slate); margin: 0 0 10px; line-height: 1.4;">${escapeHtml(exo.desc)}</p>
-                    <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(exo.name + ' exercice de musculation')}" target="_blank" rel="noopener noreferrer" style="font-size: 11px; font-weight: 700; color: white; background-color: #ff0000; padding: 4px 10px; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(255,0,0,0.2);">
-                      ${icon("play-circle", 12)} Tuto Vidéo (YouTube)
-                    </a>
                   </div>
                   <span class="adm-badge active" style="background: white; color: var(--ink); border: 1px solid var(--line); font-size: 12px; font-weight: 700; padding: 4px 10px; white-space: nowrap; height: fit-content;">
                     🎯 ${escapeHtml(exo.detail)}
@@ -864,9 +861,6 @@ export function renderClientProgram() {
                     <span style="font-size: 11px; background: white; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--line); color: var(--ink); font-weight: 700; font-family: monospace;">${escapeHtml(exo.detail)}</span>
                   </div>
                   <p style="font-size: 12px; color: var(--slate); margin: 0; line-height: 1.4;">${escapeHtml(exo.desc)}</p>
-                  <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(exo.name + ' exercice de musculation')}" target="_blank" rel="noopener noreferrer" style="font-size: 11px; font-weight: 700; color: white; background-color: #ff0000; padding: 3px 8px; border-radius: 4px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; width: fit-content; margin-top: 4px;">
-                    ${icon("play-circle", 12)} Tuto Vidéo
-                  </a>
                 </div>
               `).join("")}
             </div>
