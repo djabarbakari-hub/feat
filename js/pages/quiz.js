@@ -30,6 +30,47 @@ export function renderQuiz() {
 
   if (state.quizStep >= QUIZ_STEPS.length) {
     const result = trackById(state.quizAnswers.lieu);
+    const physique = state.quizAnswers.physique || {};
+    const weight = Number(physique.poids);
+    const height = Number(physique.taille);
+    const bmi = weight > 0 && height > 0 ? weight / ((height / 100) ** 2) : null;
+    let bmiStatus = "";
+    let bmiMessage = "";
+    let bmiColor = "var(--moss)";
+
+    if (bmi !== null) {
+      if (bmi < 18.5) {
+        bmiStatus = "Insuffisance pondérale";
+        bmiMessage = "Ton programme va t'aider à progresser progressivement, avec un travail adapté à ton niveau et à ta récupération.";
+        bmiColor = "#2563eb";
+      } else if (bmi < 25) {
+        bmiStatus = "Corpulence dans la norme";
+        bmiMessage = "Tu as une bonne base pour construire un programme régulier et progresser durablement vers ton objectif.";
+      } else if (bmi < 30) {
+        bmiStatus = "Surpoids";
+        bmiMessage = "Un accompagnement progressif peut t'aider à retrouver plus d'aisance, d'énergie et de régularité dans tes séances.";
+        bmiColor = "#d97706";
+      } else {
+        bmiStatus = "Obésité";
+        bmiMessage = "Un programme progressif et personnalisé peut t'aider à reprendre l'activité en respectant ton rythme et tes capacités.";
+        bmiColor = "var(--ember)";
+      }
+    }
+
+    const bmiHtml = bmi !== null
+      ? `<div style="margin-top: 1.5rem; padding: 1rem; border: 1px solid var(--line); border-left: 4px solid ${bmiColor}; background: var(--chalk-soft); border-radius: 6px;">
+          <div class="font-mono" style="font-size: 0.75rem; color: var(--slate); text-transform: uppercase;">Ton résultat IMC</div>
+          <div style="display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-top: 4px;">
+            <strong style="font-size: 2rem; color: ${bmiColor};">${bmi.toFixed(1)}</strong>
+            <span style="font-weight: 700; color: ${bmiColor};">${bmiStatus}</span>
+          </div>
+          <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; margin: 0.5rem 0 0;">${bmiMessage}</p>
+          <p style="font-size: 0.75rem; color: var(--slate); line-height: 1.5; margin: 0.75rem 0 0;">L'IMC est un indicateur général, pas un diagnostic médical.</p>
+        </div>`
+      : `<div style="margin-top: 1.5rem; padding: 1rem; border: 1px dashed var(--line); background: var(--chalk-soft); border-radius: 6px;">
+          <strong style="color: var(--ink);">Obtiens aussi ton IMC personnalisé</strong>
+          <p style="font-size: 0.875rem; color: var(--slate); line-height: 1.6; margin: 0.5rem 0 0;">Renseigne ton poids et ta taille à l'étape précédente pour recevoir ce repère avec ton programme.</p>
+        </div>`;
     const actionButton = state.role === 'client'
       ? `<div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 1.5rem;">
            <button class="btn btn-ember" data-nav="client-dashboard" aria-label="Voir mon tableau de bord">Voir mon tableau de bord ${icon("arrow-right", 14)}</button>
@@ -49,6 +90,8 @@ export function renderQuiz() {
         ${icon(result.icon, 1.75, "var(--accent-primary)")}
         <p style="font-size:1rem;color:var(--text-secondary);margin-top:1rem; line-height: 1.7;">${result.desc}</p>
         <div class="font-mono" style="font-size:0.875rem;color:var(--accent-secondary);margin-top:1rem">${result.dist}</div>
+        ${bmiHtml}
+        ${state.role === 'guest' ? `<p style="font-size: 0.95rem; color: var(--ink); font-weight: 700; line-height: 1.6; margin: 1.5rem 0 0;">Ton analyse est prête. Crée ton compte pour enregistrer ton résultat IMC et commencer ton programme personnalisé.</p>` : ""}
         ${actionButton}
       </div>
     </div>`;
