@@ -487,13 +487,35 @@
 
   .adm-client-row,
   .adm-client-row-head {
-    grid-template-columns: 38px 1fr 80px;
+    grid-template-columns: 38px minmax(0, 1fr) minmax(0, 1fr) !important;
   }
 
   /* Masquer colonnes secondaires sur mobile */
   .adm-col-prog,
   .adm-col-week,
   .adm-col-status { display: none; }
+
+  .adm-client-row .adm-col-prog,
+  .adm-client-row-head .adm-col-prog,
+  .adm-client-row .adm-col-week,
+  .adm-client-row-head .adm-col-week,
+  .adm-client-row .adm-col-status,
+  .adm-client-row-head .adm-col-status {
+    display: none !important;
+  }
+
+  .adm-section-card-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 16px;
+  }
+
+  .adm-client-row,
+  .adm-client-row-head {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
 }
 
 @media (max-width: 480px) {

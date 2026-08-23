@@ -218,6 +218,9 @@
 
   .nav-toggle {
     display: block;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 10px;
   }
 
   .navbar .wrap .btn-outline-dark {
@@ -228,7 +231,7 @@
     display: none;
     flex-direction: column;
     gap: 12px;
-    padding: 16px 24px 20px;
+    padding: 16px max(24px, env(safe-area-inset-right)) 20px max(24px, env(safe-area-inset-left));
     background: rgba(15, 26, 20, 0.96);
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     width: 100%;
@@ -243,6 +246,7 @@
     width: 100%;
     text-align: left;
     padding: 12px 0;
+    min-height: 44px;
   }
 
   .nav-mobile .btn-outline-dark, .nav-mobile .btn-logout {
@@ -285,7 +289,7 @@
   }
 
   .footer .wrap {
-    padding: 18px 16px;
+    padding: 18px max(16px, env(safe-area-inset-right)) 18px max(16px, env(safe-area-inset-left));
     flex-direction: column;
     align-items: center;
     text-align: center;

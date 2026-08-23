@@ -263,7 +263,7 @@ export function renderSignup() {
           <!-- CHAMPS FORMULAIRE -->
           <div class="auth-input-group">
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: clamp(8px, 1.2vw, 12px);">
+            <div class="signup-name-fields" style="display: grid; grid-template-columns: 1fr 1fr; gap: clamp(8px, 1.2vw, 12px);">
               <div>
                 <label class="font-mono auth-input-label">Prénom</label>
                 <input class="auth-input text-input" type="text" data-signup-firstname value="${escapeHtml(d.firstName)}" placeholder="Ex: Thomas" />

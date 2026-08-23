@@ -48,6 +48,12 @@
   --color-chalk: var(--chalk);
   --color-moss: var(--moss);
   --color-ember: var(--ember);
+  --bg-light: var(--chalk);
+  --border-light: var(--line);
+  --accent-error: var(--ember);
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-display: 'Archivo Black', 'Archivo', sans-serif;
+  --font-sans: 'Archivo', sans-serif;
 }
 
 /* Respect prefers-reduced-motion */
@@ -67,6 +73,10 @@
 html, body {
   width: 100%;
   overflow-x: clip;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 body {
   margin: 0;
@@ -140,9 +150,19 @@ h1, h2, h3, h4, h5, h6 { font-family: 'Archivo Black', 'Archivo', sans-serif; co
   width: min(100%, 1152px);
   max-width: 1152px;
   margin: 0 auto;
-  padding-left: 28px;
-  padding-right: 28px;
+  padding-left: max(28px, env(safe-area-inset-left));
+  padding-right: max(28px, env(safe-area-inset-right));
   box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  button,
+  .btn,
+  select,
+  input,
+  textarea {
+    min-height: 44px;
+  }
 }
 .section {
   padding-top: 64px;
@@ -166,6 +186,9 @@ button:active { transform: scale(0.98); }
 
 @media (max-width: 768px) {
   body { font-size: 16px; }
-  .wrap { padding-left: 20px; padding-right: 20px; }
+  .wrap {
+    padding-left: max(20px, env(safe-area-inset-left));
+    padding-right: max(20px, env(safe-area-inset-right));
+  }
   .section { padding-top: 36px; padding-bottom: 36px; }
 }

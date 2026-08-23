@@ -309,6 +309,23 @@
   
   .client-hero-actions {
     justify-content: center;
+    width: 100%;
+  }
+
+  .client-hero-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .client-list-item {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .client-list-val {
+    max-width: 52%;
+    text-align: right;
+    overflow-wrap: anywhere;
   }
 
   .client-tl-item {
