@@ -25,6 +25,10 @@ import { extractNameFromEmailOrDisplayName } from "./js/helpers.js";
 setRenderer(render);
 
 restorePersistedState(Object.keys(PAGES));
+if (state.page === "quiz" && state.role === "guest" && state.bmiConsent === null) {
+  state.page = "consent";
+  persistState();
+}
 
 // Variable pour stocker le désabonnement des programmes (tracks)
 let unsubscribeTracks = null;

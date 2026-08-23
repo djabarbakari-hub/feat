@@ -67,6 +67,11 @@ export function renderQuiz() {
           <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; margin: 0.5rem 0 0;">${bmiMessage}</p>
           <p style="font-size: 0.75rem; color: var(--slate); line-height: 1.5; margin: 0.75rem 0 0;">L'IMC est un indicateur général, pas un diagnostic médical.</p>
         </div>`
+      : state.bmiConsent === false
+      ? `<div style="margin-top: 1.5rem; padding: 1rem; border: 1px dashed var(--line); background: var(--chalk-soft); border-radius: 6px;">
+          <strong style="color: var(--ink);">IMC non calculé</strong>
+          <p style="font-size: 0.875rem; color: var(--slate); line-height: 1.6; margin: 0.5rem 0 0;">Tu as choisi de ne pas utiliser tes données physiques. Ton programme est personnalisé à partir de tes autres réponses.</p>
+        </div>`
       : `<div style="margin-top: 1.5rem; padding: 1rem; border: 1px dashed var(--line); background: var(--chalk-soft); border-radius: 6px;">
           <strong style="color: var(--ink);">Obtiens aussi ton IMC personnalisé</strong>
           <p style="font-size: 0.875rem; color: var(--slate); line-height: 1.6; margin: 0.5rem 0 0;">Renseigne ton poids et ta taille à l'étape précédente pour recevoir ce repère avec ton programme.</p>

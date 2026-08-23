@@ -282,6 +282,18 @@ document.addEventListener("input", (e) => {
 });
 
 document.addEventListener("click", async (e) => {
+  const bmiConsentBtn = e.target.closest("[data-bmi-consent]");
+  if (bmiConsentBtn) {
+    state.bmiConsent = bmiConsentBtn.dataset.bmiConsent === "accepted";
+    if (!state.bmiConsent) {
+      delete state.quizAnswers.physique;
+    }
+    state.quizStep = 0;
+    persistState();
+    navigate("quiz");
+    return;
+  }
+
   const navBtn = e.target.closest("[data-nav]");
   if (navBtn) {
     if (navBtn.dataset.logout) {
@@ -305,6 +317,9 @@ document.addEventListener("click", async (e) => {
     const [key, val] = quizBtn.dataset.quizAnswer.split(":");
     state.quizAnswers[key] = val;
     state.quizStep += 1;
+    if (state.bmiConsent !== true && QUIZ_STEPS[state.quizStep]?.type === "optional") {
+      state.quizStep += 1;
+    }
     persistState();
     render();
     return;
@@ -338,6 +353,9 @@ document.addEventListener("click", async (e) => {
   const quizNextBtn = e.target.closest("[data-quiz-next]");
   if (quizNextBtn) {
     state.quizStep++;
+    if (state.bmiConsent !== true && QUIZ_STEPS[state.quizStep]?.type === "optional") {
+      state.quizStep++;
+    }
     persistState();
     render();
     return;

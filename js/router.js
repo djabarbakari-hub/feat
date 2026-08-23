@@ -27,6 +27,10 @@ export function updateBrowserHistory(page, { replace = false } = {}) {
  * @param {string} page - Nom de la page (ex: "home", "programs").
  */
 export function navigate(page, { replace = false } = {}) {
+  if (page === "quiz" && state.role === "guest" && state.bmiConsent === null) {
+    page = "consent";
+  }
+
   if ((page.startsWith("client") || page.startsWith("admin")) && state.role === "guest") {
     page = "signup";
   }

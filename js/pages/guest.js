@@ -512,8 +512,8 @@ export function renderHome() {
       </div>
 
       <div style="display: flex; justify-content: center; margin-top: 40px;">
-        <button class="btn btn-ember glowing-halo" data-nav="quiz" style="font-weight: 700; gap: 8px;">
-          Découvrir mon programme personnalisé ${icon("arrow-right", 18)}
+        <button class="btn btn-ember glowing-halo" data-nav="consent" style="font-weight: 700; gap: 8px;">
+          Trouver mon programme ${icon("arrow-right", 18)}
         </button>
       </div>
     </div>
@@ -560,8 +560,8 @@ export function renderHome() {
         5 secondes de questionnaire pour obtenir un programme sur mesure.
       </h3>
       <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-top: 16px;">
-        <button class="btn btn-ember glowing-halo" data-nav="quiz" style="font-weight: 700; padding: 16px 32px; font-size: 16px; background: var(--ember); color: var(--chalk); border-radius: 4px;">
-          Démarrer le Onboarding ${icon("zap", 18)}
+        <button class="btn btn-ember glowing-halo" data-nav="consent" style="font-weight: 700; padding: 16px 32px; font-size: 16px; background: var(--ember); color: var(--chalk); border-radius: 4px;">
+          Trouver mon programme ${icon("zap", 18)}
         </button>
         <button class="btn btn-line" data-nav="login" aria-label="Se connecter" style="font-weight: 700; padding: 16px 32px; font-size: 16px; color: var(--chalk); border-color: rgba(255, 255, 255, 0.3);">
           Se connecter ${icon("user", 18)}
