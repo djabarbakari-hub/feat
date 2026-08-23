@@ -19,7 +19,7 @@ export function renderHome() {
   const [t0, t1, t2] = list;
 
   const realPrograms = COACH_PROGRAMS || [];
-  const prog1 = realPrograms.find(p => p.id === "pecs-epaules-home") || realPrograms[0];
+  const prog1 = realPrograms.find(p => p.id === "perte-poids-home") || realPrograms[0];
   const sess1 = prog1?.sessions?.find(s => s.id === "s_pp_home_lundi") || prog1?.sessions?.[0];
 
   const prog2 = realPrograms.find(p => p.id === "prise-de-muscle-gym") || realPrograms[1] || realPrograms[0];
@@ -668,8 +668,7 @@ export function renderPrograms() {
         ${COACH_PROGRAMS.map((p) => {
           const isPriseDeMuscle = p.id.includes("prise-de-muscle");
           const isPertePoids = p.id.includes("perte-poids");
-          const isPecsEpaules = p.id === "pecs-epaules-home";
-          const goalLabel = isPecsEpaules ? "Pectoraux & Épaules" : (isPriseDeMuscle ? "Hypertrophie" : (isPertePoids ? "Perte de Poids" : "Santé & Endurance"));
+          const goalLabel = isPriseDeMuscle ? "Hypertrophie" : (isPertePoids ? "Perte de Poids" : "Santé & Endurance");
           const cleanTitle = p.title.replace("MONPROGRAMMEFIT : ", "");
 
           return `
@@ -725,11 +724,7 @@ export function renderPrograms() {
               </div>
 
               <!-- DÉTAILS DU PROGRAMME OU VERROU POUR VISITURES -->
-              ${p.pdfOnly ? `
-              <div style="border-top: 1px dashed var(--line); margin-top: 16px; padding-top: 14px;">
-                <a class="btn btn-ember" href="${escapeHtml(p.pdfUrl)}" target="_blank" rel="noopener noreferrer" style="width: 100%; justify-content: center;">Ouvrir le programme PDF ${icon("file-text", 16)}</a>
-              </div>
-              ` : (state.role === 'client' || state.role === 'admin') ? `
+              ${(state.role === 'client' || state.role === 'admin') ? `
               <!-- ACCORDÉON DÉTAILS SÉANCES (MEMBRES CONNECTÉS) -->
               <details style="border-top: 1px dashed var(--line); margin-top: 16px; padding-top: 14px;">
                 <summary style="font-size: 13px; font-weight: 700; color: var(--ember); user-select: none; display: flex; align-items: center; gap: 6px; outline: none; cursor: pointer;">
