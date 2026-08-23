@@ -6,6 +6,40 @@ import { QUIZ_STEPS } from "../data.js";
 import { state } from "../state.js";
 import { icon, trackById, escapeHtml } from "../helpers.js";
 
+function getBmiAssessment(physique) {
+  const weight = Number(physique?.poids);
+  const height = Number(physique?.taille);
+  const bmi = weight > 0 && height > 0 ? weight / ((height / 100) ** 2) : null;
+
+  if (bmi === null) return null;
+  if (bmi < 18.5) {
+    return {
+      value: bmi,
+      status: "Insuffisance pondérale",
+      advice: "Une orientation vers un programme de prise de muscle, avec progression progressive et récupération suffisante, peut être pertinente."
+    };
+  }
+  if (bmi < 25) {
+    return {
+      value: bmi,
+      status: "Corpulence dans la norme",
+      advice: "Tu peux suivre l'objectif que tu as choisi : le programme sera ajusté à ton niveau et à ton environnement."
+    };
+  }
+  if (bmi < 30) {
+    return {
+      value: bmi,
+      status: "Surpoids",
+      advice: "Une orientation vers un programme de perte de poids progressif, combinant renforcement et endurance, peut être adaptée."
+    };
+  }
+  return {
+    value: bmi,
+    status: "Obésité",
+    advice: "Une reprise progressive, orientée vers la perte de poids et adaptée à tes capacités, est recommandée. Un avis médical peut compléter cet accompagnement."
+  };
+}
+
 /**
  * Rend le quiz de personnalisation avec animations et gestion des étapes.
  * @returns {string} HTML du quiz ou du résultat.
@@ -174,6 +208,27 @@ export function renderQuiz() {
     `;
   } else if (s.type === "resume") {
     const result = trackById(state.quizAnswers.lieu);
+    const bmiAssessment = state.bmiConsent === true
+      ? getBmiAssessment(state.quizAnswers.physique)
+      : null;
+    const bmiResumeHtml = state.bmiConsent === false
+      ? `<div class="quiz-resume-item">
+          <strong>IMC non calculé</strong>
+          <p style="margin: 0.5rem 0 0; color: var(--slate); line-height: 1.5;">Tu as refusé l'utilisation de tes données physiques. L'orientation repose sur tes autres réponses.</p>
+        </div>`
+      : bmiAssessment
+      ? `<div class="quiz-resume-item" style="border-left-color: var(--ember);">
+          <div style="display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap;">
+            <strong>IMC : ${bmiAssessment.value.toFixed(1)}</strong>
+            <span style="color: var(--ember); font-weight: 700;">${bmiAssessment.status}</span>
+          </div>
+          <p style="margin: 0.5rem 0 0; color: var(--slate); line-height: 1.5;"><strong>Orientation :</strong> ${bmiAssessment.advice}</p>
+          <p style="margin: 0.5rem 0 0; color: var(--slate); font-size: 0.75rem; line-height: 1.5;">L'IMC est un indicateur général et ne constitue pas un diagnostic médical.</p>
+        </div>`
+      : `<div class="quiz-resume-item">
+          <strong>IMC non calculé</strong>
+          <p style="margin: 0.5rem 0 0; color: var(--slate); line-height: 1.5;">Renseigne ton poids et ta taille pour obtenir ton IMC et une orientation plus précise.</p>
+        </div>`;
     content = `
       <div class="quiz-resume">
         <div class="quiz-resume-item">Objectif : <strong>${escapeHtml(state.quizAnswers.objectif)}</strong></div>
@@ -181,6 +236,7 @@ export function renderQuiz() {
         ${state.quizAnswers.physique?.poids ? `<div class="quiz-resume-item">Poids : <strong>${escapeHtml(state.quizAnswers.physique.poids)} kg</strong></div>` : ""}
         ${state.quizAnswers.physique?.taille ? `<div class="quiz-resume-item">Taille : <strong>${escapeHtml(state.quizAnswers.physique.taille)} cm</strong></div>` : ""}
         ${state.quizAnswers.physique?.age ? `<div class="quiz-resume-item">Âge : <strong>${escapeHtml(state.quizAnswers.physique.age)} ans</strong></div>` : ""}
+        ${bmiResumeHtml}
       </div>
       <div class="quiz-buttons" style="flex-wrap: wrap; margin-top: 1.5rem;">
         <button type="button" class="btn btn-outline-dark" data-quiz-back>${icon("arrow-left", 14)} Retour</button>
