@@ -59,6 +59,21 @@ export function renderQuiz() {
       .quiz-buttons { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
       .quiz-resume { display: grid; gap: 0.75rem; max-width: 420px; text-align: left; }
       .quiz-resume-item { padding: 0.75rem; background: var(--surface); border-radius: 0.125rem; border-left: 0.1875rem solid var(--accent-primary); }
+      .bmi-resume-grid { display: grid; grid-template-columns: minmax(220px, 0.85fr) minmax(280px, 1.15fr); gap: 1rem; margin-top: 0.25rem; }
+      .bmi-chart { padding: 1rem; border: 1px solid rgba(247, 245, 240, 0.16); border-radius: 0.125rem; background: rgba(247, 245, 240, 0.06); }
+      .bmi-chart-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; color: var(--ink-muted2); }
+      .bmi-chart-head span { font-size: 0.7rem; }
+      .bmi-chart-head strong { color: var(--ember); font-size: 1.75rem; }
+      .bmi-chart-scale { display: flex; position: relative; height: 0.75rem; margin-top: 1.25rem; border-radius: 1rem; overflow: visible; }
+      .bmi-chart-segment { height: 100%; }
+      .bmi-chart-low { width: 46.25%; background: #6b9ee8; border-radius: 1rem 0 0 1rem; }
+      .bmi-chart-normal { width: 16.25%; background: var(--moss); }
+      .bmi-chart-high { width: 12.5%; background: #d97706; }
+      .bmi-chart-very-high { width: 25%; background: var(--ember); border-radius: 0 1rem 1rem 0; }
+      .bmi-chart-marker { position: absolute; top: 50%; width: 1rem; height: 1rem; border: 0.2rem solid var(--chalk); border-radius: 50%; background: var(--ink); transform: translate(-50%, -50%); box-shadow: 0 0 0 0.15rem var(--ember); }
+      .bmi-chart-labels { display: flex; justify-content: space-between; gap: 0.25rem; margin-top: 0.6rem; color: var(--ink-muted3); font-size: 0.65rem; }
+      .bmi-chart-note { margin: 0.8rem 0 0; color: var(--ink-muted3); font-size: 0.7rem; line-height: 1.4; }
+      @media (max-width: 640px) { .bmi-resume-grid { grid-template-columns: 1fr; } }
     </style>
   `;
 
@@ -122,16 +137,18 @@ export function renderQuiz() {
 
     return `
     ${quizAnimation}
-    <div class="section wrap">
-      <p class="eyebrow-moss font-mono">RÉSULTAT</p>
-      <h1 class="h2 font-display">Ton point de départ : ${result.label}</h1>
-      <div class="card" style="padding:2rem; animation: fadeIn 0.6s ease-out;max-width:100%;">
+    <div class="section" style="background: var(--ink); color: var(--chalk); min-height: 100%;">
+      <div class="wrap">
+      <p class="eyebrow-ember font-mono">RÉSULTAT</p>
+      <h1 class="h2 font-display" style="color: var(--chalk);">Ton point de départ : ${result.label}</h1>
+      <div class="card" style="padding:2rem; animation: fadeIn 0.6s ease-out;max-width:100%; background: rgba(247, 245, 240, 0.06); border-color: rgba(247, 245, 240, 0.16);">
         ${icon(result.icon, 1.75, "var(--accent-primary)")}
-        <p style="font-size:1rem;color:var(--text-secondary);margin-top:1rem; line-height: 1.7;">${result.desc}</p>
-        <div class="font-mono" style="font-size:0.875rem;color:var(--accent-secondary);margin-top:1rem">${result.dist}</div>
+        <p style="font-size:1rem;color:var(--ink-muted2);margin-top:1rem; line-height: 1.7;">${result.desc}</p>
+        <div class="font-mono" style="font-size:0.875rem;color:var(--ember);margin-top:1rem">${result.dist}</div>
         ${bmiHtml}
         ${state.role === 'guest' ? `<p style="font-size: 0.95rem; color: var(--ink); font-weight: 700; line-height: 1.6; margin: 1.5rem 0 0;">Ton analyse est prête. Crée ton compte pour enregistrer ton résultat IMC et commencer ton programme personnalisé.</p>` : ""}
         ${actionButton}
+      </div>
       </div>
     </div>`;
   }
@@ -211,19 +228,43 @@ export function renderQuiz() {
     const bmiAssessment = state.bmiConsent === true
       ? getBmiAssessment(state.quizAnswers.physique)
       : null;
+    const bmiChartHtml = bmiAssessment
+      ? `<div class="bmi-chart" role="img" aria-label="Échelle de l'IMC : ${bmiAssessment.value.toFixed(1)}, ${bmiAssessment.status}">
+          <div class="bmi-chart-head">
+            <span class="font-mono">REPÈRE IMC</span>
+            <strong>${bmiAssessment.value.toFixed(1)}</strong>
+          </div>
+          <div class="bmi-chart-scale">
+            <span class="bmi-chart-segment bmi-chart-low"></span>
+            <span class="bmi-chart-segment bmi-chart-normal"></span>
+            <span class="bmi-chart-segment bmi-chart-high"></span>
+            <span class="bmi-chart-segment bmi-chart-very-high"></span>
+            <span class="bmi-chart-marker" style="left: ${Math.min(98, Math.max(2, (bmiAssessment.value / 40) * 100))}%;"></span>
+          </div>
+          <div class="bmi-chart-labels">
+            <span>&lt; 18,5</span>
+            <span>18,5–24,9</span>
+            <span>25–29,9</span>
+            <span>30+</span>
+          </div>
+          <p class="bmi-chart-note">Indicateur général, pas un diagnostic médical.</p>
+        </div>`
+      : "";
     const bmiResumeHtml = state.bmiConsent === false
       ? `<div class="quiz-resume-item">
           <strong>IMC non calculé</strong>
           <p style="margin: 0.5rem 0 0; color: var(--slate); line-height: 1.5;">Tu as refusé l'utilisation de tes données physiques. L'orientation repose sur tes autres réponses.</p>
         </div>`
       : bmiAssessment
-      ? `<div class="quiz-resume-item" style="border-left-color: var(--ember);">
-          <div style="display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap;">
-            <strong>IMC : ${bmiAssessment.value.toFixed(1)}</strong>
-            <span style="color: var(--ember); font-weight: 700;">${bmiAssessment.status}</span>
+      ? `<div class="bmi-resume-grid">
+          ${bmiChartHtml}
+          <div class="quiz-resume-item" style="border-left-color: var(--ember);">
+            <div style="display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap;">
+              <strong>IMC : ${bmiAssessment.value.toFixed(1)}</strong>
+              <span style="color: var(--ember); font-weight: 700;">${bmiAssessment.status}</span>
+            </div>
+            <p style="margin: 0.5rem 0 0; color: var(--slate); line-height: 1.5;"><strong>Orientation :</strong> ${bmiAssessment.advice}</p>
           </div>
-          <p style="margin: 0.5rem 0 0; color: var(--slate); line-height: 1.5;"><strong>Orientation :</strong> ${bmiAssessment.advice}</p>
-          <p style="margin: 0.5rem 0 0; color: var(--slate); font-size: 0.75rem; line-height: 1.5;">L'IMC est un indicateur général et ne constitue pas un diagnostic médical.</p>
         </div>`
       : `<div class="quiz-resume-item">
           <strong>IMC non calculé</strong>

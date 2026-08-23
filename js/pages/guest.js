@@ -303,7 +303,7 @@ export function renderHome() {
       <div class="hero-grid">
         <div style="position: relative; z-index: 2;">
           <p class="eyebrow-ember font-mono">Votre coaching, votre rythme, vos résultats.</p>
-          <h1 class="h1 font-display">Un programme conçu pour&nbsp;vous — pas pour tout le monde.</h1>
+          <h1 class="h1 font-display">Un programme conçu pour&nbsp;vous: pas pour tout le monde.</h1>
           <p class="hero-sub">À domicile ou en salle, avec ou sans matériel : nous adaptons le programme à votre situation, pas l'inverse.</p>
           <div class="hero-cta">
             <button class="btn btn-ember glowing-halo" data-nav="signup" aria-label="Trouver mon programme" style="font-weight: 700;">Trouver mon programme ${icon("arrow-right", 16)}</button>
