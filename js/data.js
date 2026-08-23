@@ -82,9 +82,12 @@ export const QUIZ_STEPS = [
 export const COACH_PROGRAMS = [
   {
 
-    id: "perte-poids-home",
-    title: "MONPROGRAMMEFIT : PROGRAMME PERTE DE POIDS",
-    subtitle: "Maison avec matériel",
+    id: "pecs-epaules-home",
+    title: "MONPROGRAMMEFIT : PROGRAMME PECS & ÉPAULES",
+    subtitle: "Maison avec matériel · document PDF officiel",
+    pdfUrl: "/programmes/Programme_Pecs_Epaules_Maison.pdf",
+    image: "/images/maison-au-poids-du-corps.jpg",
+    pdfOnly: true,
     author: "Coach Abdou BAKARI",
     duration: "8 semaines",
     level: "Débutant - Intermédiaire",

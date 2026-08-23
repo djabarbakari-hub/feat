@@ -763,7 +763,7 @@ export function renderClientProgram() {
   const completedSessions = program.sessions.filter(s => s.done).length;
   const totalSessions = program.sessions.length;
 
-  const coachInstructionsHtml = isCoachProgram ? `
+  const coachInstructionsHtml = isCoachProgram && !coachProg.pdfOnly ? `
     <div class="client-card" style="margin-bottom: 28px; background: white; border: 1px solid var(--line); border-radius: 12px; padding: 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.02);">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px solid var(--line);">
         <div>
@@ -830,6 +830,13 @@ export function renderClientProgram() {
     </div>
   ` : "";
 
+  const coachPdfHtml = coachProg.pdfOnly && coachProg.pdfUrl ? `
+    <div class="client-card" style="margin-bottom: 28px; background: white; border: 1px solid var(--line); border-radius: 12px; padding: 20px 24px;">
+      <p style="font-size: 13px; color: var(--slate); margin: 0 0 12px;">Le document officiel de ce programme est disponible au format PDF.</p>
+      <a class="btn btn-ember" href="${escapeHtml(coachProg.pdfUrl)}" target="_blank" rel="noopener noreferrer" style="width: 100%; justify-content: center;">Ouvrir le programme PDF ${icon("file-text", 16)}</a>
+    </div>
+  ` : "";
+
   return `
   <div class="wrap client-page" style="padding-bottom: 60px;">
     
@@ -853,6 +860,7 @@ export function renderClientProgram() {
 
     <!-- 2. INSTRUCTIONS COACH SI DISPONIBLE -->
     ${coachInstructionsHtml}
+    ${coachPdfHtml}
 
     <!-- 3. AGENDA & SÉANCES DU CYCLE -->
     <div style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
