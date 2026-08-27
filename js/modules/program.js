@@ -169,6 +169,18 @@ export async function applyProgramToUser(uid, coachProgram, options = {}) {
   if (physique.taille) payload.height = parseFloat(physique.taille);
   if (physique.age) payload.age = parseInt(physique.age, 10);
 
+  const weight = Number(physique.poids);
+  const height = Number(physique.taille);
+  let bmiValue = null;
+  if (weight > 0 && height > 0) {
+    const bmi = weight / ((height / 100) ** 2);
+    if (!Number.isNaN(bmi)) {
+      bmiValue = Math.round(bmi * 10) / 10;
+      payload.bmi = bmiValue;
+      payload.physique = { ...physique, bmi: bmiValue };
+    }
+  }
+
   const isSelf = auth.currentUser?.uid === uid && !options.skipLocalState && !state.simulationActive;
   if (isSelf) {
     state.clientProfile = {
@@ -177,10 +189,15 @@ export async function applyProgramToUser(uid, coachProgram, options = {}) {
       track,
       niveau,
       frequence,
-      physique: { ...(state.clientProfile?.physique || {}), ...physique },
+      physique: {
+        ...(state.clientProfile?.physique || {}),
+        ...physique,
+        ...(bmiValue != null ? { bmi: bmiValue } : {}),
+      },
       quizAnswers: { ...(state.clientProfile?.quizAnswers || {}), ...quizAnswers },
       assignedProgramId: coachProgram.id,
       program,
+      ...(bmiValue != null ? { bmi: bmiValue } : {}),
     };
     persistState();
   }

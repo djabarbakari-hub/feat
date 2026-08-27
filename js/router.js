@@ -27,6 +27,11 @@ export function updateBrowserHistory(page, { replace = false } = {}) {
  * @param {string} page - Nom de la page (ex: "home", "programs").
  */
 export function navigate(page, { replace = false } = {}) {
+  // Invité sans choix IMC → écran de consentement avant le quiz
+  if (page === "quiz" && state.role === "guest" && state.bmiConsent === null) {
+    page = "consent";
+  }
+
   if (page.startsWith("admin") && state.role !== "admin") {
     page = state.role === "client" ? "client-dashboard" : "signup";
   } else if (page.startsWith("client") && state.role === "guest") {
@@ -48,9 +53,14 @@ export function navigate(page, { replace = false } = {}) {
     state.history.push(state.page);
   }
 
-  // Invité qui relance "Trouver mon programme" : nouveau quiz vide.
-  // On ne conserve l'ancien brouillon que sur la page signup (après confirmation du quiz).
-  if (page === "quiz" && state.role === "guest") {
+  // Nouveau parcours : reset au consentement, ou reset du quiz invité (en gardant le choix IMC)
+  if (page === "consent" && state.role === "guest") {
+    state.quizStep = 0;
+    state.quizAnswers = {};
+    state.pendingProgramId = null;
+    state.bmiConsent = null;
+    clearPendingOnboarding();
+  } else if (page === "quiz" && state.role === "guest") {
     state.quizStep = 0;
     state.quizAnswers = {};
     state.pendingProgramId = null;

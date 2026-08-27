@@ -9,6 +9,7 @@ export const state = {
   page: "home",
   role: "guest", // guest | client | admin
   pendingProgramId: null,
+  bmiConsent: null,
   quizStep: 0,
   quizAnswers: {},
   loginTab: "client",
@@ -70,6 +71,7 @@ export function savePendingOnboarding() {
       pendingProgramId: state.pendingProgramId || null,
       quizAnswers: state.quizAnswers || {},
       quizStep: state.quizStep || 0,
+      bmiConsent: state.bmiConsent,
       savedAt: Date.now(),
     }));
   } catch (error) {
@@ -94,6 +96,9 @@ export function restorePendingOnboarding() {
     }
     if (typeof pending.quizStep === "number" && pending.quizStep > (state.quizStep || 0)) {
       state.quizStep = pending.quizStep;
+    }
+    if (typeof pending.bmiConsent === "boolean") {
+      state.bmiConsent = pending.bmiConsent;
     }
     return hasPendingOnboardingData();
   } catch (error) {
@@ -131,6 +136,7 @@ export function persistState() {
       page: state.page,
       role: state.role,
       pendingProgramId: state.pendingProgramId,
+      bmiConsent: state.bmiConsent,
       quizStep: state.quizStep,
       quizAnswers: state.quizAnswers,
       loginTab: state.loginTab,
@@ -162,6 +168,7 @@ export function restorePersistedState(validPageKeys = []) {
       if (parsed.page) state.page = parsed.page;
       if (parsed.role) state.role = parsed.role;
       if (parsed.pendingProgramId !== undefined) state.pendingProgramId = parsed.pendingProgramId;
+      if (typeof parsed.bmiConsent === "boolean") state.bmiConsent = parsed.bmiConsent;
       if (typeof parsed.quizStep === "number") state.quizStep = parsed.quizStep;
       if (parsed.quizAnswers) state.quizAnswers = parsed.quizAnswers;
       if (parsed.loginTab) state.loginTab = parsed.loginTab;

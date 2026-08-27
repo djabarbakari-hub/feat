@@ -371,7 +371,7 @@ export function renderHome() {
           <h1 class="h1 font-display">Un programme conçu pour vous:<br>pas pour tout le monde.</h1>
           <p class="hero-sub">À domicile ou en salle, avec ou sans matériel : nous adaptons le programme à votre situation, pas l'inverse.</p>
           <div class="hero-cta">
-            <button class="btn btn-ember glowing-halo" data-nav="quiz" aria-label="Trouver mon programme" style="font-weight: 700;">Trouver mon programme ${icon("arrow-right", 16)}</button>
+            <button class="btn btn-ember glowing-halo" data-nav="consent" aria-label="Trouver mon programme" style="font-weight: 700;">Trouver mon programme ${icon("arrow-right", 16)}</button>
             <button class="btn btn-line" data-nav="programs" aria-label="Voir les programmes" style="color: var(--chalk); border-color: rgba(255,255,255,0.25);">Voir les programmes</button>
           </div>
         </div>
@@ -590,7 +590,7 @@ export function renderHome() {
       </div>
 
       <div style="display: flex; justify-content: center; margin-top: 40px;">
-        <button class="btn btn-ember glowing-halo" data-nav="quiz" style="font-weight: 700; gap: 8px;">
+        <button class="btn btn-ember glowing-halo" data-nav="consent" style="font-weight: 700; gap: 8px;">
           Découvrir mon programme personnalisé ${icon("arrow-right", 18)}
         </button>
       </div>
@@ -686,7 +686,7 @@ export function renderHome() {
         5 secondes de questionnaire pour obtenir un programme sur mesure.
       </h3>
       <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-top: 16px;">
-        <button class="btn btn-ember" data-nav="quiz" style="font-weight: 700; padding: 16px 32px; font-size: 16px; background: var(--ember); color: #fff; border-radius: 4px;">
+        <button class="btn btn-ember" data-nav="consent" style="font-weight: 700; padding: 16px 32px; font-size: 16px; background: var(--ember); color: #fff; border-radius: 4px;">
           Démarrer le Onboarding ${icon("zap", 18)}
         </button>
         <button class="btn btn-line" data-nav="login" aria-label="Se connecter" style="font-weight: 700; padding: 16px 32px; font-size: 16px; color: #fff; border-color: rgba(255, 255, 255, 0.28);">
@@ -913,7 +913,7 @@ export function renderPrograms() {
             ${state.role === 'client' ? `
               <button class="btn btn-ember" data-nav="client-program" style="font-weight: 700; padding: 12px 24px; font-size: 14px;">Consulter mon entraînement</button>
             ` : `
-              <button class="btn btn-ember" data-nav="quiz" style="font-weight: 700; padding: 12px 24px; font-size: 14px;">Commencer mon Questionnaire Onboarding</button>
+              <button class="btn btn-ember" data-nav="consent" style="font-weight: 700; padding: 12px 24px; font-size: 14px;">Commencer mon Questionnaire Onboarding</button>
             `}
           </div>
         </div>
@@ -1258,7 +1258,7 @@ export function renderAbout() {
             Réponds à notre questionnaire rapide de 2 minutes pour découvrir les séances parfaitement ajustées à tes objectifs.
           </p>
           <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
-            <button class="btn btn-ember" data-nav="quiz" style="font-weight: 700; padding: 12px 24px; font-size: 14px;">
+            <button class="btn btn-ember" data-nav="consent" style="font-weight: 700; padding: 12px 24px; font-size: 14px;">
               Passer le questionnaire gratuit
             </button>
             <button class="btn btn-outline-light" data-nav="programs" style="padding: 12px 20px; font-size: 14px; color: var(--chalk); border-color: rgba(255,255,255,0.2);">
