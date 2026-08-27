@@ -5,6 +5,7 @@
 import { TRACKS, COACH_PROGRAMS } from "../data.js";
 import { state } from "../state.js";
 import { icon, escapeHtml, showToast, setButtonLoading } from "../helpers.js";
+import { getGoalLabel } from "../modules/program.js";
 import { auth, db } from "../firebase.js";
 import { doc, setDoc } from "firebase/firestore";
 
@@ -103,20 +104,6 @@ function getTrackLabel(trackId) {
   const list = state.tracks && state.tracks.length > 0 ? state.tracks : TRACKS;
   const t = list.find(tr => tr.id === trackId);
   return t ? t.label : (trackId || "Non défini");
-}
-
-/**
- * Helper pour traduire l'objectif en français.
- */
-function getGoalLabel(goalId) {
-  const map = {
-    "perte-poids": "Perte de poids",
-    "prise-muscle": "Prise de muscle",
-    "musculation": "Prise de muscle / Hypertrophie",
-    "endurance-sante": "Endurance & Santé",
-    "remise": "Remise en forme",
-  };
-  return map[goalId] || goalId || "Non défini";
 }
 
 function getAssignedProgramLabel(client) {
@@ -879,10 +866,10 @@ export function renderAdminPrograms() {
           <div class="card" style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid ${badgeColor}; background: var(--surface); box-shadow: 0 4px 20px rgba(0,0,0,0.02); border-radius: 8px;">
             <div>
               <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
-                <span style="font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; background: ${badgeColor}; color: white;">
+                <span style="font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; font-family: var(--font-mono); background: ${badgeColor}; color: white;">
                   ${goalLabel}
                 </span>
-                <span style="font-size: 10px; font-weight: 700; color: var(--slate); background: rgba(0,0,0,0.05); padding: 3px 8px; border-radius: 4px; font-family: 'IBM Plex Mono', monospace;">
+                <span style="font-size: 10px; font-weight: 700; color: var(--slate); background: rgba(0,0,0,0.05); padding: 3px 8px; border-radius: 4px; font-family: var(--font-mono);">
                   ${p.level || "Tous niveaux"}
                 </span>
               </div>
@@ -1143,19 +1130,33 @@ export function renderAdminMessages() {
         <div style="padding: 12px 22px;">
           ${messages.length === 0 ? `
             <p style="color: var(--slate); font-size: 14px; padding: 16px 0;">Aucun message dans la base Firestore pour le moment.</p>
-          ` : messages.map(m => `
+          ` : messages.map(m => {
+            const isAdjustment = m.type === "adjustment";
+            const clientRef = m.fromUid || m.fromEmail || "";
+            return `
             <div class="adm-msg-row ${!m.read ? 'unread' : ''}" style="margin-bottom: 12px; border: 1px solid var(--line); border-radius: 4px; padding: 16px;">
               ${renderAvatarHtml(m.photoURL || m.photoUrl, m.fromName, "", m.fromEmail, "adm-avatar adm-avatar-sm av-1")}
               <div class="adm-msg-body" style="flex: 1;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; gap:8px; flex-wrap:wrap;">
                   <div class="adm-msg-name" style="font-weight:700;">${escapeHtml(m.fromName || "Anonyme")} (${escapeHtml(m.fromEmail || "Pas d'email")})</div>
-                  <div class="adm-msg-time" style="font-size:12px; color:var(--slate);">${formatTimeAgo(m.createdAt)}</div>
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    ${isAdjustment ? `<span class="adm-badge" style="background: rgba(226,98,45,0.12); color: var(--ember); border: 1px solid rgba(226,98,45,0.25);">Ajustement</span>` : ""}
+                    <div class="adm-msg-time" style="font-size:12px; color:var(--slate);">${formatTimeAgo(m.createdAt)}</div>
+                  </div>
                 </div>
                 <div style="font-size: 12px; font-weight: 600; color: var(--ember); margin-bottom: 6px;">Sujet: ${escapeHtml(m.subject || "Sans sujet")}</div>
+                ${isAdjustment && m.currentProgramLabel ? `<div style="font-size:12px; color:var(--slate); margin-bottom:6px;">Programme actuel : ${escapeHtml(m.currentProgramLabel)}</div>` : ""}
                 <div class="adm-msg-preview" style="font-size:14px; color:var(--ink); line-height:1.5; white-space:pre-wrap;">${escapeHtml(m.message || "")}</div>
+                ${clientRef ? `
+                  <div style="margin-top:10px;">
+                    <button type="button" class="btn btn-outline-dark" data-view-client="${escapeHtml(clientRef)}" style="padding:6px 10px; font-size:12px;">
+                      Ouvrir la fiche et réassigner
+                    </button>
+                  </div>
+                ` : ""}
               </div>
-            </div>
-          `).join("")}
+            </div>`;
+          }).join("")}
         </div>
       </div>
 

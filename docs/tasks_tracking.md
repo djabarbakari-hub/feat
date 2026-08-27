@@ -43,3 +43,7 @@
 
 ## Mise à jour UX récente
 - [x] Les boutons visibles du site déclenchent désormais des actions réelles (retour, contact, progression, administration). — 2026-07-14
+- [x] Séances lues par id dans le programme assigné (plus de mélange entre jours / plans). — 2026-08-14
+- [x] Changement de programme réel (client + admin) : confirmation, reset semaine 1, suppression des anciennes séances. — 2026-08-14
+- [x] Demande d’ajustement client → messagerie admin, avec lien vers la fiche pour réassigner. — 2026-08-14
+- [x] Résultat du quiz : titre du programme coach, pas seulement le lieu. — 2026-08-14

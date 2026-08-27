@@ -8,7 +8,7 @@
 import { TRACKS, COACH_PROGRAMS } from "../data.js";
 import { state } from "../state.js";
 import { icon, escapeHtml } from "../helpers.js";
-import { COACH_AVATAR } from "../assets.js";
+import { COACH_AVATAR, TRACK_GYM_IMG } from "../assets.js";
 
 /**
  * Rend la page d'accueil avec un héros animé et une grille de programmes.
@@ -39,10 +39,80 @@ export function renderHome() {
       
       .hero .h1 {
         color: var(--chalk) !important;
+        font-size: clamp(1.85rem, 4.2vw, 3.05rem);
+        line-height: 1.12;
+        letter-spacing: -0.03em;
       }
       
       .hero .hero-sub {
         color: var(--ink-muted2) !important;
+        margin-top: 20px;
+        max-width: 34rem;
+      }
+
+      .hero-visual-panel {
+        position: relative;
+        z-index: 2;
+      }
+
+      .hero-visual-card {
+        position: relative;
+        border-radius: 20px;
+        overflow: hidden;
+        min-height: 340px;
+        height: 100%;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.32);
+        background: #0d1418;
+      }
+
+      .hero-visual-card img {
+        width: 100%;
+        height: 100%;
+        min-height: 340px;
+        object-fit: cover;
+        object-position: center;
+        display: block;
+      }
+
+      .hero-visual-card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(22, 35, 44, 0.08) 20%, rgba(22, 35, 44, 0.82) 100%);
+      }
+
+      .hero-visual-caption {
+        position: absolute;
+        left: 20px;
+        right: 20px;
+        bottom: 20px;
+        z-index: 2;
+      }
+
+      .hero-visual-caption span {
+        display: inline-block;
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--ember);
+        font-weight: 800;
+        margin-bottom: 8px;
+      }
+
+      .hero-visual-caption strong {
+        display: block;
+        color: #fff;
+        font-size: 18px;
+        font-weight: 800;
+        line-height: 1.25;
+      }
+
+      @media (max-width: 991px) {
+        .hero-visual-card,
+        .hero-visual-card img {
+          min-height: 260px;
+        }
       }
       
       .cinematic-bg-title {
@@ -59,7 +129,7 @@ export function renderHome() {
         text-transform: uppercase;
         letter-spacing: -0.02em;
         user-select: none;
-        font-family: 'Archivo Black', 'Archivo', sans-serif;
+        font-family: var(--font-display);
       }
 
       .hero-card-cluster-container {
@@ -239,12 +309,14 @@ export function renderHome() {
       
       @media (min-width: 992px) {
         .hero-grid {
-          grid-template-columns: 1.2fr 1fr !important;
-          gap: 48px !important;
+          grid-template-columns: 1.15fr 0.85fr !important;
+          gap: 40px !important;
+          align-items: center !important;
         }
         .split-layout-grid {
-          grid-template-columns: 1fr 1.2fr !important;
-          gap: 64px !important;
+          grid-template-columns: minmax(260px, 0.9fr) 1.1fr !important;
+          gap: 56px !important;
+          align-items: center !important;
         }
       }
       
@@ -267,26 +339,19 @@ export function renderHome() {
         animation: pulseHalo 4s infinite alternate ease-in-out;
       }
 
-      /* --- Section 9: Rideau Reveal Footer --- */
-      #main-content {
-        position: relative;
-        z-index: 2;
-        background: var(--chalk);
-        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-        margin-bottom: 220px;
+      .home-final-cta {
+        background: #0d1418 !important;
+        background-image: radial-gradient(ellipse at 50% 0%, rgba(226, 98, 45, 0.14) 0%, transparent 58%) !important;
+        padding: 72px 20px !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        margin: 0 !important;
       }
-      #appFooter {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        z-index: 1;
-        pointer-events: auto;
+      .home-final-cta h3 {
+        color: #fff !important;
+        text-shadow: none;
       }
-      @media (max-width: 768px) {
-        #main-content {
-          margin-bottom: 260px;
-        }
+      .home-final-cta .eyebrow-ember {
+        color: var(--ember);
       }
     </style>
   `;
@@ -303,14 +368,23 @@ export function renderHome() {
       <div class="hero-grid">
         <div style="position: relative; z-index: 2;">
           <p class="eyebrow-ember font-mono">Votre coaching, votre rythme, vos résultats.</p>
-          <h1 class="h1 font-display">Avec le bon programme et le bon suivi, votre objectif physique est à votre portée.</h1>
-          <p class="hero-sub">Des programmes personnalisés adaptés à votre niveau, votre environnement et vos objectifs. Avec ou sans matériel : nous vous accompagnons avec une méthode efficace pour construire votre meilleure version.</p>
+          <h1 class="h1 font-display">Un programme conçu pour vous:<br>pas pour tout le monde.</h1>
+          <p class="hero-sub">À domicile ou en salle, avec ou sans matériel : nous adaptons le programme à votre situation, pas l'inverse.</p>
           <div class="hero-cta">
-            <button class="btn btn-ember glowing-halo" data-nav="signup" aria-label="Trouver mon programme" style="font-weight: 700;">Trouver mon programme ${icon("arrow-right", 16)}</button>
+            <button class="btn btn-ember glowing-halo" data-nav="quiz" aria-label="Trouver mon programme" style="font-weight: 700;">Trouver mon programme ${icon("arrow-right", 16)}</button>
             <button class="btn btn-line" data-nav="programs" aria-label="Voir les programmes" style="color: var(--chalk); border-color: rgba(255,255,255,0.25);">Voir les programmes</button>
           </div>
         </div>
 
+        <aside class="hero-visual-panel" aria-label="Entraînement musculation">
+          <div class="hero-visual-card">
+            <img src="${TRACK_GYM_IMG}" alt="Haltères de musculation" onerror="this.onerror=null;this.src='/images/salle-de-gym.jpg'" />
+            <div class="hero-visual-caption">
+              <span class="font-mono">Haltères · Salle · Maison</span>
+              <strong class="font-display">Le bon matériel n'est pas obligatoire. La méthode, si.</strong>
+            </div>
+          </div>
+        </aside>
       </div>
 
       <!-- Section 3 : Archipel des Catégories (Floating Archipelago 3D) -->
@@ -356,12 +430,16 @@ export function renderHome() {
       <p class="eyebrow-moss font-mono">POURQUOI CE COACHING</p>
       <h2 class="h2 font-display" style="margin-bottom: 48px;">Fait pour ceux qui commencent, sans excuse liée au matériel.</h2>
       
-      <div class="split-layout-grid" style="display: grid; grid-template-columns: 1fr; gap: 48px; align-items: center;">
+      <div class="split-layout-grid" style="display: grid; gap: 48px; align-items: center;">
         <!-- Left: Portrait and rotating orbital badge with morphing glow -->
         <div class="coach-morph-container" style="display: flex; justify-content: center; position: relative;">
-          <div class="coach-photo-frame glowing-halo" style="width: min(100%, 340px); height: 400px; border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; overflow: hidden; position: relative; box-shadow: var(--shadow); border: 3px solid var(--ember); animation: morphingBorder 8s infinite alternate ease-in-out;">
-            <img src="${COACH_AVATAR}" alt="Coach Abdou BAKARI" style="width: 100%; height: 100%; object-fit: cover;" />
-            <div style="position: absolute; inset: 0; background: linear-gradient(180deg, transparent 60%, rgba(22, 35, 44, 0.8) 100%);"></div>
+          <div class="coach-photo-frame glowing-halo" style="width: min(100%, 360px); height: 440px; border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; overflow: hidden; position: relative; box-shadow: var(--shadow); border: 3px solid var(--ember); animation: morphingBorder 8s infinite alternate ease-in-out;">
+            <img src="${COACH_AVATAR}" alt="Coach Abdou BAKARI" style="width: 100%; height: 100%; object-fit: cover; object-position: center 18%;" />
+            <div style="position: absolute; inset: 0; background: linear-gradient(180deg, transparent 55%, rgba(22, 35, 44, 0.82) 100%);"></div>
+            <div style="position: absolute; bottom: 22px; left: 0; right: 0; text-align: center; z-index: 2; padding: 0 16px;">
+              <div class="font-display" style="color: var(--chalk); font-size: 20px; font-weight: 800; margin: 0;">Abdou BAKARI</div>
+              <div class="font-mono" style="color: var(--ember); font-size: 11px; letter-spacing: 0.08em; margin-top: 4px;">COACH &amp; FONDATEUR</div>
+            </div>
           </div>
           <!-- Orbital badge floating -->
           <div class="rotating-orbital-badge font-mono" style="position: absolute; top: -10px; right: 12%; background: var(--ink); color: var(--chalk); border: 2px solid var(--ember); padding: 8px 12px; border-radius: 4px; font-size: 11px; font-weight: 700; transform: rotate(5deg); box-shadow: var(--shadow); animation: floatOrbital 3s infinite ease-in-out; z-index: 10;">
@@ -421,8 +499,8 @@ export function renderHome() {
         <div class="film-card" style="flex: 0 0 300px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 24px; scroll-snap-align: start; display: flex; flex-direction: column; justify-content: space-between; min-height: 380px;">
           <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ember); font-weight: bold; background: rgba(226, 98, 45, 0.1); padding: 4px 8px; border-radius: 4px; text-transform: uppercase;">${escapeHtml(prog1?.subtitle || "Maison")}</span>
-              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-muted2);">${escapeHtml(sess1?.duration || "45 Min")}</span>
+              <span style="font-family: var(--font-mono); font-size: 11px; color: var(--ember); font-weight: bold; background: rgba(226, 98, 45, 0.1); padding: 4px 8px; border-radius: 4px; text-transform: uppercase;">${escapeHtml(prog1?.subtitle || "Maison")}</span>
+              <span style="font-family: var(--font-mono); font-size: 11px; color: var(--ink-muted2);">${escapeHtml(sess1?.duration || "45 Min")}</span>
             </div>
             <h3 class="font-display" style="font-size: 16px; color: var(--chalk); margin: 0 0 8px; font-weight: 700;">${escapeHtml(sess1?.name || "Réveil Musculaire")}</h3>
             <p style="color: var(--ink-muted); font-size: 12.5px; line-height: 1.5; margin-bottom: 16px;">
@@ -452,8 +530,8 @@ export function renderHome() {
         <div class="film-card" style="flex: 0 0 300px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 24px; scroll-snap-align: start; display: flex; flex-direction: column; justify-content: space-between; min-height: 380px;">
           <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ember); font-weight: bold; background: rgba(226, 98, 45, 0.1); padding: 4px 8px; border-radius: 4px; text-transform: uppercase;">${escapeHtml(prog2?.subtitle || "Salle de Gym")}</span>
-              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-muted2);">${escapeHtml(sess2?.duration || "50 Min")}</span>
+              <span style="font-family: var(--font-mono); font-size: 11px; color: var(--ember); font-weight: bold; background: rgba(226, 98, 45, 0.1); padding: 4px 8px; border-radius: 4px; text-transform: uppercase;">${escapeHtml(prog2?.subtitle || "Salle de Gym")}</span>
+              <span style="font-family: var(--font-mono); font-size: 11px; color: var(--ink-muted2);">${escapeHtml(sess2?.duration || "50 Min")}</span>
             </div>
             <h3 class="font-display" style="font-size: 16px; color: var(--chalk); margin: 0 0 8px; font-weight: 700;">${escapeHtml(sess2?.name || "Force & Volume")}</h3>
             <p style="color: var(--ink-muted); font-size: 12.5px; line-height: 1.5; margin-bottom: 16px;">
@@ -483,8 +561,8 @@ export function renderHome() {
         <div class="film-card" style="flex: 0 0 300px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 24px; scroll-snap-align: start; display: flex; flex-direction: column; justify-content: space-between; min-height: 380px;">
           <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ember); font-weight: bold; background: rgba(226, 98, 45, 0.1); padding: 4px 8px; border-radius: 4px; text-transform: uppercase;">${escapeHtml(prog3?.subtitle || "Poids du corps")}</span>
-              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-muted2);">${escapeHtml(sess3?.duration || "55 Min")}</span>
+              <span style="font-family: var(--font-mono); font-size: 11px; color: var(--ember); font-weight: bold; background: rgba(226, 98, 45, 0.1); padding: 4px 8px; border-radius: 4px; text-transform: uppercase;">${escapeHtml(prog3?.subtitle || "Poids du corps")}</span>
+              <span style="font-family: var(--font-mono); font-size: 11px; color: var(--ink-muted2);">${escapeHtml(sess3?.duration || "55 Min")}</span>
             </div>
             <h3 class="font-display" style="font-size: 16px; color: var(--chalk); margin: 0 0 8px; font-weight: 700;">${escapeHtml(sess3?.name || "HIIT Cardio")}</h3>
             <p style="color: var(--ink-muted); font-size: 12.5px; line-height: 1.5; margin-bottom: 16px;">
@@ -551,25 +629,6 @@ export function renderHome() {
     </div>
   </div>
 
-  <!-- Section 8 : Le Vortex Transformation (CTA Final) -->
-  <div class="cta-band vortex-cta-section" style="background: radial-gradient(circle at 50% 50%, rgba(226, 98, 45, 0.25) 0%, var(--ink) 100%) !important; padding: 100px 0 !important; border-top: 2px solid var(--ember); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; text-align: center;">
-    <div class="vortex-glow" style="position: absolute; width: 300px; height: 300px; border-radius: 50%; background: var(--ember); filter: blur(120px); opacity: 0.15; animation: pulseHalo 4s infinite alternate ease-in-out;"></div>
-    <div class="wrap" style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center;">
-      <p class="eyebrow-ember font-mono" style="letter-spacing: 0.2em; justify-content: center;">PRENDS LE CONTRÔLE DE TON FUTUR</p>
-      <h3 class="font-display" style="color: var(--chalk); font-size: clamp(1.6rem, 4vw, 2.6rem); max-width: 750px; line-height: 1.2; margin-top: 12px; margin-bottom: 24px; font-weight: 900;">
-        5 secondes de questionnaire pour obtenir un programme sur mesure.
-      </h3>
-      <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-top: 16px;">
-        <button class="btn btn-ember glowing-halo" data-nav="quiz" style="font-weight: 700; padding: 16px 32px; font-size: 16px; background: var(--ember); color: var(--chalk); border-radius: 4px;">
-          Démarrer le Onboarding ${icon("zap", 18)}
-        </button>
-        <button class="btn btn-line" data-nav="login" aria-label="Se connecter" style="font-weight: 700; padding: 16px 32px; font-size: 16px; color: var(--chalk); border-color: rgba(255, 255, 255, 0.3);">
-          Se connecter ${icon("user", 18)}
-        </button>
-      </div>
-    </div>
-  </div>
-
   <!-- Section 4 (Inclus Tarifs) -->
   <div class="section">
     <div class="wrap">
@@ -589,7 +648,7 @@ export function renderHome() {
           </div>
           
           <div class="card" style="padding:24px; background: white; border: 2px solid var(--ember); position: relative; display: flex; flex-direction: column;" id="tarif-premium">
-            <div style="position: absolute; top: -12px; right: 16px; background: var(--ember); color: white; font-size: 9px; font-weight: 800; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace;">Recommandé</div>
+            <div style="position: absolute; top: -12px; right: 16px; background: var(--ember); color: white; font-size: 9px; font-weight: 800; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; font-family: var(--font-mono);">Recommandé</div>
             <h3 class="font-display" style="font-size:18px; color:var(--ink); margin-bottom:8px">Abonnement Premium</h3>
             <p style="font-size:13px; color:var(--slate); margin-bottom:16px; flex-grow: 1;">Tous les programmes + 1 consultation de suivi visio par mois et ajustements en direct par le coach.</p>
             <div class="stat-val font-display" style="font-size: 20px; color: var(--ember);">15 000 FCFA <span style="font-size: 13px; font-family: var(--font-sans); font-weight: normal; color: var(--slate);">/ mois</span></div>
@@ -606,16 +665,33 @@ export function renderHome() {
           </div>
         </div>
         
-        <div class="card" style="margin-top:24px; padding:20px; background:var(--chalk-soft); border: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;" id="tarif-decouverte">
+        <div class="card" style="margin-top:24px; padding:20px; background:#fff; border: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;" id="tarif-decouverte">
           <div>
             <h3 class="font-display" style="font-size:16px; color:var(--ink); margin-bottom:4px">Séance Découverte Gratuite</h3>
             <p style="font-size:13px; color:var(--slate); margin:0">Bénéficiez de 1 semaine d'accès complet à nos séances d'essai pour évaluer votre motivation.</p>
           </div>
           <div style="display: flex; align-items: center; gap: 12px;">
-            <div class="font-mono" style="font-size:12px; color:var(--moss); font-weight: 700; background: rgba(60, 90, 70, 0.08); padding: 4px 10px; border-radius: 4px;">100% GRATUIT</div>
+            <div class="font-mono" style="font-size:12px; color:var(--moss); font-weight: 700; background: var(--moss-soft); padding: 4px 10px; border-radius: 4px;">100% GRATUIT</div>
             <a href="https://wa.me/2290191720596?text=${encodeURIComponent('Bonjour Coach Abdou, je suis intéressé(e) par la séance découverte gratuite.')}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark" style="text-decoration: none; font-size: 12px; padding: 8px 12px;">Demander l'accès</a>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-band vortex-cta-section home-final-cta" style="position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; text-align: center;">
+    <div class="wrap" style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center;">
+      <p class="eyebrow-ember font-mono" style="letter-spacing: 0.2em; justify-content: center;">PRENDS LE CONTRÔLE DE TON FUTUR</p>
+      <h3 class="font-display" style="color: #fff; font-size: clamp(1.6rem, 4vw, 2.6rem); max-width: 750px; line-height: 1.2; margin-top: 12px; margin-bottom: 24px; font-weight: 900;">
+        5 secondes de questionnaire pour obtenir un programme sur mesure.
+      </h3>
+      <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-top: 16px;">
+        <button class="btn btn-ember" data-nav="quiz" style="font-weight: 700; padding: 16px 32px; font-size: 16px; background: var(--ember); color: #fff; border-radius: 4px;">
+          Démarrer le Onboarding ${icon("zap", 18)}
+        </button>
+        <button class="btn btn-line" data-nav="login" aria-label="Se connecter" style="font-weight: 700; padding: 16px 32px; font-size: 16px; color: #fff; border-color: rgba(255, 255, 255, 0.28);">
+          Se connecter ${icon("user", 18)}
+        </button>
       </div>
     </div>
   </div>`;
@@ -633,7 +709,7 @@ export function renderPrograms() {
           <span class="font-mono" style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; padding: 4px 10px; background: rgba(226, 98, 45, 0.15); color: var(--ember); border-radius: 4px; font-weight: 700;">
             [ CATALOGUE OFFICIEL & SUR-MESURE ]
           </span>
-          <span style="font-size: 12px; color: var(--ink-muted2); font-family: var(--font-mono, monospace);">MonProgrammeFit — Edition 2026</span>
+          <span style="font-size: 12px; color: var(--ink-muted2); font-family: var(--font-mono);">MonProgrammeFit — Edition 2026</span>
         </div>
 
         <h1 class="font-display h1" id="prog-title" style="max-width: 860px; margin: 0 0 16px 0; font-size: clamp(28px, 4.5vw, 44px); line-height: 1.15; color: var(--chalk) !important;">
@@ -968,7 +1044,7 @@ export function renderAbout() {
           <span class="font-mono" style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; padding: 4px 10px; background: rgba(226, 98, 45, 0.15); color: var(--ember); border-radius: 4px; font-weight: 700;">
             [ NOTRE HISTOIRE & ENGAGEMENT ]
           </span>
-          <span style="font-size: 12px; color: var(--ink-muted2); font-family: var(--font-mono, monospace);">MonProgrammeFit — Edition 2026</span>
+          <span style="font-size: 12px; color: var(--ink-muted2); font-family: var(--font-mono);">MonProgrammeFit — Edition 2026</span>
         </div>
 
         <h1 class="font-display h1" style="max-width: 860px; margin: 0 0 16px 0; font-size: clamp(28px, 4.5vw, 44px); line-height: 1.15; color: var(--chalk) !important;">

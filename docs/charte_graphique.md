@@ -23,28 +23,18 @@
 ---
 ## Typographie
 
-### Archivo Black (Display)
-- **Source** : Google Fonts (`Archivo+Black&family=Archivo:wght@400;500;600;700`).
-- **Substituts** : `sans-serif`, Arial.
-- **Poids utilisés** : 900.
-- **Rôle** : Logo, titres h1.
-- **Rationale** : Police géométrique et moderne → équilibre entre élégance et lisibilité pour une app fitness.
-
-### Archivo (Body)
-- **Source** : Google Fonts (`Archivo:wght@400;500;600;700`).
-- **Substituts** : `sans-serif`, Helvetica.
-- **Poids utilisés** : 400, 500, 600, 700.
+### Inter (unique)
+- **Source** : Google Fonts (`Inter:wght@300;400;500;600;700;800;900`).
+- **Substituts** : `system-ui`, `sans-serif`.
+- **Tokens CSS** : `--font-sans`, `--font-display`, `--font-body`, `--font-mono` (tous pointent vers Inter).
+- **Poids utilisés** : 300, 400, 500, 600, 700, 800, 900.
 - **Rôle par poids** :
   - 400 : Texte courant.
   - 500 : Boutons secondaires, liens.
-  - 600 : Sous-titres h2/h3.
+  - 600 : Sous-titres, labels.
   - 700 : Boutons primaires.
-- **Rationale** : Sans-serif lisible et moderne → complémentaire à Archivo Black.
-
-### IBM Plex Mono (Utilitaire)
-- **Source** : Google Fonts (`IBM+Plex+Mono:wght@500`).
-- **Substituts** : `monospace`, Courier New.
-- **Rôle** : Chiffres, icônes, captions, code.
+  - 800 / 900 : Logo, titres h1–h6, `.font-display`.
+- **Rationale** : Police unique de la maquette `mon_programme_fit_app.html` — lisible, moderne, cohérente sur tout le projet vanilla.
 
 **Échelle typographique** :
 

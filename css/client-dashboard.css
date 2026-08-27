@@ -16,7 +16,7 @@
 }
 
 .client-eyebrow {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.12em;
@@ -26,7 +26,7 @@
 }
 
 .client-title {
-  font-family: 'Archivo Black', sans-serif;
+  font-family: var(--font-display);
   font-size: 32px;
   color: var(--ink);
   margin: 0 0 12px;
@@ -78,7 +78,7 @@
 }
 
 .client-hero-title {
-  font-family: 'Archivo Black', sans-serif;
+  font-family: var(--font-display);
   font-size: 24px;
   color: var(--ink);
   margin: 0 0 16px;
@@ -126,7 +126,7 @@
 }
 
 .client-pb-val {
-  font-family: 'Archivo Black', sans-serif;
+  font-family: var(--font-display);
   font-size: 32px;
   color: var(--ink);
   line-height: 1;
@@ -166,7 +166,7 @@
 }
 
 .client-card-title {
-  font-family: 'Archivo Black', sans-serif;
+  font-family: var(--font-display);
   font-size: 18px;
   color: var(--ink);
   margin: 0 0 16px;
@@ -247,7 +247,7 @@
 .client-tl-content { flex: 1; }
 
 .client-tl-title {
-  font-family: 'Archivo Black', sans-serif;
+  font-family: var(--font-display);
   font-size: 16px;
   color: var(--ink);
   margin: 0 0 4px;
@@ -282,7 +282,7 @@
 }
 
 .client-empty-title {
-  font-family: 'Archivo Black', sans-serif;
+  font-family: var(--font-display);
   font-size: 24px;
   margin: 0 0 16px;
 }
@@ -318,3 +318,91 @@
     padding: 20px;
   }
 }
+
+/* ──────────────── ILLUSTRATIONS EXERCICES ──────────────── */
+.exo-card__top {
+  display: grid;
+  grid-template-columns: minmax(140px, 200px) 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.exo-card__top--compact {
+  grid-template-columns: 120px 1fr;
+  gap: 12px;
+}
+
+.exo-visual {
+  margin: 0;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.exo-visual__img {
+  width: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  background: #eef1f4;
+}
+
+.exo-visual__credit {
+  font-size: 9px;
+  color: var(--slate);
+  padding: 4px 8px;
+  line-height: 1.3;
+  border-top: 1px solid var(--line);
+  background: var(--chalk-soft);
+}
+
+.exo-visual--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, var(--moss-soft), #fff);
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  min-height: 88px;
+}
+
+.exo-visual__placeholder {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 22px;
+  color: var(--moss);
+  opacity: 0.7;
+}
+
+.exo-yt-secondary {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--slate);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.exo-yt-secondary:hover {
+  color: var(--ember);
+}
+
+@media (max-width: 640px) {
+  .exo-card__top,
+  .exo-card__top--compact {
+    grid-template-columns: 1fr;
+  }
+
+  .exo-visual,
+  .exo-visual--empty {
+    width: 100% !important;
+    max-width: 280px;
+  }
+
+  .exo-visual__img {
+    height: 160px !important;
+  }
+}
+

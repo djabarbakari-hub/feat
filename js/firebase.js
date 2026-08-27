@@ -27,6 +27,12 @@ const firebaseConfig = {
   appId:             import.meta.env.VITE_FIREBASE_APP_ID || "1:123456789012:web:abcdef1234567890",
 };
 
+if (!import.meta.env.VITE_FIREBASE_API_KEY || import.meta.env.VITE_FIREBASE_API_KEY.includes("Dummy")) {
+  console.error(
+    "[Firebase] Clés absentes ou invalides. Remplis le fichier .env (VITE_FIREBASE_API_KEY, etc.) puis relance npm run dev. Sans ça, inscription et connexion échoueront."
+  );
+}
+
 let app;
 if (!getApps().length) {
   try {

@@ -5,6 +5,7 @@
 
 import { state, persistState, STORAGE_KEY } from "../state.js";
 import { showToast, getMatchingCoachProgram, setButtonLoading } from "../helpers.js";
+import { buildClientProgramFromCoach, replaceUserSessionDocs } from "./program.js";
 import { auth, db, handleFirestoreError } from "../firebase.js";
 import { doc, setDoc, deleteDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { sendPasswordResetEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider, deleteUser, GoogleAuthProvider, reauthenticateWithPopup } from "firebase/auth";
@@ -94,21 +95,11 @@ export async function updateUserProfile(newData) {
   if ((newData.goal !== undefined || newData.track !== undefined) && !newData.program) {
     const matchedP = getMatchingCoachProgram(newGoal, newTrack);
     if (matchedP) {
-      const currentProg = state.clientProfile?.program || {};
-      updatedProgram = {
-        ...currentProg,
-        coachProgramId: matchedP.id,
-        trackLabel: `${matchedP.title.replace("MONPROGRAMMEFIT : ", "")} (${matchedP.subtitle}) — Coach Abdou BAKARI`,
+      updatedProgram = buildClientProgramFromCoach(matchedP, {
+        week: 1,
         track: newTrack,
-        sessions: matchedP.sessions.map((s, idx) => ({
-          id: `s${idx + 1}`,
-          name: s.name,
-          exos: s.exercises.length,
-          duree: s.duration,
-          done: false,
-          weekNumber: 1
-        }))
-      };
+        history: state.clientProfile?.program?.history,
+      });
     }
   }
 
@@ -163,6 +154,12 @@ export async function updateUserProfile(newData) {
         quizAnswers: state.clientProfile.quizAnswers || null,
         updatedAt: new Date().toISOString(),
       }, { merge: true });
+      if (newData.program || newData.goal !== undefined || newData.track !== undefined) {
+        const sessions = state.clientProfile.program?.sessions;
+        if (sessions?.length) {
+          await replaceUserSessionDocs(currentUser.uid, sessions);
+        }
+      }
     } catch (err) {
       console.warn("Erreur mise à jour Firestore profile:", err);
       handleFirestoreError(err, "write", userPath);
@@ -734,7 +731,7 @@ function showReauthModal(currentUser, callback) {
       border-radius: 8px; padding: 32px; max-width: 440px;
       width: 100%; box-shadow: 0 24px 64px rgba(0,0,0,0.35); border: 1px solid var(--line);
     ">
-      <h3 style="margin: 0 0 12px; font-family: 'Archivo Black', sans-serif; font-size: 18px; color: var(--ink);">Réauthentification requise</h3>
+      <h3 style="margin: 0 0 12px; font-family: var(--font-display); font-size: 18px; color: var(--ink);">Réauthentification requise</h3>
       <p style="font-size: 13px; color: var(--slate); line-height: 1.5; margin: 0 0 20px;">
         Pour des raisons de sécurité, vous devez vous reconnecter pour pouvoir supprimer définitivement votre compte.
       </p>

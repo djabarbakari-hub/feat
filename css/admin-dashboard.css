@@ -24,7 +24,7 @@
 }
 
 .adm-eyebrow {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.12em;
@@ -34,7 +34,7 @@
 }
 
 .adm-title {
-  font-family: 'Archivo Black', sans-serif;
+  font-family: var(--font-display);
   font-size: 28px;
   color: var(--ink);
   margin: 0;
@@ -106,7 +106,7 @@
 .adm-kpi-icon.bg-purple { background: rgba(139,92,246,0.1); color: #8B5CF6; }
 
 .adm-kpi-value {
-  font-family: 'Archivo Black', sans-serif;
+  font-family: var(--font-display);
   font-size: 32px;
   color: var(--ink);
   line-height: 1;
@@ -122,7 +122,7 @@
 .adm-kpi-delta {
   font-size: 11px;
   font-weight: 600;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
   margin-top: 8px;
   display: flex;
   align-items: center;
@@ -157,7 +157,7 @@
 }
 
 .adm-section-card-title {
-  font-family: 'Archivo Black', sans-serif;
+  font-family: var(--font-display);
   font-size: 15px;
   color: var(--ink);
   margin: 0;
@@ -185,7 +185,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Archivo Black', sans-serif;
+  font-family: var(--font-display);
   font-size: 13px;
   color: var(--chalk);
   flex-shrink: 0;
@@ -260,7 +260,7 @@
   color: var(--slate);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
 }
 
 /* ──────────────── BADGES ──────────────── */
@@ -270,7 +270,7 @@
   padding: 3px 8px;
   border-radius: 2px;
   white-space: nowrap;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
 }
 
 .adm-badge.active {
@@ -357,7 +357,7 @@
 }
 
 .adm-msg-time {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 10px;
   color: var(--ink-muted3);
 }
@@ -411,7 +411,7 @@
 }
 
 .adm-prog-stat-val {
-  font-family: 'Archivo Black', sans-serif;
+  font-family: var(--font-display);
   font-size: 20px;
   color: var(--ink);
 }

@@ -3,14 +3,13 @@
    Nécessite <script type="module" src="app.js"> dans index.html.
    ========================================================== */
 
-import { restorePersistedState, persistState } from "./js/state.js";
+import { restorePersistedState, persistState, restorePendingOnboarding, PENDING_ONBOARDING_KEY } from "./js/state.js";
 import { setRenderer, handleBackNavigation } from "./js/router.js";
 import { render } from "./js/render.js";
 import { PAGES } from "./js/pages/index.js";
 import "./js/events.js"; // enregistre les écouteurs globaux (input/click)
 import {
   cleanupExpiredData,
-  hasAnalyticsServices,
   getAnalyticsConsent,
 } from "./js/modules/privacy.js";
 import { renderConsentModal } from "./js/modules/consent-modal.js";
@@ -25,6 +24,12 @@ import { extractNameFromEmailOrDisplayName } from "./js/helpers.js";
 setRenderer(render);
 
 restorePersistedState(Object.keys(PAGES));
+if (!state.tracks?.length) {
+  state.tracks = [...TRACKS];
+}
+if (state.page?.startsWith("admin") && state.role !== "admin") {
+  state.page = state.role === "client" ? "client-dashboard" : "home";
+}
 
 // Variable pour stocker le désabonnement des programmes (tracks)
 let unsubscribeTracks = null;
@@ -43,10 +48,21 @@ export function listenToTracks() {
       list.push({ id: docSnap.id, ...docSnap.data() });
     });
     if (list.length > 0) {
-      // Trier par id ou garder l'ordre d'origine
       const order = ["gym", "home-equip", "bodyweight"];
       list.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
-      state.tracks = list;
+      state.tracks = list.map((t) => {
+        const fallback = TRACKS.find((x) => x.id === t.id) || {};
+        return {
+          ...fallback,
+          ...t,
+          label: t.label || t.l || t.name || fallback.label,
+          icon: t.icon || fallback.icon,
+          tagline: t.tagline || fallback.tagline,
+          desc: t.desc || fallback.desc,
+          dist: t.dist || fallback.dist,
+          img: t.img || fallback.img,
+        };
+      });
     } else {
       state.tracks = [...TRACKS];
     }
@@ -369,14 +385,21 @@ onAuthStateChanged(auth, async (user) => {
         }
 
         // Reconstitution des réponses de l'onboarding / quiz
-        const quizAns = userData.quizAnswers || state.clientProfile?.quizAnswers || {};
+        restorePendingOnboarding();
+        const localQuiz = state.quizAnswers || {};
+        const firestoreQuiz = userData.quizAnswers || {};
+        const quizAns = (firestoreQuiz.objectif && firestoreQuiz.lieu)
+          ? firestoreQuiz
+          : (localQuiz.objectif && localQuiz.lieu)
+            ? localQuiz
+            : { ...firestoreQuiz, ...localQuiz };
         const restoredQuizAnswers = {
           ...quizAns,
-          objectif: quizAns.objectif || userData.goal || "",
-          lieu: quizAns.lieu || userData.track || "",
+          objectif: quizAns.objectif || userData.goal || localQuiz.objectif || "",
+          lieu: quizAns.lieu || userData.track || localQuiz.lieu || "",
           niveau: quizAns.niveau || userData.niveau || "",
           frequence: quizAns.frequence || userData.frequence || "",
-          physique: quizAns.physique || physique
+          physique: quizAns.physique || localQuiz.physique || physique
         };
         state.quizAnswers = restoredQuizAnswers;
 
@@ -404,6 +427,16 @@ onAuthStateChanged(auth, async (user) => {
           await refreshAdminData();
         }
 
+        const hasProgram = !!(userData.program?.sessions?.length || state.clientProfile?.program?.sessions?.length);
+        if (userRole !== "admin" && !hasProgram) {
+          try {
+            const { applyPendingOnboardingIfNeeded } = await import("./js/events.js");
+            await applyPendingOnboardingIfNeeded();
+          } catch (e) {
+            console.warn("Impossible d'appliquer l'onboarding en attente:", e);
+          }
+        }
+
         persistState();
         render();
       }, (error) => {
@@ -417,6 +450,7 @@ onAuthStateChanged(auth, async (user) => {
         sessionsSnap.forEach((sDoc) => {
           sessions.push({ id: sDoc.id, ...sDoc.data() });
         });
+        sessions.sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
 
         if (sessions.length > 0) {
           if (!state.clientProfile.program) {
@@ -437,14 +471,29 @@ onAuthStateChanged(auth, async (user) => {
     }
   } else {
     cleanupAdminRealTimeSync();
+    let pendingDraft = null;
+    try {
+      const raw = window.localStorage.getItem(PENDING_ONBOARDING_KEY);
+      pendingDraft = raw ? JSON.parse(raw) : null;
+    } catch (_) {
+      pendingDraft = null;
+    }
     state.role = "guest";
     state.clientProfile = {};
-    state.quizAnswers = {};
     state.adminData = { clients: [], messages: [], loaded: false, loading: false };
+    // Ne garder un brouillon quiz que s'il a été sauvé AVANT création de compte,
+    // jamais les réponses déjà liées au profil connecté.
+    if (pendingDraft?.quizAnswers?.objectif) {
+      state.quizAnswers = pendingDraft.quizAnswers;
+      state.pendingProgramId = pendingDraft.pendingProgramId || null;
+      state.quizStep = pendingDraft.quizStep || 0;
+    } else {
+      state.quizAnswers = {};
+      state.pendingProgramId = null;
+      state.quizStep = 0;
+    }
     if (state.page.startsWith("client") || state.page.startsWith("admin")) {
-      state.page = "signup";
-    } else if (state.page === "quiz") {
-      state.page = "signup";
+      state.page = "home";
     }
     persistState();
     render();
@@ -457,10 +506,10 @@ cleanupExpiredData();
 // 2. Rendu initial
 render();
 
-// 3. Bannière de consentement analytics (si services présents et pas encore choisi)
+// 3. Bannière cookies & confidentialité (première visite, jusqu'au choix utilisateur)
 (function initConsentBanner() {
   const consent = getAnalyticsConsent();
-  if (hasAnalyticsServices() && !consent.userChoice) {
+  if (!consent.userChoice) {
     const container = document.createElement("div");
     container.innerHTML = renderConsentModal();
     const modal = container.firstElementChild;

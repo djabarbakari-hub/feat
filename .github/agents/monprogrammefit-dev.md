@@ -27,6 +27,7 @@ css/navbar.css, hero.css, sections.css, components.css, dashboards.css
 js/data.js           → constantes (TRACKS, QUIZ_STEPS, données mock à terme remplacées par Firestore)
 js/state.js          → état global + persistState()/restorePersistedState()
 js/helpers.js        → icon(), escapeHtml(), showToast(), trackById(), isQuizComplete()
+js/modules/program.js → applyProgramToUser(), getExercisesForSession() par id de séance
 js/router.js         → navigate(), goBack(), historique navigateur
 js/navbar.js         → renderNavbar(), renderFooter()
 js/render.js         → assemble navbar + page courante + footer
@@ -42,7 +43,7 @@ ET son gestionnaire dans `js/events.js` — jamais l'un sans l'autre.
 Source unique : `css/tokens.css`. Palette et polices d'origine (celles voulues par le porteur du
 projet, restaurées après l'incident de dérive design) :
 
-- Polices : `Archivo Black` (titres/`.font-display`), `Archivo` (corps), `IBM Plex Mono` (`.font-mono`)
+- Polices : `Inter` (titres/`.font-display`, corps, `.font-mono`) — seule police du projet vanilla
 - Couleurs : `--ink` (#16232C), `--chalk` (#F7F5F0), `--moss` (#3C5A46), `--ember` (#E2622D),
   `--slate` (#6B7280), `--line` (#E4E0D6), plus leurs variantes `-soft`/`-muted`/`-line2`
 

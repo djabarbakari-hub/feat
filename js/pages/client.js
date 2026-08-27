@@ -6,6 +6,8 @@
 import { state } from "../state.js";
 import { icon, escapeHtml, getUserAvatarHtml, getMatchingCoachProgram } from "../helpers.js";
 import { COACH_PROGRAMS } from "../data.js";
+import { getExercisesForSession, findClientSession, ADJUSTMENT_REASONS } from "../modules/program.js";
+import { renderExerciseVisualHtml, renderYoutubeSecondaryLink } from "../modules/exercise-visuals.js";
 
 /**
  * 1. TABLEAU DE BORD (DASHBOARD)
@@ -125,12 +127,12 @@ export function renderClientDashboard() {
             <h3 class="client-card-title" style="margin: 0; display: flex; align-items: center; gap: 8px;">
               ${icon("activity", 18, "var(--moss)")} Diagnostic IMC & Métabolisme
             </h3>
-            <span style="font-size: 10px; font-family: 'IBM Plex Mono', monospace; font-weight: 800; background: var(--moss-soft); color: var(--moss); padding: 3px 8px; border-radius: 12px; text-transform: uppercase;">MÀJ Automatique</span>
+            <span style="font-size: 10px; font-family: var(--font-mono); font-weight: 800; background: var(--moss-soft); color: var(--moss); padding: 3px 8px; border-radius: 12px; text-transform: uppercase;">MÀJ Automatique</span>
           </div>
           <p style="font-size: 13px; color: var(--slate); margin-bottom: 16px; line-height: 1.4;">Calculé en temps réel selon vos mensurations à jour.</p>
           
           <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px;">
-            <span style="font-size: 42px; font-family: 'Archivo Black', sans-serif; color: var(--ink); line-height: 1;">${imc}</span>
+            <span style="font-size: 42px; font-family: var(--font-display); color: var(--ink); line-height: 1;">${imc}</span>
             <span style="font-size: 13px; font-weight: 800; color: ${statusColor}; background: rgba(0,0,0,0.03); padding: 4px 10px; border-radius: 20px;">${status}</span>
           </div>
           <p style="font-size: 13px; line-height: 1.5; color: var(--slate); margin: 0 0 14px;">
@@ -147,25 +149,25 @@ export function renderClientDashboard() {
               ${icon("target", 18, "var(--ember)")} Cibles Nutritionnelles Journalières
             </h3>
           </div>
-          <span style="font-size: 10px; font-family: 'IBM Plex Mono', monospace; color: var(--ember); font-weight: 800; text-transform: uppercase;">${goalText}</span>
+          <span style="font-size: 10px; font-family: var(--font-mono); color: var(--ember); font-weight: 800; text-transform: uppercase;">${goalText}</span>
           
           <div style="margin-top: 10px; display: flex; align-items: baseline; gap: 6px;">
-            <span style="font-size: 32px; font-family: 'Archivo Black', sans-serif; color: var(--ink);">${targetCalories}</span>
+            <span style="font-size: 32px; font-family: var(--font-display); color: var(--ink);">${targetCalories}</span>
             <span style="font-size: 13px; color: var(--slate); font-weight: 600;">kcal / jour recommandées</span>
           </div>
           
           <div style="margin-top: 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
             <div style="background: rgba(60,90,70,0.04); padding: 8px 6px; border-radius: 8px; border: 1px solid rgba(60,90,70,0.15);">
               <div style="font-size: 9px; text-transform: uppercase; color: var(--slate); font-weight: 700;">Protéines</div>
-              <div style="font-size: 14px; font-family: 'Archivo Black', sans-serif; color: var(--moss); margin-top: 2px;">${proteinTarget}g</div>
+              <div style="font-size: 14px; font-family: var(--font-display); color: var(--moss); margin-top: 2px;">${proteinTarget}g</div>
             </div>
             <div style="background: rgba(226,98,45,0.04); padding: 8px 6px; border-radius: 8px; border: 1px solid rgba(226,98,45,0.15);">
               <div style="font-size: 9px; text-transform: uppercase; color: var(--slate); font-weight: 700;">Glucides</div>
-              <div style="font-size: 14px; font-family: 'Archivo Black', sans-serif; color: var(--ember); margin-top: 2px;">${carbTarget}g</div>
+              <div style="font-size: 14px; font-family: var(--font-display); color: var(--ember); margin-top: 2px;">${carbTarget}g</div>
             </div>
             <div style="background: rgba(37,99,235,0.04); padding: 8px 6px; border-radius: 8px; border: 1px solid rgba(37,99,235,0.15);">
               <div style="font-size: 9px; text-transform: uppercase; color: var(--slate); font-weight: 700;">Lipides</div>
-              <div style="font-size: 14px; font-family: 'Archivo Black', sans-serif; color: #2563eb; margin-top: 2px;">${fatTarget}g</div>
+              <div style="font-size: 14px; font-family: var(--font-display); color: #2563eb; margin-top: 2px;">${fatTarget}g</div>
             </div>
           </div>
         </div>
@@ -205,19 +207,19 @@ export function renderClientDashboard() {
           <h3 class="client-card-title" style="display: flex; align-items: center; gap: 8px; margin: 0;">
             💧 Suivi d'Hydratation
           </h3>
-          <span style="font-size: 11px; font-family: 'IBM Plex Mono', monospace; font-weight: 700; color: #2563eb; background: rgba(37,99,235,0.08); padding: 2px 8px; border-radius: 12px;">Objectif 2.5L</span>
+          <span style="font-size: 11px; font-family: var(--font-mono); font-weight: 700; color: #2563eb; background: rgba(37,99,235,0.08); padding: 2px 8px; border-radius: 12px;">Objectif 2.5L</span>
         </div>
         <p style="font-size: 12px; color: var(--slate); margin-bottom: 18px; line-height: 1.4;">Maintenir l'hydratation cellulaire maximise vos performances en séance.</p>
         
         <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 18px;">
           <div style="width: 58px; height: 86px; border: 3px solid var(--ink); border-radius: 6px 6px 16px 16px; position: relative; overflow: hidden; background: #f1f5f9; display: flex; align-items: flex-end; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
             <div style="width: 100%; height: ${waterPct}%; background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%); transition: height 0.4s ease;"></div>
-            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; font-family: 'Archivo Black', sans-serif; font-size: 11px; color: ${waterPct > 50 ? '#ffffff' : 'var(--ink)'}; text-shadow: ${waterPct > 50 ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'}; z-index: 2;">
+            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 11px; color: ${waterPct > 50 ? '#ffffff' : 'var(--ink)'}; text-shadow: ${waterPct > 50 ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'}; z-index: 2;">
               ${waterPct}%
             </div>
           </div>
           <div>
-            <div style="font-size: 28px; font-family: 'Archivo Black', sans-serif; color: var(--ink); line-height: 1;">${waterAmount} <span style="font-size: 14px; color: var(--slate); font-weight: normal;">/ 2500 ml</span></div>
+            <div style="font-size: 28px; font-family: var(--font-display); color: var(--ink); line-height: 1;">${waterAmount} <span style="font-size: 14px; color: var(--slate); font-weight: normal;">/ 2500 ml</span></div>
             <p style="font-size: 12px; color: var(--slate); margin: 6px 0 0; line-height: 1.4;">${waterAmount >= 2500 ? '✅ Cible d\'eau atteinte pour aujourd\'hui !' : 'Ajoutez vos consommations d\'eau au fil de la journée.'}</p>
           </div>
         </div>
@@ -260,7 +262,7 @@ export function renderClientDashboard() {
           <h3 class="client-card-title" style="display: flex; align-items: center; gap: 8px; margin: 0;">
             ⚖️ Évolution du Poids
           </h3>
-          <span style="font-size: 11px; font-family: 'IBM Plex Mono', monospace; font-weight: 700; color: var(--ember); background: var(--ember-soft); padding: 2px 8px; border-radius: 12px;">${weight > 0 ? weight + ' kg' : 'À renseigner'}</span>
+          <span style="font-size: 11px; font-family: var(--font-mono); font-weight: 700; color: var(--ember); background: var(--ember-soft); padding: 2px 8px; border-radius: 12px;">${weight > 0 ? weight + ' kg' : 'À renseigner'}</span>
         </div>
         <p style="font-size: 12px; color: var(--slate); margin-bottom: 14px;">Enregistrez votre pesée à jeun 1 à 2 fois par semaine.</p>
         
@@ -314,7 +316,7 @@ export function renderClientDashboard() {
                 AB
               </div>
               <div>
-                <h3 style="font-size: 16px; font-weight: 800; color: white; margin: 0; font-family: 'Archivo Black', sans-serif; display: flex; align-items: center; gap: 6px;">
+                <h3 style="font-size: 16px; font-weight: 800; color: white; margin: 0; font-family: var(--font-display); display: flex; align-items: center; gap: 6px;">
                   Analyse & Bilan de Coach Abdou BAKARI <span style="color: #4ade80; font-size: 12px;">✓</span>
                 </h3>
                 <span style="font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 600;">Recommandation VIP Personnalisée</span>
@@ -373,10 +375,10 @@ export function renderClientDashboard() {
         </div>
         <div>
           <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-            <span style="font-size: 10px; font-family: 'IBM Plex Mono', monospace; font-weight: 800; text-transform: uppercase; background: var(--ember); color: white; padding: 2px 8px; border-radius: 4px;">ATHLÈTE VIP</span>
+            <span style="font-size: 10px; font-family: var(--font-mono); font-weight: 800; text-transform: uppercase; background: var(--ember); color: white; padding: 2px 8px; border-radius: 4px;">ATHLÈTE VIP</span>
             <span style="font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 600;">Coach Attitré : <strong>Coach Abdou BAKARI</strong></span>
           </div>
-          <h1 style="font-size: 22px; font-family: 'Archivo Black', sans-serif; color: white; margin: 4px 0 2px;">Bonjour, ${escapeHtml(firstName)} !</h1>
+          <h1 style="font-size: 22px; font-family: var(--font-display); color: white; margin: 4px 0 2px;">Bonjour, ${escapeHtml(firstName)} !</h1>
           <p style="font-size: 12px; color: rgba(255,255,255,0.75); margin: 0;">Objectif : <strong>${escapeHtml(goalLabel)}</strong> · Semaine <strong>${week} sur ${totalWeeks}</strong></p>
         </div>
       </div>
@@ -478,16 +480,36 @@ export function renderClientDashboard() {
       <!-- CARD 3: Weight Tracker -->
       ${weightCardHtml}
 
-      <!-- CARD 4: Support WhatsApp Direct -->
-      <div class="client-card" style="display:flex; flex-direction:column; justify-content:space-between; text-align:center; background: white; border: 1px solid var(--line); border-radius: 12px; padding: 24px;">
+      <!-- CARD 4: Demande d'ajustement -->
+      <div class="client-card" style="display:flex; flex-direction:column; justify-content:space-between; background: white; border: 1px solid var(--line); border-radius: 12px; padding: 24px;">
         <div>
-          <div style="color:var(--ember); margin-bottom:12px; display: flex; justify-content: center;">${icon("message-circle", 36)}</div>
-          <h3 class="client-card-title" style="margin-bottom: 6px;">Support Coach Direct</h3>
-          <p style="color:var(--slate); font-size:13px; margin:0 0 16px; line-height:1.5;">Vous hésitez sur une charge ou la posture d'un exercice ? Contactez directement Coach Abdou sur WhatsApp.</p>
+          <div style="color:var(--ember); margin-bottom:12px;">${icon("message-circle", 28)}</div>
+          <h3 class="client-card-title" style="margin-bottom: 6px;">Adapter mon programme</h3>
+          <p style="color:var(--slate); font-size:13px; margin:0 0 16px; line-height:1.5;">Douleur, matériel, rythme trop dur ou trop facile : envoie une demande. Le coach la reçoit dans son espace et peut réassigner ton plan.</p>
         </div>
-        <a href="https://wa.me/2290191720596" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark" style="margin: 0 auto; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-weight: 700; width: 100%; justify-content: center; padding: 10px;">
-          💬 Échanger avec Coach Abdou
-        </a>
+        ${state.ui.adjustmentSuccess ? `
+          <div>
+            <p style="font-size:13px; color:var(--moss); font-weight:700; margin:0 0 10px;">Demande envoyée. Le coach va l'examiner.</p>
+            <button type="button" class="btn btn-outline-dark" data-adjustment-reset style="width:100%; justify-content:center; font-size:12px;">Nouvelle demande</button>
+          </div>
+        ` : `
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <select data-adjustment-reason class="text-input" style="width:100%; padding:10px; font-size:13px;">
+              <option value="">Motif</option>
+              ${ADJUSTMENT_REASONS.map((r) => `
+                <option value="${r.v}" ${state.drafts.adjustment?.reason === r.v ? "selected" : ""}>${escapeHtml(r.l)}</option>
+              `).join("")}
+            </select>
+            <textarea data-adjustment-message class="text-input" rows="3" placeholder="Ex : gêne à l'épaule sur les développés, je m'entraîne maintenant à la maison…" style="width:100%; padding:10px; font-size:13px; resize:vertical;">${escapeHtml(state.drafts.adjustment?.message || "")}</textarea>
+            ${state.ui.adjustmentError ? `<p style="margin:0; font-size:12px; color:var(--ember); font-weight:600;">${escapeHtml(state.ui.adjustmentError)}</p>` : ""}
+            <button type="button" class="btn btn-ember" data-adjustment-send ${state.ui.adjustmentPending ? "disabled" : ""} style="width:100%; justify-content:center; font-size:13px; font-weight:700;">
+              ${state.ui.adjustmentPending ? "Envoi…" : "Envoyer au coach"}
+            </button>
+            <a href="https://wa.me/2290191720596" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px; font-weight:700; width:100%; justify-content:center; padding:10px; font-size:12px;">
+              WhatsApp (urgent)
+            </a>
+          </div>
+        `}
       </div>
 
     </div>
@@ -495,68 +517,9 @@ export function renderClientDashboard() {
 }
 
 /**
- * Exercices prédéfinis pour la simulation et les séances d'entraînement.
+ * Exercices de la séance du programme assigné (ids officiels).
  */
-export function getExercisesForSession(sessionName) {
-  const normName = (sessionName || "").toLowerCase().trim();
-
-  // 1. Recherche prioritaire dans les programmes officiels rédigés par Coach Abdou BAKARI
-  for (const prog of COACH_PROGRAMS) {
-    const matchedSession = prog.sessions.find(s => 
-      s.name.toLowerCase().trim() === normName ||
-      normName.includes(s.day.toLowerCase()) ||
-      normName.includes(s.name.toLowerCase())
-    );
-    if (matchedSession) {
-      return matchedSession.exercises.map(ex => ({
-        name: ex.name,
-        desc: ex.desc,
-        detail: `${ex.sets} séries × ${ex.reps} (Repos: ${ex.rest})`
-      }));
-    }
-  }
-
-  const goal = state.clientProfile?.goal || "musculation";
-  const track = state.clientProfile?.track || "gym";
-
-  if (track === "gym") {
-    if (goal === "perte-poids" || goal === "endurance" || goal === "sante") {
-      return [
-        { name: "Tapis de course (Échauffement)", desc: "Fréquence cardiaque à 65-70%. Cadence modérée.", detail: "8 mins · Pente 2%" },
-        { name: "Presse à cuisses inclinée", desc: "Contrôlez la descente et poussez dynamiquement sans verrouiller les genoux.", detail: "4 séries de 12-15 reps (Repos: 60s)" },
-        { name: "Tirage vertical à la poulie haute", desc: "Tirez la barre vers le haut de la poitrine, coudes vers le bas.", detail: "3 séries de 12-15 reps (Repos: 60s)" },
-        { name: "Développé assis à la machine", desc: "Poussez les poignées vers l'avant, contractez les pectoraux.", detail: "3 séries de 12-15 reps (Repos: 60s)" },
-        { name: "Gainage planche active", desc: "Alignement fessiers-épaules parfait. Respirez calmement.", detail: "3 séries de 45 secondes" }
-      ];
-    } else {
-      return [
-        { name: "Squats à la barre olympique", desc: "Descente contrôlée, fesses sous la ligne des genoux si possible.", detail: "4 séries de 8-10 reps (Repos: 90s)" },
-        { name: "Développé couché (Bench Press)", desc: "Barre touche la poitrine puis poussée puissante vers le haut.", detail: "4 séries de 8-10 reps (Repos: 90s)" },
-        { name: "Tirage buste penché (Barbell Row)", desc: "Ramenez la barre vers le nombril en serrant les omoplates.", detail: "4 séries de 8-10 reps (Repos: 90s)" },
-        { name: "Développé militaire assis aux haltères", desc: "Poussez verticalement, contrôlez le retour aux oreilles.", detail: "3 séries de 10 reps (Repos: 75s)" },
-        { name: "Curl biceps à la barre EZ", desc: "Gardez les coudes serrés le long du corps.", detail: "3 séries de 12 reps (Repos: 60s)" }
-      ];
-    }
-  } else {
-    if (goal === "perte-poids" || goal === "endurance" || goal === "sante") {
-      return [
-        { name: "Jumping Jacks (Échauffement)", desc: "Mouvement fluide pour monter la température corporelle.", detail: "2 x 45 secondes" },
-        { name: "Goblet Squats (avec sac ou lest)", desc: "Tenez la charge contre la poitrine. Dos bien droit.", detail: "4 séries de 15 reps (Repos: 45s)" },
-        { name: "Pompes inclinées (surélevé)", desc: "Mains sur une chaise ou un lit, corps parfaitement gainé.", detail: "3 séries de 12 reps (Repos: 60s)" },
-        { name: "Tirage unilatéral haltère / élastique", desc: "Prenez appui, tirez le coude vers la hanche.", detail: "3 séries de 15 reps / bras (Repos: 45s)" },
-        { name: "Crunchs abdominaux", desc: "Enroulez le buste en gardant le bas du dos scellé au sol.", detail: "3 séries de 20 reps (Repos: 30s)" }
-      ];
-    } else {
-      return [
-        { name: "Fentes alternées (Walking Lunges)", desc: "Faites un grand pas, genou arrière frôle le sol.", detail: "4 séries de 12 reps / jambe (Repos: 60s)" },
-        { name: "Pompes classiques au sol", desc: "Mains largeur d'épaules, fessiers serrés.", detail: "4 séries de 10-15 reps (Repos: 75s)" },
-        { name: "Dips sur chaise", desc: "Pliez les coudes vers l'arrière pour solliciter les triceps.", detail: "3 séries de 12 reps (Repos: 60s)" },
-        { name: "Bulgarian Split Squats (arrière sur chaise)", desc: "Excellente tension unilatérale pour les quadriceps et fessiers.", detail: "3 séries de 10 reps / jambe (Repos: 60s)" },
-        { name: "Gainage planche latérale", desc: "Travail intense des obliques abdominaux.", detail: "3 séries de 30s / côté (Repos: 45s)" }
-      ];
-    }
-  }
-}
+export { getExercisesForSession } from "../modules/program.js";
 
 /**
  * 2. MON PROGRAMME (TIMELINE ET PLAYER DE SÉANCE)
@@ -569,8 +532,8 @@ export function renderClientProgram() {
     return `
     <div class="wrap client-page">
       <div class="client-header" style="background: linear-gradient(135deg, var(--ink) 0%, #1c2b36 100%); color: white; border-radius: 14px; padding: 24px; margin-top: 10px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.08);">
-        <span style="font-size: 10px; font-family: 'IBM Plex Mono', monospace; font-weight: 800; text-transform: uppercase; background: var(--ember); color: white; padding: 2px 8px; border-radius: 4px;">STATUT PROGRAMME</span>
-        <h1 style="font-size: 22px; font-family: 'Archivo Black', sans-serif; color: white; margin: 6px 0 4px;">Aucun programme actif</h1>
+        <span style="font-size: 10px; font-family: var(--font-mono); font-weight: 800; text-transform: uppercase; background: var(--ember); color: white; padding: 2px 8px; border-radius: 4px;">STATUT PROGRAMME</span>
+        <h1 style="font-size: 22px; font-family: var(--font-display); color: white; margin: 6px 0 4px;">Aucun programme actif</h1>
         <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin: 0;">Sélectionnez un programme ou réalisez le quiz pour débloquer votre planification personnalisée.</p>
       </div>
       
@@ -587,8 +550,9 @@ export function renderClientProgram() {
 
   // --- RENDU : SÉANCE ACTIVE EN COURS DE LECTURE (WORKOUT PLAYER) ---
   if (state.activeSession) {
-    const sessionName = state.activeSession;
-    const listExos = getExercisesForSession(sessionName);
+    const active = findClientSession(state.activeSession);
+    const sessionName = active?.name || state.activeSession;
+    const listExos = getExercisesForSession(active || state.activeSession);
     
     const initSecs = state.activeSessionSeconds || 0;
     const mins = Math.floor(initSecs / 60).toString().padStart(2, '0');
@@ -607,23 +571,23 @@ export function renderClientProgram() {
             ${icon("arrow-left", 14)} Quitter la séance
           </button>
           <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 10px; font-family: 'IBM Plex Mono', monospace; font-weight: 800; text-transform: uppercase; background: #22c55e; color: white; padding: 2px 8px; border-radius: 4px;">MODE SÉANCE EN DIRECT</span>
+            <span style="font-size: 10px; font-family: var(--font-mono); font-weight: 800; text-transform: uppercase; background: #22c55e; color: white; padding: 2px 8px; border-radius: 4px;">MODE SÉANCE EN DIRECT</span>
             <span style="font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 600;">Supervisé par Coach Abdou</span>
           </div>
-          <h1 style="font-size: 22px; font-family: 'Archivo Black', sans-serif; color: white; margin: 4px 0 2px;">${escapeHtml(sessionName)}</h1>
+          <h1 style="font-size: 22px; font-family: var(--font-display); color: white; margin: 4px 0 2px;">${escapeHtml(sessionName)}</h1>
         </div>
 
         <!-- PANNEAU DE CHRONOMÈTRE -->
         <div style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); padding: 14px 20px; border-radius: 12px; text-align: center; min-width: 280px; width: 100%; max-width: 380px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span style="font-size: 10px; font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; color: rgba(255,255,255,0.7); font-weight: 700;">Temps Écoulé</span>
+            <span style="font-size: 10px; font-family: var(--font-mono); text-transform: uppercase; color: rgba(255,255,255,0.7); font-weight: 700;">Temps Écoulé</span>
             <span id="timer-status-badge" class="adm-badge ${isRunning ? 'active' : ''}" style="font-size: 10px; background: ${isRunning ? '#22c55e' : 'rgba(255,255,255,0.2)'}; color: white; border: none; font-weight: 800;">
               ${isRunning ? '▶ EN COURS' : '⏸ EN PAUSE'}
             </span>
           </div>
 
           <div style="margin: 4px 0 10px;">
-            <span id="workout-timer" style="font-size: 36px; font-family: 'IBM Plex Mono', monospace; font-weight: 800; color: white; letter-spacing: 1px; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">${formattedTime}</span>
+            <span id="workout-timer" style="font-size: 36px; font-family: var(--font-mono); font-weight: 800; color: white; letter-spacing: 1px; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">${formattedTime}</span>
           </div>
 
           <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
@@ -644,31 +608,34 @@ export function renderClientProgram() {
             <h3 class="client-card-title" style="margin: 0; display: flex; align-items: center; gap: 8px;">
               ${icon("list", 20, "var(--ember)")} Feuille de Route & Exécution Des Exercices
             </h3>
-            <span style="font-size: 11px; font-family: 'IBM Plex Mono', monospace; color: var(--slate); font-weight: 700;">${listExos.length} Mouvements</span>
+            <span style="font-size: 11px; font-family: var(--font-mono); color: var(--slate); font-weight: 700;">${listExos.length} Mouvements</span>
           </div>
           <p style="font-size: 12px; color: var(--slate); margin-bottom: 20px; line-height: 1.5;">
-            Cochez les séries accomplies au fur et à mesure. Respectez les temps de repos indiqués entre chaque série.
+            Regarde l'illustration sur la plateforme pour exécuter le mouvement, puis coche les séries.
           </p>
 
           <div style="display: grid; gap: 18px;">
-            ${listExos.map((exo, idx) => {
+            ${listExos.length === 0 ? `<p style="margin:0; font-size:14px; color:var(--slate);">Aucun exercice trouvé pour cette séance dans ton programme actuel.</p>` : listExos.map((exo, idx) => {
               const match = String(exo.detail || "").match(/(\d+)\s*séries?/i);
               const setsCount = match ? parseInt(match[1], 10) : 4;
               const setsArray = Array.from({ length: setsCount }, (_, i) => i + 1);
               return `
-              <div style="padding: 18px; border: 1px solid var(--line); border-radius: 10px; background: #f8fafc; display: flex; flex-direction: column; gap: 10px;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap;">
-                  <div>
-                    <span style="font-size: 10px; font-weight: 800; color: var(--ember); font-family: 'IBM Plex Mono', monospace; text-transform: uppercase;">EXERCICE #${idx + 1}</span>
-                    <h4 style="font-size: 16px; font-weight: 800; margin: 2px 0 4px; color: var(--ink);">${escapeHtml(exo.name)}</h4>
-                    <p style="font-size: 12px; color: var(--slate); margin: 0 0 10px; line-height: 1.4;">${escapeHtml(exo.desc)}</p>
-                    <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(exo.name + ' exercice de musculation')}" target="_blank" rel="noopener noreferrer" style="font-size: 11px; font-weight: 700; color: white; background-color: #ff0000; padding: 4px 10px; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(255,0,0,0.2);">
-                      ${icon("play-circle", 12)} Tuto Vidéo (YouTube)
-                    </a>
+              <div class="exo-card" style="padding: 18px; border: 1px solid var(--line); border-radius: 10px; background: #f8fafc; display: flex; flex-direction: column; gap: 10px;">
+                <div class="exo-card__top">
+                  ${renderExerciseVisualHtml(exo.name)}
+                  <div class="exo-card__body">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap;">
+                      <div style="flex: 1; min-width: 0;">
+                        <span style="font-size: 10px; font-weight: 800; color: var(--ember); font-family: var(--font-mono); text-transform: uppercase;">EXERCICE #${idx + 1}</span>
+                        <h4 style="font-size: 16px; font-weight: 800; margin: 2px 0 4px; color: var(--ink);">${escapeHtml(exo.name)}</h4>
+                        <p style="font-size: 12px; color: var(--slate); margin: 0 0 8px; line-height: 1.4;">${escapeHtml(exo.desc)}</p>
+                        ${renderYoutubeSecondaryLink(exo.name)}
+                      </div>
+                      <span class="adm-badge active" style="background: white; color: var(--ink); border: 1px solid var(--line); font-size: 12px; font-weight: 700; padding: 4px 10px; white-space: nowrap; height: fit-content;">
+                        🎯 ${escapeHtml(exo.detail)}
+                      </span>
+                    </div>
                   </div>
-                  <span class="adm-badge active" style="background: white; color: var(--ink); border: 1px solid var(--line); font-size: 12px; font-weight: 700; padding: 4px 10px; white-space: nowrap; height: fit-content;">
-                    🎯 ${escapeHtml(exo.detail)}
-                  </span>
                 </div>
                 
                 <!-- SÉRIES INTERACTIVES -->
@@ -725,10 +692,10 @@ export function renderClientProgram() {
       <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px solid var(--line);">
         <div>
           <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-            <span style="background: var(--ember); color: white; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace;">PROGRAMME OFFICIEL</span>
+            <span style="background: var(--ember); color: white; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; font-family: var(--font-mono);">PROGRAMME OFFICIEL</span>
             <span style="font-size: 11px; color: var(--moss); font-weight: 700; background: var(--moss-soft); padding: 2px 8px; border-radius: 4px;">Supervision Coach Abdou</span>
           </div>
-          <h2 style="font-size: 20px; font-family: 'Archivo Black', sans-serif; color: var(--ink); margin: 0 0 4px;">${escapeHtml(coachProg.title)}</h2>
+          <h2 style="font-size: 20px; font-family: var(--font-display); color: var(--ink); margin: 0 0 4px;">${escapeHtml(coachProg.title)}</h2>
           <p style="font-size: 12px; color: var(--slate); margin: 0; line-height: 1.4;">${escapeHtml(coachProg.subtitle)} · Durée : <strong>${escapeHtml(coachProg.duration)}</strong> · Rythme : <strong>${escapeHtml(coachProg.frequency)}</strong></p>
         </div>
       </div>
@@ -794,16 +761,19 @@ export function renderClientProgram() {
     <div style="background: linear-gradient(135deg, var(--ink) 0%, #1c2b36 100%); color: white; border-radius: 14px; padding: 22px 26px; margin-top: 10px; margin-bottom: 28px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 12px 30px rgba(22,35,44,0.12); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
       <div>
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-          <span style="font-size: 10px; font-family: 'IBM Plex Mono', monospace; font-weight: 800; text-transform: uppercase; background: var(--ember); color: white; padding: 2px 8px; border-radius: 4px;">MON PROGRAMME</span>
+          <span style="font-size: 10px; font-family: var(--font-mono); font-weight: 800; text-transform: uppercase; background: var(--ember); color: white; padding: 2px 8px; border-radius: 4px;">MON PROGRAMME</span>
           <span style="font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 600;">Semaine <strong>${program.week}</strong> sur ${program.totalWeeks || 8}</span>
         </div>
-        <h1 style="font-size: 22px; font-family: 'Archivo Black', sans-serif; color: white; margin: 0 0 4px;">${escapeHtml(program.trackLabel || "Parcours Sur-Mesure")}</h1>
+        <h1 style="font-size: 22px; font-family: var(--font-display); color: white; margin: 0 0 4px;">${escapeHtml(program.trackLabel || "Parcours Sur-Mesure")}</h1>
         <p style="font-size: 12px; color: rgba(255,255,255,0.75); margin: 0;">Validez vos séances de la semaine pour faire progresser votre cycle d'entraînement.</p>
       </div>
 
       <div style="display: flex; gap: 10px; flex-wrap: wrap;">
         <button class="btn btn-outline-dark" data-nav="quiz" style="color: white; border-color: rgba(255,255,255,0.3); font-size: 12px; font-weight: 700; padding: 8px 14px; background: rgba(255,255,255,0.05);">
-          🔄 Repasser le questionnaire d'onboarding
+          Repasser le questionnaire
+        </button>
+        <button class="btn btn-outline-dark" data-nav="programs" style="color: white; border-color: rgba(255,255,255,0.3); font-size: 12px; font-weight: 700; padding: 8px 14px; background: rgba(255,255,255,0.05);">
+          Changer de programme
         </button>
       </div>
     </div>
@@ -813,7 +783,7 @@ export function renderClientProgram() {
 
     <!-- 3. AGENDA & SÉANCES DU CYCLE -->
     <div style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-      <h2 style="font-size: 18px; font-family: 'Archivo Black', sans-serif; color: var(--ink); margin: 0; display: flex; align-items: center; gap: 8px;">
+      <h2 style="font-size: 18px; font-family: var(--font-display); color: var(--ink); margin: 0; display: flex; align-items: center; gap: 8px;">
         ${icon("calendar", 20, "var(--ember)")} Agenda des Séances De La Semaine
       </h2>
       <span style="font-size: 12px; font-weight: 700; color: var(--slate); background: white; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--line);">
@@ -823,7 +793,7 @@ export function renderClientProgram() {
 
     <div class="client-timeline" style="display: grid; gap: 18px;">
       ${program.sessions.map((s, idx) => {
-        const sessionExercises = getExercisesForSession(s.name);
+        const sessionExercises = getExercisesForSession(s);
         const isNextRecommend = !s.done && program.sessions.findIndex(x => !x.done) === idx;
 
         return `
@@ -836,7 +806,7 @@ export function renderClientProgram() {
               </div>
               <div>
                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
-                  <span style="font-size: 10px; font-family: 'IBM Plex Mono', monospace; font-weight: 800; text-transform: uppercase; color: ${s.done ? 'var(--moss)' : (isNextRecommend ? 'var(--ember)' : 'var(--slate)')};">
+                  <span style="font-size: 10px; font-family: var(--font-mono); font-weight: 800; text-transform: uppercase; color: ${s.done ? 'var(--moss)' : (isNextRecommend ? 'var(--ember)' : 'var(--slate)')};">
                     ${s.done ? '✓ VALIDÉE' : (isNextRecommend ? '⚡ PROCHAINE SÉANCE' : `SÉANCE #${idx + 1}`)}
                   </span>
                   <span style="font-size: 11px; color: var(--slate); font-weight: 600;">${s.exos} exercices · ${s.duree}</span>
@@ -846,7 +816,7 @@ export function renderClientProgram() {
             </div>
 
             <div>
-              <button type="button" class="${s.done ? 'btn btn-outline-dark' : 'btn btn-primary'}" data-session-action="${s.done ? 'review' : 'start'}" data-session-name="${escapeHtml(s.name)}" style="font-weight: 800; font-size: 13px; padding: 10px 18px; ${!s.done ? 'background: var(--ember); border-color: var(--ember);' : ''}">
+              <button type="button" class="${s.done ? 'btn btn-outline-dark' : 'btn btn-primary'}" data-session-action="${s.done ? 'review' : 'start'}" data-session-id="${escapeHtml(s.id || "")}" data-session-name="${escapeHtml(s.name)}" style="font-weight: 800; font-size: 13px; padding: 10px 18px; ${!s.done ? 'background: var(--ember); border-color: var(--ember);' : ''}">
                 ${s.done ? "Revoir la séance" : `Lancer la séance en direct ${icon("play-circle", 16)}`}
               </button>
             </div>
@@ -858,15 +828,18 @@ export function renderClientProgram() {
             </summary>
             <div style="margin-top: 14px; display: grid; gap: 10px;">
               ${sessionExercises.map((exo, exoIdx) => `
-                <div style="background: #f8fafc; border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px;">
-                  <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap;">
-                    <strong style="font-size: 13px; color: var(--ink); font-weight: 800;">${exoIdx + 1}. ${escapeHtml(exo.name)}</strong>
-                    <span style="font-size: 11px; background: white; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--line); color: var(--ink); font-weight: 700; font-family: monospace;">${escapeHtml(exo.detail)}</span>
+                <div class="exo-card exo-card--compact" style="background: #f8fafc; border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px;">
+                  <div class="exo-card__top exo-card__top--compact">
+                    ${renderExerciseVisualHtml(exo.name, { compact: true })}
+                    <div class="exo-card__body" style="display: flex; flex-direction: column; gap: 6px; min-width: 0; flex: 1;">
+                      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap;">
+                        <strong style="font-size: 13px; color: var(--ink); font-weight: 800;">${exoIdx + 1}. ${escapeHtml(exo.name)}</strong>
+                        <span style="font-size: 11px; background: white; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--line); color: var(--ink); font-weight: 700; font-family: var(--font-mono);">${escapeHtml(exo.detail)}</span>
+                      </div>
+                      <p style="font-size: 12px; color: var(--slate); margin: 0; line-height: 1.4;">${escapeHtml(exo.desc)}</p>
+                      ${renderYoutubeSecondaryLink(exo.name)}
+                    </div>
                   </div>
-                  <p style="font-size: 12px; color: var(--slate); margin: 0; line-height: 1.4;">${escapeHtml(exo.desc)}</p>
-                  <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(exo.name + ' exercice de musculation')}" target="_blank" rel="noopener noreferrer" style="font-size: 11px; font-weight: 700; color: white; background-color: #ff0000; padding: 3px 8px; border-radius: 4px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; width: fit-content; margin-top: 4px;">
-                    ${icon("play-circle", 12)} Tuto Vidéo
-                  </a>
                 </div>
               `).join("")}
             </div>
@@ -1066,7 +1039,7 @@ export function renderClientProgress() {
       <div style="overflow-x: auto;">
         <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
           <thead>
-            <tr style="border-bottom: 2px solid var(--line); color: var(--slate); font-family: 'IBM Plex Mono', monospace; font-size: 11px; text-transform: uppercase;">
+            <tr style="border-bottom: 2px solid var(--line); color: var(--slate); font-family: var(--font-mono); font-size: 11px; text-transform: uppercase;">
               <th style="padding: 10px 12px; font-weight: 700;">Zone Corporelle</th>
               <th style="padding: 10px 12px; font-weight: 700;">Dernier Relevé</th>
               <th style="padding: 10px 12px; font-weight: 700;">Statut & Objectif</th>
@@ -1077,35 +1050,35 @@ export function renderClientProgress() {
               <td style="padding: 12px; font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 8px;">
                 📏 Tour de Taille (Nombril)
               </td>
-              <td style="padding: 12px; font-weight: 800; font-family: 'Archivo Black', sans-serif; color: var(--ink);">${waist !== "--" ? waist + " cm" : "--"}</td>
+              <td style="padding: 12px; font-weight: 800; font-family: var(--font-display); color: var(--ink);">${waist !== "--" ? waist + " cm" : "--"}</td>
               <td style="padding: 12px; color: var(--slate); font-size: 12px;">Cible clé pour l'indice de masse grasse abdominale</td>
             </tr>
             <tr style="border-bottom: 1px solid var(--chalk-soft);">
               <td style="padding: 12px; font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 8px;">
                 📐 Tour de Poitrine (Pectoraux)
               </td>
-              <td style="padding: 12px; font-weight: 800; font-family: 'Archivo Black', sans-serif; color: var(--ink);">${chest !== "--" ? chest + " cm" : "--"}</td>
+              <td style="padding: 12px; font-weight: 800; font-family: var(--font-display); color: var(--ink);">${chest !== "--" ? chest + " cm" : "--"}</td>
               <td style="padding: 12px; color: var(--slate); font-size: 12px;">Indicateur de développement du haut du corps</td>
             </tr>
             <tr style="border-bottom: 1px solid var(--chalk-soft);">
               <td style="padding: 12px; font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 8px;">
                 💪 Tour de Bras (Biceps contracté)
               </td>
-              <td style="padding: 12px; font-weight: 800; font-family: 'Archivo Black', sans-serif; color: var(--ink);">${arms !== "--" ? arms + " cm" : "--"}</td>
+              <td style="padding: 12px; font-weight: 800; font-family: var(--font-display); color: var(--ink);">${arms !== "--" ? arms + " cm" : "--"}</td>
               <td style="padding: 12px; color: var(--slate); font-size: 12px;">Densité musculaire des membres supérieurs</td>
             </tr>
             <tr style="border-bottom: 1px solid var(--chalk-soft);">
               <td style="padding: 12px; font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 8px;">
                 🦵 Tour de Cuisses
               </td>
-              <td style="padding: 12px; font-weight: 800; font-family: 'Archivo Black', sans-serif; color: var(--ink);">${thighs !== "--" ? thighs + " cm" : "--"}</td>
+              <td style="padding: 12px; font-weight: 800; font-family: var(--font-display); color: var(--ink);">${thighs !== "--" ? thighs + " cm" : "--"}</td>
               <td style="padding: 12px; color: var(--slate); font-size: 12px;">Puissance et volume des quadriceps et ischios</td>
             </tr>
             <tr>
               <td style="padding: 12px; font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 8px;">
                 🍑 Tour de Hanches / Fessiers
               </td>
-              <td style="padding: 12px; font-weight: 800; font-family: 'Archivo Black', sans-serif; color: var(--ink);">${hips !== "--" ? hips + " cm" : "--"}</td>
+              <td style="padding: 12px; font-weight: 800; font-family: var(--font-display); color: var(--ink);">${hips !== "--" ? hips + " cm" : "--"}</td>
               <td style="padding: 12px; color: var(--slate); font-size: 12px;">Soutien de la chaîne postérieure</td>
             </tr>
           </tbody>
@@ -1198,14 +1171,14 @@ export function renderClientProgress() {
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; position: relative; z-index: 2;">
         <div>
           <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
-            <span style="font-size: 10px; font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; background: var(--moss); color: white; padding: 3px 10px; border-radius: 4px; font-weight: 800;">
+            <span style="font-size: 10px; font-family: var(--font-mono); text-transform: uppercase; background: var(--moss); color: white; padding: 3px 10px; border-radius: 4px; font-weight: 800;">
               Phase Active : ${profile.goal === 'perte-poids' ? 'Déficit Calorigène & Sèche' : profile.goal === 'musculation' ? 'Hypertrophie & Volume' : 'Recomposition & Forme'}
             </span>
             <span style="font-size: 12px; color: rgba(255,255,255,0.7); font-weight: 600;">
               Athlète : <strong style="color: white;">${escapeHtml(firstName)}</strong>
             </span>
           </div>
-          <h2 style="font-size: 22px; font-family: 'Archivo Black', sans-serif; margin: 0 0 6px; color: white;">
+          <h2 style="font-size: 22px; font-family: var(--font-display); margin: 0 0 6px; color: white;">
             Série en cours : Semaine ${week} sur ${totalWeeks}
           </h2>
           <p style="font-size: 13px; color: rgba(255,255,255,0.8); margin: 0; max-width: 580px; line-height: 1.5;">
@@ -1216,7 +1189,7 @@ export function renderClientProgress() {
         <div style="display: flex; gap: 16px; align-items: center; background: rgba(255,255,255,0.06); padding: 12px 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12);">
           <div style="text-align: center;">
             <div style="font-size: 10px; text-transform: uppercase; color: rgba(255,255,255,0.6); font-weight: 700;">Progression globale</div>
-            <div style="font-size: 22px; font-family: 'Archivo Black', sans-serif; color: #4ade80; margin-top: 2px;">
+            <div style="font-size: 22px; font-family: var(--font-display); color: #4ade80; margin-top: 2px;">
               ${Math.round((totalDone / Math.max(1, sessions.length)) * 100)}%
             </div>
           </div>
@@ -1236,14 +1209,14 @@ export function renderClientProgress() {
       <!-- CARD 1: Poids Actuel -->
       <div class="client-card" style="padding: 20px; background: white; border: 1px solid var(--line); border-radius: 10px; display: flex; flex-direction: column; justify-content: space-between;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-          <span style="font-size: 11px; font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; color: var(--slate); font-weight: 700;">Poids & Tendance</span>
+          <span style="font-size: 11px; font-family: var(--font-mono); text-transform: uppercase; color: var(--slate); font-weight: 700;">Poids & Tendance</span>
           <div style="background: rgba(226, 98, 45, 0.1); color: var(--ember); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
             ${icon("scale", 18)}
           </div>
         </div>
         <div>
           <div style="display: flex; align-items: baseline; gap: 8px;">
-            <span style="font-size: 32px; font-family: 'Archivo Black', sans-serif; color: var(--ink); line-height: 1;">${currentWeight ? currentWeight + ' <span style="font-size:16px;color:var(--slate);">kg</span>' : '--'}</span>
+            <span style="font-size: 32px; font-family: var(--font-display); color: var(--ink); line-height: 1;">${currentWeight ? currentWeight + ' <span style="font-size:16px;color:var(--slate);">kg</span>' : '--'}</span>
             ${weightDiff !== 0 ? `<span style="font-size: 12px; font-weight: 800; color: ${weightDiff < 0 ? 'var(--moss)' : 'var(--ember)'}; background: ${weightDiff < 0 ? 'rgba(60,90,70,0.1)' : 'rgba(226,98,45,0.1)'}; padding: 2px 8px; border-radius: 12px;">${weightDiff > 0 ? '+' : ''}${weightDiff} kg ${weightTrendIcon}</span>` : ''}
           </div>
           <p style="font-size: 12px; color: var(--slate); margin: 6px 0 0; line-height: 1.4;">
@@ -1255,13 +1228,13 @@ export function renderClientProgress() {
       <!-- CARD 2: Assiduité Séances -->
       <div class="client-card" style="padding: 20px; background: white; border: 1px solid var(--line); border-radius: 10px; display: flex; flex-direction: column; justify-content: space-between;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-          <span style="font-size: 11px; font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; color: var(--slate); font-weight: 700;">Discipline Séances</span>
+          <span style="font-size: 11px; font-family: var(--font-mono); text-transform: uppercase; color: var(--slate); font-weight: 700;">Discipline Séances</span>
           <div style="background: rgba(60, 90, 70, 0.1); color: var(--moss); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
             ${icon("dumbbell", 18)}
           </div>
         </div>
         <div>
-          <div style="font-size: 32px; font-family: 'Archivo Black', sans-serif; color: var(--ink); line-height: 1;">
+          <div style="font-size: 32px; font-family: var(--font-display); color: var(--ink); line-height: 1;">
             ${totalDone} <span style="font-size:16px;color:var(--slate);">/ ${sessions.length}</span>
           </div>
           <div class="client-pb-bar" style="margin-top: 10px; height: 6px; background: var(--chalk-soft);">
@@ -1273,13 +1246,13 @@ export function renderClientProgress() {
       <!-- CARD 3: Hydratation -->
       <div class="client-card" style="padding: 20px; background: white; border: 1px solid var(--line); border-radius: 10px; display: flex; flex-direction: column; justify-content: space-between;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-          <span style="font-size: 11px; font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; color: var(--slate); font-weight: 700;">Eau du jour</span>
+          <span style="font-size: 11px; font-family: var(--font-mono); text-transform: uppercase; color: var(--slate); font-weight: 700;">Eau du jour</span>
           <div style="background: rgba(37, 99, 235, 0.1); color: #2563eb; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
             ${icon("droplet", 18)}
           </div>
         </div>
         <div>
-          <div style="font-size: 32px; font-family: 'Archivo Black', sans-serif; color: var(--ink); line-height: 1;">
+          <div style="font-size: 32px; font-family: var(--font-display); color: var(--ink); line-height: 1;">
             ${profile.dailyWaterLog?.amount || 0} <span style="font-size:14px;color:var(--slate);">/ 2500 ml</span>
           </div>
           <p style="font-size: 12px; color: var(--slate); margin: 6px 0 0; line-height: 1.4;">
@@ -1291,13 +1264,13 @@ export function renderClientProgress() {
       <!-- CARD 4: IMC & Métabolisme -->
       <div class="client-card" style="padding: 20px; background: white; border: 1px solid var(--line); border-radius: 10px; display: flex; flex-direction: column; justify-content: space-between;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-          <span style="font-size: 11px; font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; color: var(--slate); font-weight: 700;">Diagnostic IMC</span>
+          <span style="font-size: 11px; font-family: var(--font-mono); text-transform: uppercase; color: var(--slate); font-weight: 700;">Diagnostic IMC</span>
           <div style="background: rgba(16, 185, 129, 0.1); color: #10b981; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
             ${icon("activity", 18)}
           </div>
         </div>
         <div>
-          <div style="font-size: 32px; font-family: 'Archivo Black', sans-serif; color: var(--ink); line-height: 1;">
+          <div style="font-size: 32px; font-family: var(--font-display); color: var(--ink); line-height: 1;">
             ${imc || '--'}
           </div>
           <p style="font-size: 12px; color: ${imcColor}; font-weight: 700; margin: 6px 0 0; line-height: 1.4;">
@@ -1333,7 +1306,7 @@ export function renderClientProgress() {
           <div style="padding: 16px; border: 1px solid ${isCurrent ? 'var(--moss)' : 'var(--line)'}; border-radius: 8px; background: ${isCurrent ? 'rgba(60,90,70,0.02)' : 'rgba(0,0,0,0.01)'}; position: relative;">
             ${isCurrent ? `<span style="position: absolute; right: 14px; top: 14px; font-size: 9px; font-weight: 800; background: var(--moss); color: white; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Semaine active</span>` : ""}
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <strong style="font-size: 15px; color: var(--ink); font-family: 'Archivo Black', sans-serif;">${escapeHtml(h.name)}</strong>
+              <strong style="font-size: 15px; color: var(--ink); font-family: var(--font-display);">${escapeHtml(h.name)}</strong>
               <span style="font-size: 13px; font-weight: 700; color: var(--slate);">${h.done} / ${h.total} Séances</span>
             </div>
             <div class="client-pb-bar" style="height: 8px; background: rgba(0,0,0,0.06); border-radius: 4px; overflow: hidden;">

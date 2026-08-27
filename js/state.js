@@ -3,6 +3,7 @@
    ========================================================== */
 
 export const STORAGE_KEY = "monprogrammefit-state-v1";
+export const PENDING_ONBOARDING_KEY = "monprogrammefit-pending-onboarding";
 
 export const state = {
   page: "home",
@@ -37,6 +38,7 @@ export const state = {
     contact: { name: "", email: "", message: "", subject: "", captcha: "" },
     signup: { firstName: "", lastName: "", email: "", password: "" },
     login: { email: "", password: "" },
+    adjustment: { reason: "", message: "" },
   },
   ui: {
     isSending: false,
@@ -47,12 +49,66 @@ export const state = {
     loginPending: false,
     signupError: "",
     signupSuccessMessage: "", // [COMMENTAIRE] Message de succès d'inscription
-    signupShowPassword: false, // [COMMENTAIRE] Détermine si le mot de passe d'inscription doit être visible
+    signupShowPassword: false,
     signupPending: false,
+    adjustmentPending: false,
+    adjustmentSuccess: false,
+    adjustmentError: "",
   },
   backExitAttempted: false,
   backNoticeTimer: null,
 };
+
+export function hasPendingOnboardingData(answers = state.quizAnswers, programId = state.pendingProgramId) {
+  return !!(programId || (answers?.objectif && answers?.lieu));
+}
+
+export function savePendingOnboarding() {
+  if (!hasPendingOnboardingData()) return;
+  try {
+    window.localStorage.setItem(PENDING_ONBOARDING_KEY, JSON.stringify({
+      pendingProgramId: state.pendingProgramId || null,
+      quizAnswers: state.quizAnswers || {},
+      quizStep: state.quizStep || 0,
+      savedAt: Date.now(),
+    }));
+  } catch (error) {
+    console.warn("Impossible de sauvegarder l'onboarding en attente", error);
+  }
+}
+
+export function restorePendingOnboarding() {
+  try {
+    const raw = window.localStorage.getItem(PENDING_ONBOARDING_KEY);
+    if (!raw) return false;
+    const pending = JSON.parse(raw);
+    if (pending.quizAnswers && Object.keys(pending.quizAnswers).length) {
+      if (!state.quizAnswers?.objectif) {
+        state.quizAnswers = pending.quizAnswers;
+      } else {
+        state.quizAnswers = { ...pending.quizAnswers, ...state.quizAnswers };
+      }
+    }
+    if (!state.pendingProgramId && pending.pendingProgramId) {
+      state.pendingProgramId = pending.pendingProgramId;
+    }
+    if (typeof pending.quizStep === "number" && pending.quizStep > (state.quizStep || 0)) {
+      state.quizStep = pending.quizStep;
+    }
+    return hasPendingOnboardingData();
+  } catch (error) {
+    console.warn("Impossible de restaurer l'onboarding en attente", error);
+    return false;
+  }
+}
+
+export function clearPendingOnboarding() {
+  try {
+    window.localStorage.removeItem(PENDING_ONBOARDING_KEY);
+  } catch (_) {
+    /* ignore */
+  }
+}
 
 /**
  * Sauvegarde un instantané de l'état dans localStorage.
@@ -117,6 +173,7 @@ export function restorePersistedState(validPageKeys = []) {
       if (parsed.lastVisitedAt) state.lastVisitedAt = parsed.lastVisitedAt;
       if (parsed.drafts) state.drafts = { ...state.drafts, ...parsed.drafts };
     }
+    restorePendingOnboarding();
   } catch (error) {
     console.warn("Restauration impossible", error);
   }

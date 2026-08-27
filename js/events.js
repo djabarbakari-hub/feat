@@ -16,14 +16,15 @@
    4. Tous les `console.log` de debug ont été retirés.
    ========================================================== */
 
-import { state, persistState } from "./state.js";
+import { state, persistState, savePendingOnboarding, restorePendingOnboarding, clearPendingOnboarding, hasPendingOnboardingData } from "./state.js";
 import { navigate, goBack } from "./router.js";
 import { render } from "./render.js";
 import { QUIZ_STEPS, COACH_PROGRAMS, TRACKS } from "./data.js";
 import { trackById, closeMobileMenu, showToast, getMatchingCoachProgram, setButtonLoading, extractNameFromEmailOrDisplayName } from "./helpers.js";
+import { applyProgramToUser, getCoachProgramDisplayName, getAdjustmentReasonLabel, buildClientProgramFromCoach, findClientSession, replaceUserSessionDocs } from "./modules/program.js";
 import { auth, db } from "./firebase.js";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup, sendEmailVerification } from "firebase/auth";
-import { doc, setDoc, getDoc, addDoc, collection, writeBatch, query, where, getDocs, updateDoc, deleteDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, addDoc, collection, query, where, getDocs, updateDoc, deleteDoc } from "firebase/firestore";
 import { refreshAdminData } from "../app.js";
 
 /**
@@ -32,6 +33,10 @@ import { refreshAdminData } from "../app.js";
  */
 function getReadableAuthError(error) {
   const code = error?.code || "";
+  const message = String(error?.message || "");
+  if (code.includes("api-key-not-valid") || code.includes("invalid-api-key") || message.includes("api-key-not-valid")) {
+    return "Firebase n'est pas configuré : la clé API est manquante ou invalide. Renseigne les variables VITE_FIREBASE_* dans le fichier .env, puis relance npm run dev.";
+  }
   switch (code) {
     case "auth/email-already-in-use":
       return "Cette adresse e-mail est déjà associée à un compte.";
@@ -51,6 +56,9 @@ function getReadableAuthError(error) {
       return "Trop de tentatives infructueuses. Veuillez répliquer plus tard.";
     case "auth/network-request-failed":
       return "Connexion réseau impossible. Vérifiez votre connexion Internet.";
+    case "auth/api-key-not-valid":
+    case "auth/invalid-api-key":
+      return "Firebase n'est pas configuré : la clé API est manquante ou invalide. Renseigne les variables VITE_FIREBASE_* dans le fichier .env, puis relance npm run dev.";
     case "auth/popup-closed-by-user":
       return "Connexion annulée : la fenêtre Google a été fermée avant la fin.";
     case "auth/popup-blocked":
@@ -86,17 +94,6 @@ function validatePasswordComplexity(password) {
 }
 
 /**
- * Déduit l'objectif (goal) à partir de l'identifiant du programme si non fourni.
- */
-function deduceGoalFromProgramId(programId) {
-  if (!programId) return "musculation";
-  if (programId.startsWith("perte-poids")) return "perte-poids";
-  if (programId.startsWith("sante-endurance")) return "endurance-sante";
-  if (programId.startsWith("prise-de-muscle")) return "musculation";
-  return "musculation";
-}
-
-/**
  * Fonction centralisée pour appliquer la sélection d'un programme.
  * Harmonise les données écrites dans l'état local et Firestore (goal, track, niveau, frequence, quizAnswers, program, updatedAt).
  * 
@@ -109,13 +106,13 @@ export async function applyProgramSelection(coachProgram, options = {}) {
 
   const currentProgram = state.clientProfile?.program;
   
-  // 1. Confirmation explicite si un programme est déjà actif et différent
+  // Confirmation explicite si un programme est déjà actif et différent
   if (!options.skipConfirmation && currentProgram && currentProgram.coachProgramId && currentProgram.coachProgramId !== coachProgram.id) {
     const oldCoachP = COACH_PROGRAMS.find(p => p.id === currentProgram.coachProgramId);
-    const oldName = oldCoachP 
-      ? `${oldCoachP.title.replace("MONPROGRAMMEFIT : ", "")} (${oldCoachP.subtitle})` 
+    const oldName = oldCoachP
+      ? getCoachProgramDisplayName(oldCoachP)
       : (currentProgram.trackLabel || "Programme actif");
-    const newName = `${coachProgram.title.replace("MONPROGRAMMEFIT : ", "")} (${coachProgram.subtitle})`;
+    const newName = getCoachProgramDisplayName(coachProgram);
     
     const confirmed = confirm(`Tu as déjà un programme actif (${oldName}). Le remplacer par ${newName} ? Ta progression actuelle sera réinitialisée.`);
     if (!confirmed) {
@@ -123,88 +120,63 @@ export async function applyProgramSelection(coachProgram, options = {}) {
     }
   }
 
-  // 2. Harmonisation complète des données
   const answers = options.answers || state.quizAnswers || {};
-  const goal = answers.objectif || options.goal || deduceGoalFromProgramId(coachProgram.id);
-  const track = answers.lieu || coachProgram.trackId || state.clientProfile?.track || "home-equip";
-  const niveau = answers.niveau || state.clientProfile?.niveau || coachProgram.level || "Débutant - Intermédiaire";
-  const frequence = answers.frequence || state.clientProfile?.frequence || coachProgram.frequency || "5 séances / semaine";
-  const physique = answers.physique || state.clientProfile?.physique || {};
-
-  const quizAnswers = {
-    ...state.clientProfile?.quizAnswers,
-    ...answers,
-    objectif: goal,
-    lieu: track,
-    niveau,
-    frequence
-  };
-
-  const program = {
-    coachProgramId: coachProgram.id,
-    trackLabel: `${coachProgram.title.replace("MONPROGRAMMEFIT : ", "")} (${coachProgram.subtitle}) — Coach Abdou BAKARI`,
-    track: track,
-    week: 1,
-    totalWeeks: 8,
-    nextSession: coachProgram.sessions[0]?.name || "",
-    history: [
-      { name: "Semaine 1", done: 0, total: coachProgram.sessions.length }
-    ],
-    sessions: coachProgram.sessions.map((s, idx) => ({
-      id: `s${idx + 1}`,
-      name: s.name,
-      exos: s.exercises.length,
-      duree: s.duration,
-      done: false,
-      weekNumber: 1
-    }))
-  };
-
-  // Mise à jour de l'état local
-  state.clientProfile = {
-    ...state.clientProfile,
-    goal,
-    track,
-    niveau,
-    frequence,
-    physique,
-    quizAnswers,
-    program,
-  };
-
-  persistState();
-
-  // 3. Écriture synchronisée dans Firestore pour l'utilisateur connecté
-  const currentUser = auth.currentUser;
-  if (currentUser && !state.simulationActive) {
-    try {
-      const userRef = doc(db, "users", currentUser.uid);
-      await setDoc(userRef, {
-        goal,
-        track,
-        niveau,
-        frequence,
-        weight: physique.poids ? parseFloat(physique.poids) : (state.clientProfile.weight || null),
-        height: physique.taille ? parseFloat(physique.taille) : (state.clientProfile.height || null),
-        age: physique.age ? parseInt(physique.age, 10) : (state.clientProfile.age || null),
-        quizAnswers,
-        program,
-        updatedAt: new Date().toISOString()
-      }, { merge: true });
-
-      // Enregistrement des séances dans la sous-collection users/{uid}/sessions
-      const batch = writeBatch(db);
-      program.sessions.forEach((s) => {
-        const sRef = doc(db, "users", currentUser.uid, "sessions", s.id);
-        batch.set(sRef, s);
-      });
-      await batch.commit();
-    } catch (err) {
-      console.error("Erreur d'enregistrement Firestore du programme:", err);
-    }
+  const uid = options.uid || auth.currentUser?.uid;
+  if (!uid) {
+    return false;
   }
 
-  return true;
+  try {
+    return await applyProgramToUser(uid, coachProgram, {
+      ...options,
+      answers,
+      goal: answers.objectif || options.goal,
+      track: answers.lieu || options.track || state.clientProfile?.track,
+      niveau: answers.niveau || state.clientProfile?.niveau,
+      frequence: answers.frequence || state.clientProfile?.frequence,
+      physique: answers.physique || state.clientProfile?.physique || {},
+      quizAnswers: state.clientProfile?.quizAnswers,
+      skipLocalState: !!options.uid && options.uid !== auth.currentUser?.uid,
+    });
+  } catch (err) {
+    console.error("Erreur d'enregistrement Firestore du programme:", err);
+    return false;
+  }
+}
+
+/**
+ * Applique le quiz invité + le programme en attente au compte connecté.
+ * Utilisé après inscription, connexion, Google, ou restauration de session.
+ */
+export async function applyPendingOnboardingIfNeeded() {
+  restorePendingOnboarding();
+
+  const answers = state.quizAnswers || {};
+  let coachP = state.pendingProgramId
+    ? COACH_PROGRAMS.find((p) => p.id === state.pendingProgramId)
+    : null;
+  if (!coachP && answers.objectif) {
+    coachP = getMatchingCoachProgram(answers.objectif, answers.lieu);
+  }
+  if (!coachP || !auth.currentUser) return false;
+  if (state.clientProfile?.program?.sessions?.length) {
+    state.pendingProgramId = null;
+    clearPendingOnboarding();
+    persistState();
+    return true;
+  }
+
+  const applied = await applyProgramSelection(coachP, {
+    answers,
+    skipConfirmation: true,
+    fromQuiz: true,
+  });
+  if (applied) {
+    state.pendingProgramId = null;
+    clearPendingOnboarding();
+    persistState();
+  }
+  return applied;
 }
 
 document.addEventListener("input", (e) => {
@@ -279,6 +251,16 @@ document.addEventListener("input", (e) => {
     state.quizAnswers.physique[e.target.dataset.quizPhysique] = e.target.value;
     persistState();
   }
+  if (e.target.matches("[data-adjustment-reason]")) {
+    state.drafts.adjustment = state.drafts.adjustment || { reason: "", message: "" };
+    state.drafts.adjustment.reason = e.target.value;
+    persistState();
+  }
+  if (e.target.matches("[data-adjustment-message]")) {
+    state.drafts.adjustment = state.drafts.adjustment || { reason: "", message: "" };
+    state.drafts.adjustment.message = e.target.value;
+    persistState();
+  }
 });
 
 document.addEventListener("click", async (e) => {
@@ -292,8 +274,13 @@ document.addEventListener("click", async (e) => {
       }
       state.role = "guest";
       state.clientProfile = {};
+      state.quizAnswers = {};
+      state.quizStep = 0;
+      state.pendingProgramId = null;
+      clearPendingOnboarding();
       state.drafts.login.password = "";
       state.drafts.signup.password = "";
+      persistState();
     }
     navigate(navBtn.dataset.nav);
     closeMobileMenu();
@@ -354,10 +341,11 @@ document.addEventListener("click", async (e) => {
 
     const currentUser = auth.currentUser;
     if (!currentUser && state.role === "guest") {
-      state.pendingProgramId = coachP.id;
+      if (coachP) state.pendingProgramId = coachP.id;
       state.quizStep = QUIZ_STEPS.length;
+      savePendingOnboarding();
       persistState();
-      showToast("Veuillez vous inscrire ou vous connecter pour enregistrer votre programme.");
+      showToast("Ton programme est prêt. Crée un compte pour continuer.");
       navigate("signup");
       return;
     }
@@ -385,6 +373,7 @@ document.addEventListener("click", async (e) => {
       const currentUser = auth.currentUser;
       if (!currentUser && state.role === "guest") {
         state.pendingProgramId = coachP.id;
+        savePendingOnboarding();
         persistState();
         showToast("Veuillez vous inscrire ou vous connecter pour activer ce programme.");
         navigate("signup");
@@ -472,6 +461,78 @@ document.addEventListener("click", async (e) => {
   if (contactResetBtn) {
     state.ui.sendSuccess = false;
     state.drafts.contact = { name: "", email: "", message: "", subject: "", captcha: "" };
+    persistState();
+    render();
+    return;
+  }
+
+  const adjustmentSendBtn = e.target.closest("[data-adjustment-send]");
+  if (adjustmentSendBtn) {
+    if (!auth.currentUser) {
+      showToast("Connecte-toi pour envoyer une demande d'ajustement.");
+      navigate("login");
+      return;
+    }
+    const draft = state.drafts.adjustment || { reason: "", message: "" };
+    const reason = draft.reason || "";
+    const message = (draft.message || "").trim();
+    if (!reason) {
+      state.ui.adjustmentError = "Choisis un motif.";
+      render();
+      return;
+    }
+    if (message.length < 8) {
+      state.ui.adjustmentError = "Explique en quelques mots ce qu'il faut adapter.";
+      render();
+      return;
+    }
+
+    state.ui.adjustmentPending = true;
+    state.ui.adjustmentError = "";
+    render();
+
+    const profile = state.clientProfile || {};
+    const programId = profile.program?.coachProgramId || profile.assignedProgramId || "";
+    const coachP = COACH_PROGRAMS.find((p) => p.id === programId);
+    const reasonLabel = getAdjustmentReasonLabel(reason);
+    const fromName = `${profile.firstName || ""} ${profile.lastName || ""}`.trim()
+      || auth.currentUser.displayName
+      || "Client";
+
+    try {
+      await addDoc(collection(db, "messages"), {
+        type: "adjustment",
+        fromUid: auth.currentUser.uid,
+        fromName,
+        fromEmail: profile.email || auth.currentUser.email || "",
+        subject: `Ajustement : ${reasonLabel}`,
+        message,
+        reason,
+        reasonLabel,
+        currentProgramId: programId || null,
+        currentProgramLabel: coachP ? getCoachProgramDisplayName(coachP) : (profile.program?.trackLabel || ""),
+        createdAt: new Date().toISOString(),
+        read: false,
+      });
+      state.ui.adjustmentPending = false;
+      state.ui.adjustmentSuccess = true;
+      state.drafts.adjustment = { reason: "", message: "" };
+      persistState();
+      showToast("Demande envoyée au coach.");
+      render();
+    } catch (err) {
+      console.error("Erreur demande d'ajustement:", err);
+      state.ui.adjustmentPending = false;
+      state.ui.adjustmentError = "Impossible d'envoyer la demande. Réessaie.";
+      render();
+    }
+    return;
+  }
+
+  const adjustmentResetBtn = e.target.closest("[data-adjustment-reset]");
+  if (adjustmentResetBtn) {
+    state.ui.adjustmentSuccess = false;
+    state.ui.adjustmentError = "";
     persistState();
     render();
     return;
@@ -726,12 +787,13 @@ document.addEventListener("click", async (e) => {
   const sessionActionBtn = e.target.closest("[data-session-action]");
   if (sessionActionBtn) {
     const action = sessionActionBtn.dataset.sessionAction;
+    const sessionId = sessionActionBtn.dataset.sessionId || "";
     const sessionName = sessionActionBtn.dataset.sessionName || "";
-    state.activeSession = sessionName;
-    state.activeSessionSeconds = 0; // Réinitialiser le chronomètre de séance
-    state.isTimerRunning = false; // L'utilisateur choisit explicitement de démarrer
-    if (action === 'start' || action === 'review') {
-      navigate('client-program');
+    state.activeSession = sessionId || sessionName;
+    state.activeSessionSeconds = 0;
+    state.isTimerRunning = false;
+    if (action === "start" || action === "review") {
+      navigate("client-program");
       return;
     }
   }
@@ -802,8 +864,33 @@ document.addEventListener("click", async (e) => {
       }
 
       try {
-        const targetDoc = doc(db, "users", clientId);
-        await setDoc(targetDoc, { assignedProgramId: selectedProgramId || null }, { merge: true });
+        const coachP = selectedProgramId
+          ? COACH_PROGRAMS.find((p) => p.id === selectedProgramId)
+          : null;
+
+        if (selectedProgramId && !coachP) {
+          state.adminNotice = "Programme introuvable.";
+          render();
+          return;
+        }
+
+        if (!selectedProgramId) {
+          await setDoc(doc(db, "users", clientId), { assignedProgramId: null }, { merge: true });
+        } else {
+          const confirmed = confirm("Remplacer le programme et les séances de ce client ? La semaine reprend à 1.");
+          if (!confirmed) return;
+
+          const client = (state.adminData.allUsers || state.adminData.clients || []).find((u) =>
+            (u.id && u.id === clientId) || (u.uid && u.uid === clientId)
+          );
+          await applyProgramToUser(clientId, coachP, {
+            skipLocalState: clientId !== auth.currentUser?.uid,
+            goal: client?.goal || client?.quizAnswers?.objectif,
+            track: coachP.trackId || client?.track,
+            quizAnswers: client?.quizAnswers || {},
+            physique: client?.physique || {},
+          });
+        }
 
         const client = (state.adminData.allUsers || state.adminData.clients || []).find(u =>
           (u.id && u.id === clientId) || (u.uid && u.uid === clientId)
@@ -811,10 +898,11 @@ document.addEventListener("click", async (e) => {
 
         if (client) {
           client.assignedProgramId = selectedProgramId || null;
+          if (coachP) client.program = { ...(client.program || {}), coachProgramId: coachP.id };
         }
 
         state.adminNotice = selectedProgramId
-          ? `Programme enregistré pour le client.`
+          ? `Programme appliqué : les séances du client ont été remplacées.`
           : `Programme retiré pour le client.`;
         render();
       } catch (error) {
@@ -1077,6 +1165,8 @@ document.addEventListener("click", async (e) => {
         }
       }
 
+      restorePendingOnboarding();
+      const onboardingAnswers = state.quizAnswers || {};
       await setDoc(doc(db, "users", user.uid), {
         firstName,
         lastName,
@@ -1084,7 +1174,16 @@ document.addEventListener("click", async (e) => {
         phone,
         role: assignedRole,
         createdAt: new Date().toISOString(),
+        ...(hasPendingOnboardingData(onboardingAnswers, state.pendingProgramId) ? {
+          quizAnswers: onboardingAnswers,
+          goal: onboardingAnswers.objectif || "",
+          track: onboardingAnswers.lieu || "",
+        } : {}),
       });
+
+      if (assignedRole !== "admin") {
+        await applyPendingOnboardingIfNeeded();
+      }
 
       // 3. [COMMENTAIRE] Envoi de l'e-mail de vérification Firebase pour s'assurer que l'adresse Gmail/e-mail existe réellement.
       // Le compte est créé, mais immédiatement déconnecté tant que l'e-mail n'est pas validé.
@@ -1100,7 +1199,9 @@ document.addEventListener("click", async (e) => {
       state.ui.signupError = "";
       
       // On redirige vers l'écran de connexion avec un message de succès vert très explicite incitant l'utilisateur à cliquer sur le lien d'activation.
-      state.ui.loginSuccessMessage = `Votre compte a bien été créé ! 📧 Un e-mail de vérification a été envoyé à ${email}. Veuillez cliquer sur le lien dans cet e-mail pour activer votre compte avant de pouvoir vous connecter.`;
+      state.ui.loginSuccessMessage = state.pendingProgramId
+        ? `Votre compte a bien été créé ! 📧 Un e-mail de vérification a été envoyé à ${email}. Après activation et connexion, votre programme personnalisé sera enregistré automatiquement.`
+        : `Votre compte a bien été créé ! 📧 Un e-mail de vérification a été envoyé à ${email}. Veuillez cliquer sur le lien dans cet e-mail pour activer votre compte avant de pouvoir vous connecter.`;
       state.ui.loginError = "";
       
       persistState();
@@ -1250,15 +1351,12 @@ document.addEventListener("click", async (e) => {
       state.ui.loginPending = false;
       state.ui.loginError = "";
 
-      if (state.pendingProgramId && userRole !== "admin") {
-        const pendingCoachP = COACH_PROGRAMS.find(p => p.id === state.pendingProgramId);
-        state.pendingProgramId = null;
-        persistState();
-        if (pendingCoachP) {
-          await applyProgramSelection(pendingCoachP, { skipConfirmation: true });
+      if (userRole !== "admin") {
+        const appliedOnboarding = await applyPendingOnboardingIfNeeded();
+        if (appliedOnboarding) {
           showToast("Connexion réussie et programme activé avec succès !");
           render();
-          navigate("client-program");
+          navigate("client-dashboard");
           return;
         }
       }
@@ -1357,22 +1455,19 @@ document.addEventListener("click", async (e) => {
       state.ui.loginError = "";
       state.ui.signupError = "";
 
-      if (state.pendingProgramId && userRole !== "admin") {
-        const pendingCoachP = COACH_PROGRAMS.find(p => p.id === state.pendingProgramId);
-        state.pendingProgramId = null;
-        persistState();
-        if (pendingCoachP) {
-          await applyProgramSelection(pendingCoachP, { skipConfirmation: true });
+      if (userRole !== "admin") {
+        const appliedOnboarding = await applyPendingOnboardingIfNeeded();
+        if (appliedOnboarding) {
           showToast("Connexion réussie et programme activé avec succès !");
           render();
-          navigate("client-program");
+          navigate("client-dashboard");
           return;
         }
       }
 
       persistState();
 
-      if (!userDocSnap.exists() && userRole !== "admin") {
+      if (!userDocSnap.exists() && userRole !== "admin" && !hasPendingOnboardingData()) {
         navigate("quiz");
       } else {
         navigate(userRole === "admin" ? "admin-dashboard" : "client-dashboard");
@@ -1525,12 +1620,19 @@ document.addEventListener("click", async (e) => {
     const gaCheckbox = document.getElementById("consent-ga");
     const clarityCheckbox = document.getElementById("consent-clarity");
     const { setAnalyticsConsent } = await import("./modules/privacy.js");
-    
-    if (gaCheckbox) setAnalyticsConsent(gaCheckbox.checked, "analytics");
-    if (clarityCheckbox) setAnalyticsConsent(clarityCheckbox.checked, "clarity");
-    
+
+    if (gaCheckbox || clarityCheckbox) {
+      if (gaCheckbox) setAnalyticsConsent(gaCheckbox.checked, "analytics");
+      if (clarityCheckbox) setAnalyticsConsent(clarityCheckbox.checked, "clarity");
+    } else {
+      // Pas d'outils d'audience : enregistrer le choix (essentiels + coaching)
+      setAnalyticsConsent(false, "all");
+    }
+
     const customizeModal = document.getElementById("consent-customize-modal");
     if (customizeModal) customizeModal.remove();
+    const banner = document.getElementById("consent-modal");
+    if (banner) banner.remove();
     return;
   }
 
@@ -1629,38 +1731,42 @@ document.addEventListener("submit", async (e) => {
     const profile = state.clientProfile || {};
     const program = profile.program || {};
     const sessions = program.sessions || [];
-    const activeSessionName = state.activeSession;
-    
-    // Marquer la séance comme faite
-    const sessionObj = sessions.find(s => s.name === activeSessionName);
+    const sessionObj = findClientSession(state.activeSession);
     if (sessionObj) {
       sessionObj.done = true;
+      if (notes) sessionObj.notes = notes;
     }
     
-    // Mettre à jour l'avancement de la semaine courante
     const history = program.history || [];
     const currentWeekNumber = program.week || 1;
     const currentWeekName = `Semaine ${currentWeekNumber}`;
     let weekHistoryObj = history.find(h => h.name === currentWeekName);
     if (weekHistoryObj) {
-      weekHistoryObj.done = Math.min(weekHistoryObj.total, weekHistoryObj.done + 1);
+      weekHistoryObj.done = Math.min(weekHistoryObj.total || sessions.length, weekHistoryObj.done + 1);
     } else {
-      weekHistoryObj = { name: currentWeekName, done: 1, total: 3 };
+      weekHistoryObj = { name: currentWeekName, done: 1, total: sessions.length };
       history.push(weekHistoryObj);
     }
     
-    // Si toutes les séances de la semaine sont validées, passer à la semaine suivante
     const allDone = sessions.every(s => s.done);
     if (allDone) {
       program.week = (program.week || 1) + 1;
-      // Régénérer de nouvelles séances pour la nouvelle semaine
-      program.sessions = [
-        { id: "s1", name: `Séance 1 — Progression intensive S${program.week}`, exos: 5, duree: "45 min", done: false, weekNumber: program.week },
-        { id: "s2", name: `Séance 2 — Force & Volume S${program.week}`, exos: 6, duree: "50 min", done: false, weekNumber: program.week },
-        { id: "s3", name: `Séance 3 — Métabolique S${program.week}`, exos: 5, duree: "40 min", done: false, weekNumber: program.week },
-      ];
-      // Ajouter la nouvelle semaine dans l'historique de progression
-      history.push({ name: `Semaine ${program.week}`, done: 0, total: 3 });
+      const coachP = COACH_PROGRAMS.find((p) => p.id === program.coachProgramId);
+      if (coachP) {
+        const rebuilt = buildClientProgramFromCoach(coachP, {
+          week: program.week,
+          track: program.track,
+          history,
+        });
+        program.sessions = rebuilt.sessions;
+        history.push({ name: `Semaine ${program.week}`, done: 0, total: rebuilt.sessions.length });
+      } else {
+        sessions.forEach((s) => {
+          s.done = false;
+          s.weekNumber = program.week;
+        });
+        history.push({ name: `Semaine ${program.week}`, done: 0, total: sessions.length });
+      }
     }
     
     const { updateUserProfile } = await import("./modules/privacy.js");
@@ -1680,6 +1786,11 @@ document.addEventListener("submit", async (e) => {
       await updateUserProfile({
         program: program
       });
+      try {
+        await replaceUserSessionDocs(auth.currentUser.uid, program.sessions || []);
+      } catch (err) {
+        console.warn("Mise à jour des séances Firestore:", err);
+      }
     }
     
     persistState();
@@ -2066,7 +2177,7 @@ export function showPasswordResetSuccessModal(email) {
       <div style="width: 56px; height: 56px; background: var(--ember-soft); color: var(--ember); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; font-size: 24px;">
         ⚠️
       </div>
-      <h2 style="margin: 0 0 12px; font-family: 'Archivo Black', sans-serif; font-size: 20px; color: var(--ink);">Lien envoyé avec succès !</h2>
+      <h2 style="margin: 0 0 12px; font-family: var(--font-display); font-size: 20px; color: var(--ink);">Lien envoyé avec succès !</h2>
       <p style="font-size: 14px; color: var(--slate); line-height: 1.6; margin: 0 0 16px;">
         Un e-mail de réinitialisation/définition de mot de passe a été envoyé à l'adresse :<br>
         <strong style="color: var(--ink); font-weight: 600;">${email}</strong>
@@ -2118,7 +2229,7 @@ export function showForgotPasswordModal() {
       width: 100%; box-shadow: 0 24px 64px rgba(0,0,0,0.35); border: 1px solid var(--line);
     ">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--line); padding-bottom: 12px;">
-        <h2 style="margin: 0; font-size: 18px; font-weight: 700; font-family: 'Archivo Black', sans-serif;">Mot de passe oublié ?</h2>
+        <h2 style="margin: 0; font-size: 18px; font-weight: 700; font-family: var(--font-display);">Mot de passe oublié ?</h2>
         <button id="close-forgot-pw-modal" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--slate); font-weight: bold;">&times;</button>
       </div>
 
@@ -2198,7 +2309,7 @@ export function showQuickMetricsModal() {
       width: 100%; box-shadow: 0 24px 64px rgba(0,0,0,0.35); border: 1px solid var(--line);
     ">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--line); padding-bottom: 12px;">
-        <h2 style="margin: 0; font-size: 18px; font-weight: 700; font-family: 'Archivo Black', sans-serif;">Mensurations Fitness</h2>
+        <h2 style="margin: 0; font-size: 18px; font-weight: 700; font-family: var(--font-display);">Mensurations Fitness</h2>
         <button id="close-metrics-modal" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--slate); font-weight: bold;">&times;</button>
       </div>
 
@@ -2353,7 +2464,7 @@ export function showBodyMeasurementsModal() {
       width: 100%; box-shadow: 0 24px 64px rgba(0,0,0,0.35); border: 1px solid var(--line);
     ">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--line); padding-bottom: 12px;">
-        <h2 style="margin: 0; font-size: 18px; font-weight: 800; font-family: 'Archivo Black', sans-serif; color: var(--ink); display: flex; align-items: center; gap: 8px;">
+        <h2 style="margin: 0; font-size: 18px; font-weight: 800; font-family: var(--font-display); color: var(--ink); display: flex; align-items: center; gap: 8px;">
           📐 Mensurations Corporelles
         </h2>
         <button id="close-measurements-modal-btn" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--slate); font-weight: bold;">&times;</button>
@@ -2464,7 +2575,7 @@ window.viewFullImage = function(url, title = "Aperçu de la Photo") {
   modal.innerHTML = `
     <div style="position: relative; max-width: 90vw; max-height: 90vh; text-align: center;">
       <button id="close-lightbox-btn" style="position: absolute; top: -45px; right: 0; background: none; border: none; color: white; font-size: 32px; cursor: pointer; font-weight: bold;">&times;</button>
-      <h3 style="color: white; font-size: 15px; margin-bottom: 12px; font-weight: 700; font-family: 'IBM Plex Mono', monospace;">${title}</h3>
+      <h3 style="color: white; font-size: 15px; margin-bottom: 12px; font-weight: 700; font-family: var(--font-mono);">${title}</h3>
       <img src="${url}" style="max-width: 100%; max-height: 80vh; border-radius: 8px; box-shadow: 0 16px 48px rgba(0,0,0,0.8); object-fit: contain; border: 1px solid rgba(255,255,255,0.2);" />
     </div>
   `;

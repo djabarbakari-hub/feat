@@ -52,7 +52,7 @@ export function renderContact() {
           <span class="font-mono" style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; padding: 4px 10px; background: rgba(226, 98, 45, 0.15); color: var(--ember); border-radius: 4px; font-weight: 700;">
             [ CONTACT & SUPPORT ]
           </span>
-          <span style="font-size: 12px; color: var(--ink-muted2); font-family: var(--font-mono, monospace);">MonProgrammeFit — À votre écoute</span>
+          <span style="font-size: 12px; color: var(--ink-muted2); font-family: var(--font-mono);">MonProgrammeFit — À votre écoute</span>
         </div>
 
         <h1 class="font-display h1" style="max-width: 800px; margin: 0 0 16px 0; font-size: clamp(28px, 4.5vw, 44px); line-height: 1.15; color: var(--chalk) !important;">

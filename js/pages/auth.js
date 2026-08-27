@@ -168,6 +168,7 @@ export function renderLogin() {
 
 export function renderSignup() {
   const d = state.drafts.signup;
+  const fromOnboarding = !!(state.pendingProgramId || (state.quizAnswers?.objectif && state.quizAnswers?.lieu));
   return `
   <div class="auth-page-container" style="background: var(--chalk);">
     <div class="auth-wrap">
@@ -185,11 +186,13 @@ export function renderSignup() {
             </div>
 
             <h1 class="font-display auth-title" style="color: #ffffff;">
-              Commencez votre transformation dès aujourd'hui.
+              ${fromOnboarding ? "Ton programme est prêt. Crée ton compte pour continuer." : "Commencez votre transformation dès aujourd'hui."}
             </h1>
 
             <p class="auth-desc">
-              Créez votre profil en quelques secondes pour accéder à vos programmes personnalisés.
+              ${fromOnboarding
+                ? "Tes réponses d'onboarding sont enregistrées. Un compte te permet de sauvegarder ton programme et d'accéder à ton espace athlète."
+                : "Créez votre profil en quelques secondes pour accéder à vos programmes personnalisés."}
             </p>
 
             <!-- POINTS FORTS INSCRIPTION -->
@@ -238,8 +241,8 @@ export function renderSignup() {
         <div class="auth-form-card">
           
           <div style="margin-bottom: 12px;">
-            <h2 class="font-display auth-title" style="color: var(--ink);">Créer mon compte</h2>
-            <p class="auth-desc" style="margin: 0;">Rejoignez-nous et commencez votre entraînement.</p>
+            <h2 class="font-display auth-title" style="color: var(--ink);">${fromOnboarding ? "Dernière étape" : "Créer mon compte"}</h2>
+            <p class="auth-desc" style="margin: 0;">${fromOnboarding ? "Crée ton compte pour enregistrer ton programme et continuer." : "Rejoignez-nous et commencez votre entraînement."}</p>
           </div>
 
           <!-- BOUTON GOOGLE -->

@@ -6,5 +6,5 @@
 - **Alternative** : Supabase (si nécessaire)
 
 ## Google Fonts
-- **Usage** : Polices Archivo et IBM Plex Mono
+- **Usage** : Police Inter
 - **Risque** : Aucun (fallback sur les polices système)

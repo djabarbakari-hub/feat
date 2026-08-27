@@ -2,9 +2,10 @@
    pages/quiz.js — Quiz d'onboarding (personnalisation du programme).
    ========================================================== */
 
-import { QUIZ_STEPS } from "../data.js";
+import { QUIZ_STEPS, TRACKS } from "../data.js";
 import { state } from "../state.js";
-import { icon, trackById, escapeHtml } from "../helpers.js";
+import { icon, trackById, escapeHtml, getMatchingCoachProgram } from "../helpers.js";
+import { getGoalLabel, getCoachProgramDisplayName } from "../modules/program.js";
 
 /**
  * Rend le quiz de personnalisation avec animations et gestion des étapes.
@@ -29,14 +30,15 @@ export function renderQuiz() {
   `;
 
   if (state.quizStep >= QUIZ_STEPS.length) {
-    const result = trackById(state.quizAnswers.lieu);
+    const coachP = getMatchingCoachProgram(state.quizAnswers.objectif, state.quizAnswers.lieu);
+    const programName = getCoachProgramDisplayName(coachP);
     const actionButton = state.role === 'client'
       ? `<div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 1.5rem;">
            <button class="btn btn-ember" data-nav="client-dashboard" aria-label="Voir mon tableau de bord">Voir mon tableau de bord ${icon("arrow-right", 14)}</button>
            <button type="button" class="btn btn-outline-dark" data-quiz-restart>${icon("rotate-ccw", 14)} Refaire le questionnaire</button>
          </div>`
       : `<div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 1.5rem;">
-           <button class="btn btn-ember" data-nav="signup" aria-label="Créer mon compte et démarrer">Créer mon compte et démarrer ${icon("arrow-right", 14)}</button>
+           <button class="btn btn-ember" data-quiz-confirm aria-label="Créer mon compte et démarrer">Créer mon compte pour continuer ${icon("arrow-right", 14)}</button>
            <button type="button" class="btn btn-outline-dark" data-quiz-restart>${icon("rotate-ccw", 14)} Recommencer le test</button>
          </div>`;
 
@@ -44,11 +46,11 @@ export function renderQuiz() {
     ${quizAnimation}
     <div class="section wrap">
       <p class="eyebrow-moss font-mono">RÉSULTAT</p>
-      <h1 class="h2 font-display">Ton point de départ : ${result.label}</h1>
+      <h1 class="h2 font-display">Ton programme : ${escapeHtml(programName)}</h1>
       <div class="card" style="padding:2rem; animation: fadeIn 0.6s ease-out;max-width:100%;">
-        ${icon(result.icon, 1.75, "var(--accent-primary)")}
-        <p style="font-size:1rem;color:var(--text-secondary);margin-top:1rem; line-height: 1.7;">${result.desc}</p>
-        <div class="font-mono" style="font-size:0.875rem;color:var(--accent-secondary);margin-top:1rem">${result.dist}</div>
+        ${icon(coachP.icon || "dumbbell", 1.75, "var(--accent-primary)")}
+        <p style="font-size:1rem;color:var(--text-secondary);margin-top:1rem; line-height: 1.7;">${escapeHtml(coachP.objective || coachP.subtitle || "")}</p>
+        <div class="font-mono" style="font-size:0.875rem;color:var(--accent-secondary);margin-top:1rem">${escapeHtml(coachP.duration || "")} · ${escapeHtml(coachP.frequency || "")}</div>
         ${actionButton}
       </div>
     </div>`;
@@ -59,12 +61,12 @@ export function renderQuiz() {
 
   let options = s.options || [];
   if (s.key === "lieu") {
-    const list = state.tracks && state.tracks.length > 0 ? state.tracks : s.options;
-    options = list.map(t => ({
-      v: t.id,
-      l: t.label,
-      icon: t.icon
-    }));
+    const list = (state.tracks && state.tracks.length > 0) ? state.tracks : (s.options?.length ? s.options : TRACKS);
+    options = list.map((t) => ({
+      v: t.v || t.id,
+      l: t.l || t.label || t.name || "",
+      icon: t.icon || "dumbbell",
+    })).filter((opt) => opt.v && opt.l);
   }
 
   let content;
@@ -126,17 +128,19 @@ export function renderQuiz() {
     `;
   } else if (s.type === "resume") {
     const result = trackById(state.quizAnswers.lieu);
+    const coachP = getMatchingCoachProgram(state.quizAnswers.objectif, state.quizAnswers.lieu);
     content = `
       <div class="quiz-resume">
-        <div class="quiz-resume-item">Objectif : <strong>${escapeHtml(state.quizAnswers.objectif)}</strong></div>
+        <div class="quiz-resume-item">Objectif : <strong>${escapeHtml(getGoalLabel(state.quizAnswers.objectif))}</strong></div>
         <div class="quiz-resume-item">Lieu : <strong>${escapeHtml(result.label)}</strong></div>
+        <div class="quiz-resume-item">Programme : <strong>${escapeHtml(getCoachProgramDisplayName(coachP))}</strong></div>
         ${state.quizAnswers.physique?.poids ? `<div class="quiz-resume-item">Poids : <strong>${escapeHtml(state.quizAnswers.physique.poids)} kg</strong></div>` : ""}
         ${state.quizAnswers.physique?.taille ? `<div class="quiz-resume-item">Taille : <strong>${escapeHtml(state.quizAnswers.physique.taille)} cm</strong></div>` : ""}
         ${state.quizAnswers.physique?.age ? `<div class="quiz-resume-item">Âge : <strong>${escapeHtml(state.quizAnswers.physique.age)} ans</strong></div>` : ""}
       </div>
       <div class="quiz-buttons" style="flex-wrap: wrap; margin-top: 1.5rem;">
         <button type="button" class="btn btn-outline-dark" data-quiz-back>${icon("arrow-left", 14)} Retour</button>
-        <button type="button" class="btn btn-ember" data-quiz-confirm>Confirmer et commencer</button>
+        <button type="button" class="btn btn-ember" data-quiz-confirm>${state.role === "guest" ? "Créer mon compte pour continuer" : "Confirmer et commencer"}</button>
         <button type="button" class="btn btn-outline-dark" data-quiz-restart style="margin-left:auto;">${icon("rotate-ccw", 14)} Recommencer</button>
       </div>
     `;

@@ -48,13 +48,13 @@ export function getUserAvatarHtml({
     return `
       <div class="user-avatar-wrap ${className}" style="${containerStyle}">
         <img src="${escapeHtml(photo)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;" alt="${escapeHtml(initials)}" referrerpolicy="no-referrer" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';" />
-        <span style="display:none; align-items:center; justify-content:center; width:100%; height:100%; background:var(--ember); color:#ffffff; font-size:${Math.round(size * 0.42)}px; font-weight:800; font-family:'Archivo', sans-serif;">${escapeHtml(initials)}</span>
+        <span style="display:none; align-items:center; justify-content:center; width:100%; height:100%; background:var(--ember); color:#ffffff; font-size:${Math.round(size * 0.42)}px; font-weight:800; font-family:var(--font-sans);">${escapeHtml(initials)}</span>
       </div>
     `;
   }
 
   return `
-    <div class="user-avatar-wrap ${className}" style="${containerStyle} background:var(--ember); color:#ffffff; font-size:${Math.round(size * 0.42)}px; font-weight:800; font-family:'Archivo', sans-serif;">
+    <div class="user-avatar-wrap ${className}" style="${containerStyle} background:var(--ember); color:#ffffff; font-size:${Math.round(size * 0.42)}px; font-weight:800; font-family:var(--font-sans);">
       ${escapeHtml(initials)}
     </div>
   `;

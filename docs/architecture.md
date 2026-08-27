@@ -24,6 +24,7 @@ Application monopage (SPA) en JavaScript modulaire, bundlée avec Vite. L'état 
 | `app.js`             | Logique métier et rendu dynamique.                                  | État, navigation, interactions.         | Aucune fonctionnalité ne marche.         |
 | `js/modules/workoutTimer.js` | Chronomètre et diction vocale écran éteint.                    | Web Worker, Web Audio, MediaSession, WakeLock. | Chronomètre et voix ne marchent pas.  |
 | `js/modules/privacy.js` | RGPD, export et purge intégrale Firestore.                          | Consentement, effacement de données.    | Violation RGPD et fonctions de compte.  |
+| `js/modules/program.js` | Application d’un programme coach et lookup des séances par id.     | Changement de plan, exercices du bon jour. | Séances mélangées, assignation admin inerte. |
 | `js/pages/quiz.js`   | Gestion du quiz de personnalisation.                                 | Rendu des étapes, animations.           | Le quiz ne s'affiche pas.                |
 | `js/pages/admin.js`  | Espace admin (clients, programmes, messages).                        | Tableau de bord, statistiques.          | L'admin ne fonctionne plus.              |
 | `docs/`              | Documentation technique et mémoire du projet.                       | Traçabilité, onboarding.                | Perte de contexte pour les futurs devs.  |
@@ -48,7 +49,7 @@ Application monopage (SPA) en JavaScript modulaire, bundlée avec Vite. L'état 
   - Collections :
     - `users` : Stocke les profils utilisateurs.
     - `sessions` (sous-collection) : Historique des sessions d'entraînement.
-    - `messages` : Messages de contact.
+    - `messages` : Messages de contact et demandes d’ajustement de programme (`type: adjustment`).
   - Opérations : `get`, `add`, `update`, `delete`.
 - **Firebase Storage** : Stockage des images de programmes (si applicable).
 
@@ -73,7 +74,7 @@ Application monopage (SPA) en JavaScript modulaire, bundlée avec Vite. L'état 
 | Vite | ^6.3.5 | Bundler, serveur de dev. | Oui. | Webpack, Parcel. |
 | Firebase | ^11.3.0 | Authentification, BDD (Firestore).| Oui. | Supabase, AWS Amplify. |
 | Lucide | ^0.507.0 | Icônes (via npm). | Non. | Heroicons, Feather Icons. |
-| Google Fonts | - | Polices (Archivo Black, Archivo, IBM Plex Mono). | Oui. | Polices système (dégradation). |
+| Google Fonts | - | Police Inter (300–900). | Oui. | Polices système (dégradation). |
 | Firebase Storage | ^11.3.0 | Stockage des médias (images, vidéos). | Non (MVP). | AWS S3, Cloudinary. |
 
 ## Alias de compatibilité dans `tokens.css`

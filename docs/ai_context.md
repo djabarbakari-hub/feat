@@ -13,7 +13,7 @@
 - **Référence** : `css/tokens.css` (variables `--ink`, `--ember`, `--moss`, `--chalk`).
 
 ### Typographie
-- **Polices** : `Archivo Black` (titres), `Archivo` (corps), `IBM Plex Mono` (utilitaire).
+- **Polices** : `Inter` (titres, corps, utilitaire) — Google Fonts, poids 300–900.
 - **Rationale** : Équilibre entre élégance et lisibilité pour une app fitness premium.
 
 ### Animations
@@ -45,7 +45,8 @@
 
 ### Bonnes Pratiques
 - **Échappement HTML** : Utiliser `escapeHtml()` de `js/helpers.js` pour toute valeur utilisateur injectée dans le DOM.
-- **Modularisation** : Chaque page a son fichier dans `js/pages/` (ex: `quiz.js`, `admin.js`), et les fonctionnalités autonomes sont isolées dans `js/modules/` (`workoutTimer.js`, `privacy.js`, `consent-modal.js`).
+- **Modularisation** : Chaque page a son fichier dans `js/pages/` (ex: `quiz.js`, `admin.js`), et les fonctionnalités autonomes sont isolées dans `js/modules/` (`workoutTimer.js`, `privacy.js`, `consent-modal.js`, `program.js`).
+- **Programmes coach** : `js/modules/program.js` applique un programme à un compte (écrase les séances Firestore), et lit les exercices par `session.id` dans le programme assigné — jamais par le mot « lundi » dans tout le catalogue.
 - **Chronomètre & Diction Écran Éteint** : `js/modules/workoutTimer.js` combine Web Worker, Web Audio API, Screen Wake Lock et MediaSession API pour assurer l'énonciation vocale continue même smartphone verrouillé.
 - **Assets Visuels Critiques (Base64)** : La photo du coach et l'icône WhatsApp sont exportées sous forme de Data URIs Base64 autonomes dans `js/assets.js` (`COACH_AVATAR`, `WHATSAPP_ICON`). Cela garantit un rendu instantané à 100% sur tout serveur ou déploiement Vercel/Netlify sans dépendre de requêtes d'images HTTP externes.
 - **Programmes de Entraînement Officiels (Coach Abdou BAKARI)** : La constante `COACH_PROGRAMS` dans `js/data.js` centralise les programmes rédigés sur-mesure par le coach (ex: "Programme Prise de Muscle — Maison avec matériel"). Les modules `js/pages/client.js`, `js/pages/guest.js` et `js/events.js` l'exploitent pour générer la feuille de route des séances, le player interactif, le calcul des repos/tempo et le plan de progression sur 8 semaines.

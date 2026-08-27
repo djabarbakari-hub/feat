@@ -12,9 +12,14 @@
    cassé ces écrans-là (variables CSS non définies = style ignoré).
    ========================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'Inter', system-ui, sans-serif;
+
   /* --- Palette d'origine (abdou.zip) --- */
   --ink: #16232C;
   --ink-line: #2A3A45;
@@ -74,8 +79,10 @@ body {
   display: flex;
   flex-direction: column;
   background: var(--chalk);
-  font-family: 'Archivo', sans-serif;
+  font-family: var(--font-sans);
   color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 main {
@@ -130,11 +137,11 @@ a { text-decoration: none; }
 }
 .skip-link:focus-visible { top: 16px; }
 
-.font-display { font-family: 'Archivo Black', 'Archivo', sans-serif; }
-.font-body { font-family: 'Archivo', sans-serif; }
-.font-mono { font-family: 'IBM Plex Mono', monospace; }
+.font-display { font-family: var(--font-display); font-weight: 900; }
+.font-body { font-family: var(--font-body); }
+.font-mono { font-family: var(--font-mono); }
 
-h1, h2, h3, h4, h5, h6 { font-family: 'Archivo Black', 'Archivo', sans-serif; color: var(--ink); margin: 0 0 16px; }
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 900; color: var(--ink); margin: 0 0 16px; }
 
 .wrap {
   width: min(100%, 1152px);

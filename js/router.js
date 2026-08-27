@@ -2,7 +2,7 @@
    router.js — Navigation entre pages, historique navigateur.
    ========================================================== */
 
-import { state, persistState } from "./state.js";
+import { state, persistState, clearPendingOnboarding } from "./state.js";
 import { showToast, closeMobileMenu } from "./helpers.js";
 
 // Assigné depuis main.js pour éviter une dépendance circulaire avec render.js
@@ -27,10 +27,9 @@ export function updateBrowserHistory(page, { replace = false } = {}) {
  * @param {string} page - Nom de la page (ex: "home", "programs").
  */
 export function navigate(page, { replace = false } = {}) {
-  if (page === "quiz" && state.role === "guest") {
-    showToast("Veuillez vous connecter ou vous inscrire pour commencer l'onboarding.");
-    page = "signup";
-  } else if ((page.startsWith("client") || page.startsWith("admin")) && state.role === "guest") {
+  if (page.startsWith("admin") && state.role !== "admin") {
+    page = state.role === "client" ? "client-dashboard" : "signup";
+  } else if (page.startsWith("client") && state.role === "guest") {
     page = "signup";
   }
 
@@ -48,20 +47,22 @@ export function navigate(page, { replace = false } = {}) {
   if (!replace && state.page && state.page !== page) {
     state.history.push(state.page);
   }
+
+  // Invité qui relance "Trouver mon programme" : nouveau quiz vide.
+  // On ne conserve l'ancien brouillon que sur la page signup (après confirmation du quiz).
+  if (page === "quiz" && state.role === "guest") {
+    state.quizStep = 0;
+    state.quizAnswers = {};
+    state.pendingProgramId = null;
+    clearPendingOnboarding();
+  }
+
   state.page = page;
   state.backExitAttempted = false;
   persistState();
   updateBrowserHistory(page, { replace });
   renderFn();
   window.scrollTo({ top: 0, behavior: "smooth" });
-
-  // Réinitialiser le step du quiz si on navigue vers le quiz ou si on retourne à l'accueil
-  if (page === "quiz" || page === "home") {
-    state.quizStep = 0;
-    if (page === "home" && (!state.clientProfile?.quizAnswers || Object.keys(state.clientProfile.quizAnswers).length === 0)) {
-      state.quizAnswers = {};
-    }
-  }
 }
 
 export function goBack() {

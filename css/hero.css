@@ -23,7 +23,7 @@
 .hero-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 24px;
+  gap: 28px;
   align-items: center;
 }
 
@@ -43,7 +43,7 @@
   line-height: 1.1;
   color: var(--text-primary);
   margin: 0;
-  font-family: 'Archivo Black', 'Archivo', sans-serif;
+  font-family: var(--font-display);
   font-weight: 900;
 }
 
@@ -55,7 +55,7 @@
 
 @media (min-width: 768px) {
   .h1 {
-    font-size: 4rem;
+    font-size: clamp(2.25rem, 4vw, 3.25rem);
   }
 }
 

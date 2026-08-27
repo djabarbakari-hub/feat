@@ -90,12 +90,12 @@ export function renderPrivacyPage() {
         <div style="background: linear-gradient(135deg, var(--ink) 0%, #1c2b36 100%); color: white; border-radius: 14px; padding: 24px 28px; margin-top: 10px; margin-bottom: 28px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 12px 30px rgba(22,35,44,0.12); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 18px;">
           <div>
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-              <span style="font-size: 10px; font-family: 'IBM Plex Mono', monospace; font-weight: 800; text-transform: uppercase; background: var(--ember); color: white; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.05em;">
+              <span style="font-size: 10px; font-family: var(--font-mono); font-weight: 800; text-transform: uppercase; background: var(--ember); color: white; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.05em;">
                 CONSOLE D'ADMINISTRATION & AUDIT
               </span>
-              <span style="font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 600; font-family: 'IBM Plex Mono', monospace;">[ID: ${auth.currentUser?.uid?.substring(0, 8) || "admin"}]</span>
+              <span style="font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 600; font-family: var(--font-mono);">[ID: ${auth.currentUser?.uid?.substring(0, 8) || "admin"}]</span>
             </div>
-            <h1 style="font-size: 24px; font-family: 'Archivo Black', sans-serif; color: white; margin: 0 0 4px 0;">Données Coach & Journal d'Audit</h1>
+            <h1 style="font-size: 24px; font-family: var(--font-display); color: white; margin: 0 0 4px 0;">Données Coach & Journal d'Audit</h1>
             <p style="color: rgba(255,255,255,0.75); margin: 0; font-size: 12px; max-width: 620px; line-height: 1.4;">
               Gestion unifiée du compte administrateur, sécurité des accès coach, suivi analytique et journal d'audit de sécurité.
             </p>
@@ -116,7 +116,7 @@ export function renderPrivacyPage() {
           
           <div class="console-kpi-card" style="background: white; border: 1px solid var(--line); border-radius: 12px; padding: 18px; box-shadow: 0 4px 16px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between;">
             <div>
-              <div style="font-size: 10px; font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; font-weight: 800; color: var(--slate); letter-spacing: 0.05em;">COMPTE COACH</div>
+              <div style="font-size: 10px; font-family: var(--font-mono); text-transform: uppercase; font-weight: 800; color: var(--slate); letter-spacing: 0.05em;">COMPTE COACH</div>
               <div style="font-size: 15px; font-weight: 800; color: var(--ink); margin-top: 6px;">
                 ${escapeHtml((profile.firstName || "Abdou") + " " + (profile.lastName || "BAKARI"))}
               </div>
@@ -130,7 +130,7 @@ export function renderPrivacyPage() {
 
           <div class="console-kpi-card" style="background: white; border: 1px solid var(--line); border-radius: 12px; padding: 18px; box-shadow: 0 4px 16px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between;">
             <div>
-              <div style="font-size: 10px; font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; font-weight: 800; color: var(--slate); letter-spacing: 0.05em;">SESSION SÉCURISÉE</div>
+              <div style="font-size: 10px; font-family: var(--font-mono); text-transform: uppercase; font-weight: 800; color: var(--slate); letter-spacing: 0.05em;">SESSION SÉCURISÉE</div>
               <div style="font-size: 14px; font-weight: 800; color: var(--moss); margin-top: 6px;">
                 Connecté / Firebase Auth
               </div>
@@ -146,7 +146,7 @@ export function renderPrivacyPage() {
 
           <div class="console-kpi-card" style="background: white; border: 1px solid var(--line); border-radius: 12px; padding: 18px; box-shadow: 0 4px 16px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between;">
             <div>
-              <div style="font-size: 10px; font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; font-weight: 800; color: var(--slate); letter-spacing: 0.05em;">LOGS D'AUDIT</div>
+              <div style="font-size: 10px; font-family: var(--font-mono); text-transform: uppercase; font-weight: 800; color: var(--slate); letter-spacing: 0.05em;">LOGS D'AUDIT</div>
               <div style="font-size: 14px; font-weight: 800; color: var(--ink); margin-top: 6px;">
                 ${deletionLogs.length} évènement(s)
               </div>
@@ -159,7 +159,7 @@ export function renderPrivacyPage() {
 
           <div class="console-kpi-card" style="background: white; border: 1px solid var(--line); border-radius: 12px; padding: 18px; box-shadow: 0 4px 16px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between;">
             <div>
-              <div style="font-size: 10px; font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; font-weight: 800; color: var(--slate); letter-spacing: 0.05em;">ANALYTICS EN DIRECT</div>
+              <div style="font-size: 10px; font-family: var(--font-mono); text-transform: uppercase; font-weight: 800; color: var(--slate); letter-spacing: 0.05em;">ANALYTICS EN DIRECT</div>
               <div style="font-size: 14px; font-weight: 800; color: var(--ink); margin-top: 6px;">
                 ${hasGA || hasClarity ? "Détecté & Actif" : "Non configuré"}
               </div>
@@ -386,12 +386,12 @@ export function renderPrivacyPage() {
       <div style="background: linear-gradient(135deg, var(--ink) 0%, #1c2b36 100%); color: white; border-radius: 14px; padding: 24px 28px; margin-top: 10px; margin-bottom: 28px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 12px 30px rgba(22,35,44,0.12); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 18px;">
         <div>
           <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-            <span style="font-size: 10px; font-family: 'IBM Plex Mono', monospace; font-weight: 800; text-transform: uppercase; background: var(--moss); color: white; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.05em;">
+            <span style="font-size: 10px; font-family: var(--font-mono); font-weight: 800; text-transform: uppercase; background: var(--moss); color: white; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.05em;">
               CENTRE DE CONFIDENTIALITÉ & RGPD
             </span>
-            <span style="font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 600; font-family: 'IBM Plex Mono', monospace;">[ESPACE CLIENT SÉCURISÉ]</span>
+            <span style="font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 600; font-family: var(--font-mono);">[ESPACE CLIENT SÉCURISÉ]</span>
           </div>
-          <h1 style="font-size: 24px; font-family: 'Archivo Black', sans-serif; color: white; margin: 0 0 4px 0;">Mes Données Personnelles</h1>
+          <h1 style="font-size: 24px; font-family: var(--font-display); color: white; margin: 0 0 4px 0;">Mes Données Personnelles</h1>
           <p style="color: rgba(255,255,255,0.75); margin: 0; font-size: 12px; max-width: 620px; line-height: 1.4;">
             Gérez la sécurité de votre compte, votre profil sportif, vos préférences de confidentialité et téléchargez l'intégralité de vos données en un clic.
           </p>
@@ -436,7 +436,7 @@ export function renderPrivacyPage() {
         <!-- KPI 1: Identité -->
         <div class="console-kpi-card" style="background: white; border: 1px solid var(--line); border-radius: 12px; padding: 18px; box-shadow: 0 4px 16px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
-            <div style="font-size: 10px; font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; font-weight: 800; color: var(--slate); letter-spacing: 0.05em;">COMPTE ATHLÈTE</div>
+            <div style="font-size: 10px; font-family: var(--font-mono); text-transform: uppercase; font-weight: 800; color: var(--slate); letter-spacing: 0.05em;">COMPTE ATHLÈTE</div>
             <div style="font-size: 15px; font-weight: 800; color: var(--ink); margin-top: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
               ${escapeHtml((profile.firstName || "Mon") + " " + (profile.lastName || "Profil"))}
             </div>
@@ -453,7 +453,7 @@ export function renderPrivacyPage() {
         <!-- KPI 2: Profil Sportif -->
         <div class="console-kpi-card" style="background: white; border: 1px solid var(--line); border-radius: 12px; padding: 18px; box-shadow: 0 4px 16px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
-            <div style="font-size: 10px; font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; font-weight: 800; color: var(--slate); letter-spacing: 0.05em;">OBJECTIF & DISPOSITION</div>
+            <div style="font-size: 10px; font-family: var(--font-mono); text-transform: uppercase; font-weight: 800; color: var(--slate); letter-spacing: 0.05em;">OBJECTIF & DISPOSITION</div>
             <div style="font-size: 14px; font-weight: 800; color: var(--ember); margin-top: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
               ${escapeHtml(goalLabels[profile.goal] || profile.goal || "À configurer")}
             </div>
@@ -469,7 +469,7 @@ export function renderPrivacyPage() {
         <!-- KPI 3: Questionnaire & Programme -->
         <div class="console-kpi-card" style="background: white; border: 1px solid var(--line); border-radius: 12px; padding: 18px; box-shadow: 0 4px 16px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
-            <div style="font-size: 10px; font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; font-weight: 800; color: var(--slate); letter-spacing: 0.05em;">PROGRAMME ACTIF</div>
+            <div style="font-size: 10px; font-family: var(--font-mono); text-transform: uppercase; font-weight: 800; color: var(--slate); letter-spacing: 0.05em;">PROGRAMME ACTIF</div>
             <div style="font-size: 14px; font-weight: 800; color: var(--ink); margin-top: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
               ${activeProgramName ? escapeHtml(activeProgramName) : "Aucun attribué"}
             </div>
@@ -485,7 +485,7 @@ export function renderPrivacyPage() {
         <!-- KPI 4: Sécurité & Analytics -->
         <div class="console-kpi-card" style="background: white; border: 1px solid var(--line); border-radius: 12px; padding: 18px; box-shadow: 0 4px 16px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
-            <div style="font-size: 10px; font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; font-weight: 800; color: var(--slate); letter-spacing: 0.05em;">SÉCURITÉ & PROTECTION</div>
+            <div style="font-size: 10px; font-family: var(--font-mono); text-transform: uppercase; font-weight: 800; color: var(--slate); letter-spacing: 0.05em;">SÉCURITÉ & PROTECTION</div>
             <div style="font-size: 14px; font-weight: 800; color: var(--ink); margin-top: 6px;">
               ${isGoogleAuth ? "Authentification Google" : "E-mail & Chiffrement"}
             </div>
@@ -887,7 +887,7 @@ export function showEditProfileModal() {
       max-height: 90vh; overflow-y: auto; border: 1px solid var(--line);
     ">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--line); padding-bottom: 14px;">
-        <h2 style="margin: 0; font-size: 20px; font-family: var(--font-display, sans-serif); display: flex; align-items: center; gap: 10px;">
+        <h2 style="margin: 0; font-size: 20px; font-family: var(--font-display); display: flex; align-items: center; gap: 10px;">
           ${icon("edit", 18, "var(--ember)")} Modifier mes informations personnelles
         </h2>
         <button id="close-edit-modal" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--slate); font-weight: bold;">&times;</button>
