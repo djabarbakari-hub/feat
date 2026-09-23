@@ -4,9 +4,8 @@
    Objectif : montrer le geste sans envoyer l'utilisateur sur YouTube.
    ========================================================== */
 
-import catalog from "../data/free-exercise-catalog.json";
-import gifCatalog from "../data/exercisedb-gifs.json";
-import { escapeHtml } from "../helpers.js";
+import catalog from "./data/free-exercise-catalog.json";
+import gifCatalog from "./data/exercisedb-gifs.json";
 
 const PHOTO_BASE = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/";
 const GIF_BASE = "https://static.exercisedb.dev/media/";
@@ -299,50 +298,4 @@ export function resolveExerciseVisual(exerciseName) {
         ? "Illustration : free-exercise-db"
         : "",
   };
-}
-
-/**
- * HTML d'une vignette illustration pour une carte exercice.
- */
-export function renderExerciseVisualHtml(exerciseName, { compact = false } = {}) {
-  const visual = resolveExerciseVisual(exerciseName);
-  const src = visual.gif || visual.photo;
-  const height = compact ? "88px" : "140px";
-  const width = compact ? "120px" : "100%";
-
-  if (!src) {
-    return `
-      <div class="exo-visual exo-visual--empty" aria-hidden="true" style="width:${width}; min-height:${height};">
-        <span class="exo-visual__placeholder">${escapeHtml((exerciseName || "?").slice(0, 2).toUpperCase())}</span>
-      </div>
-    `;
-  }
-
-  return `
-    <figure class="exo-visual" style="width:${width};">
-      <img
-        class="exo-visual__img"
-        src="${escapeHtml(src)}"
-        alt="Démonstration : ${escapeHtml(visual.label)}"
-        loading="lazy"
-        decoding="async"
-        style="height:${height};"
-        data-fallback-photo="${visual.photo && visual.gif ? escapeHtml(visual.photo) : ""}"
-        onerror="if(this.dataset.fallbackPhoto){this.src=this.dataset.fallbackPhoto;this.dataset.fallbackPhoto='';}else{this.closest('.exo-visual')?.classList.add('exo-visual--empty');this.remove();}"
-      />
-      ${visual.credit ? `<figcaption class="exo-visual__credit">${escapeHtml(visual.credit)}</figcaption>` : ""}
-    </figure>
-  `;
-}
-
-/**
- * Lien YouTube secondaire — désactivé pour garder l'utilisateur dans l'app.
- */
-export function renderYoutubeSecondaryLink(_exerciseName) {
-  // return `
-  //   <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(`${_exerciseName} exercice musculation`)}" target="_blank" rel="noopener noreferrer" class="exo-yt-secondary">
-  //     Voir aussi sur YouTube
-  //   </a>
-  // `;
-  return "";
 }
